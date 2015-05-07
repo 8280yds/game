@@ -9,10 +9,27 @@ namespace Freamwork.MVC
     {
         protected bool disposed = false;
 
+        protected bool isDestroyed = false;
 
+        virtual protected void Update()
+        {
+            MVCCharge.instance.updateViewDoLater = true;
+        }
 
+        virtual protected void LateUpdate()
+        {
+            MVCCharge.instance.doUpdateViewDelegate();
+        }
 
+        virtual protected void OnEnable()
+        {
+            addUpdateViewDelegate();
+        }
 
+        virtual protected void OnDisable()
+        {
+            removeUpdateViewDelegate();
+        }
 
         public void sendCommand<TCommand, TParam>(TParam param = default(TParam)) where TCommand : Command, new()
         {
@@ -23,8 +40,28 @@ namespace Freamwork.MVC
             MVCCharge.instance.sendCommand<TCommand, TParam>(param);
         }
 
+        virtual protected void addUpdateViewDelegate()
+        {
+
+        }
+
+        virtual protected void removeUpdateViewDelegate()
+        {
+
+        }
+
+        virtual protected void OnDestroy()
+        {
+            isDestroyed = true;
+            dispose();
+        }
+
         virtual public void dispose()
         {
+            if (!isDestroyed)
+            {
+                Destroy(this);
+            }
             if (disposed)
             {
                 Debug.Log(this.GetType().FullName + "对象重复释放！");
@@ -32,12 +69,7 @@ namespace Freamwork.MVC
             }
             disposed = true;
 
-            MVCCharge mvcCharge = MVCCharge.instance;
-            Type type = this.GetType();
-            if (mvcCharge.hasInstance(type))
-            {
-                mvcCharge.delInstance(type);
-            }
+            MVCCharge.instance.delInstance(this.GetType());
         }
 
     }

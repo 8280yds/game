@@ -36,6 +36,7 @@ namespace Freamwork.MVC
         private Hashtable delegateHashtable;
 
         private bool m_updateViewDisabled;
+        private bool m_updateViewDoLater;
         private List<string> updateViewDisabledIdList;
 
         private void init()
@@ -45,6 +46,7 @@ namespace Freamwork.MVC
             delegateHashtable = new Hashtable();
 
             m_updateViewDisabled = false;
+            m_updateViewDoLater = false;
             updateViewDisabledIdList = new List<string>();
         }
 
@@ -55,6 +57,7 @@ namespace Freamwork.MVC
             delegateHashtable.Clear();
 
             m_updateViewDisabled = false;
+            m_updateViewDoLater = false;
             updateViewDisabledIdList.Clear();
         }
 
@@ -66,6 +69,18 @@ namespace Freamwork.MVC
         }
 
         //********************************* 更新管理 *************************************
+        public bool updateViewDoLater
+        {
+            get
+            {
+                return m_updateViewDoLater;
+            }
+            set
+            {
+                m_updateViewDoLater = value;
+            }
+        }
+
         public bool updateViewDisabled
         {
             get
@@ -140,10 +155,12 @@ namespace Freamwork.MVC
 
         public void doUpdateViewDelegate()
         {
-            if (m_updateViewDisabled)
+            if (m_updateViewDisabled || !updateViewDoLater)
             {
                 return;
             }
+            updateViewDoLater = false;
+
             for (int i = 0, len = updateViewIdList.Count; i < len; i++)
             {
                 string id = updateViewIdList[i];

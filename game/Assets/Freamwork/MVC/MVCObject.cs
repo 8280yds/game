@@ -34,13 +34,7 @@ namespace Freamwork.MVC
                 return;
             }
             disposed = true;
-
-            MVCCharge mvcCharge = MVCCharge.instance;
-            Type type = this.GetType();
-            if (mvcCharge.hasInstance(type))
-            {
-                mvcCharge.delInstance(type);
-            }
+            MVCCharge.instance.delInstance(this.GetType());
         }
     }
 }
