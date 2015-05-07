@@ -1,13 +1,9 @@
-﻿namespace Freamwork.MVC
+﻿using UnityEngine;
+
+namespace Freamwork.MVC
 {
     public class Command : MVCObject, ICommand
     {
-        public Command()
-            : base()
-        {
-
-        }
-
         internal void doExecute<TParam>(TParam param = default(TParam))
         {
             execute<TParam>(param);
@@ -18,5 +14,16 @@
         {
 
         }
+
+        sealed override public void dispose()
+        {
+            if (disposed)
+            {
+                Debug.Log(this.GetType().FullName + "对象重复释放！");
+                return;
+            }
+            disposed = true;
+        }
+
     }
 }

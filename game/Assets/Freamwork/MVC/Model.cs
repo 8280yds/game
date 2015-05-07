@@ -10,14 +10,9 @@ namespace Freamwork.MVC
 
         }
 
-        protected void updateViewById(string updateId)
+        protected void dispatch(string id)
         {
-            MVCCharge.instance.addUpdateViewId(updateId);
-        }
-
-        protected void removeUpdateViewById(string updateId)
-        {
-            MVCCharge.instance.addUpdateViewId(updateId);
+            MVCCharge.instance.dispatch(id);
         }
 
         override public void dispose()

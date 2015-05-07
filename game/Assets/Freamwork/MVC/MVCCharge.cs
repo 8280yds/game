@@ -32,33 +32,33 @@ namespace Freamwork.MVC
         }
 
         private Hashtable m_instanceHashtable;
-        private List<string> updateViewIdList;
-        private Hashtable delegateHashtable;
+        private List<string> m_listenerIdList;
+        private Hashtable m_listenerHashtable;
 
-        private bool m_updateViewDisabled;
-        private bool m_updateViewDoLater;
-        private List<string> updateViewDisabledIdList;
+        private bool m_listenerDisabled;
+        private bool m_doLater;
+        private List<string> m_disabledIdList;
 
         private void init()
         {
             m_instanceHashtable = new Hashtable();
-            updateViewIdList = new List<string>();
-            delegateHashtable = new Hashtable();
+            m_listenerIdList = new List<string>();
+            m_listenerHashtable = new Hashtable();
 
-            m_updateViewDisabled = false;
-            m_updateViewDoLater = false;
-            updateViewDisabledIdList = new List<string>();
+            m_listenerDisabled = false;
+            m_doLater = false;
+            m_disabledIdList = new List<string>();
         }
 
         public void clear()
         {
             m_instanceHashtable.Clear();
-            updateViewIdList.Clear();
-            delegateHashtable.Clear();
+            m_listenerIdList.Clear();
+            m_listenerHashtable.Clear();
 
-            m_updateViewDisabled = false;
-            m_updateViewDoLater = false;
-            updateViewDisabledIdList.Clear();
+            m_listenerDisabled = false;
+            m_doLater = false;
+            m_disabledIdList.Clear();
         }
 
         //********************************* 发送命令 *************************************
@@ -69,106 +69,98 @@ namespace Freamwork.MVC
         }
 
         //********************************* 更新管理 *************************************
-        public bool updateViewDoLater
+        public bool doLater
         {
             get
             {
-                return m_updateViewDoLater;
+                return m_doLater;
             }
             set
             {
-                m_updateViewDoLater = value;
+                m_doLater = value;
             }
         }
 
-        public bool updateViewDisabled
+        public bool listenerDisabled
         {
             get
             {
-                return m_updateViewDisabled;
+                return m_listenerDisabled;
             }
             set
             {
-                m_updateViewDisabled = value;
+                m_listenerDisabled = value;
             }
         }
 
-        public void addUpdateViewId(string id)
+        public void dispatch(string id)
         {
-            if (!updateViewIdList.Contains(id))
+            if (!m_listenerIdList.Contains(id))
             {
-                updateViewIdList.Add(id);
+                m_listenerIdList.Add(id);
             }
         }
 
-        public void removeUpdateViewId(string id)
+        public void addDisabledId(string id)
         {
-            if (updateViewIdList.Contains(id))
+            if(!m_disabledIdList.Contains(id))
             {
-                updateViewIdList.Remove(id);
+                m_disabledIdList.Add(id);
             }
         }
 
-        public void addUpdateViewDisabledId(string id)
+        public void removeDisabledId(string id)
         {
-            if(!updateViewDisabledIdList.Contains(id))
+            if (m_disabledIdList.Contains(id))
             {
-                updateViewDisabledIdList.Add(id);
+                m_disabledIdList.Remove(id);
             }
         }
 
-        public void removeUpdateViewDisabledId(string id)
+        public void addListener(string id, ListenerDelegate dele)
         {
-            if (updateViewDisabledIdList.Contains(id))
+            if (!m_listenerHashtable.Contains(id))
             {
-                updateViewDisabledIdList.Remove(id);
-            }
-        }
-
-        public void addUpdateViewDelegate(string updateId, UpdateViewDelegate dele)
-        {
-            if(!delegateHashtable.Contains(updateId))
-            {
-                delegateHashtable.Add(updateId, dele);
+                m_listenerHashtable.Add(id, dele);
             }
             else
             {
-                UpdateViewDelegate delegates = delegateHashtable[updateId] as UpdateViewDelegate;
+                ListenerDelegate delegates = m_listenerHashtable[id] as ListenerDelegate;
                 delegates += dele;
             }
         }
 
-        public void removeUpdateViewDelegate(string updateId, UpdateViewDelegate dele)
+        public void removeListener(string id, ListenerDelegate dele)
         {
-            if (!delegateHashtable.Contains(updateId))
+            if (!m_listenerHashtable.Contains(id))
             {
                 return;
             }
-            UpdateViewDelegate delegates = delegateHashtable[updateId] as UpdateViewDelegate;
+            ListenerDelegate delegates = m_listenerHashtable[id] as ListenerDelegate;
             delegates -= dele;
 
             if (delegates == null)
             {
-                delegateHashtable.Remove(updateId);
+                m_listenerHashtable.Remove(id);
             }
         }
 
-        public void doUpdateViewDelegate()
+        public void doListenerDelegate()
         {
-            if (m_updateViewDisabled || !updateViewDoLater)
+            if (m_listenerDisabled || !doLater)
             {
                 return;
             }
-            updateViewDoLater = false;
+            doLater = false;
 
-            for (int i = 0, len = updateViewIdList.Count; i < len; i++)
+            for (int i = 0, len = m_listenerIdList.Count; i < len; i++)
             {
-                string id = updateViewIdList[i];
-                if (!updateViewDisabledIdList.Contains(id) && delegateHashtable.Contains(id))
+                string id = m_listenerIdList[i];
+                if (!m_disabledIdList.Contains(id) && m_listenerHashtable.Contains(id))
                 {
-                    UpdateViewDelegate dele = delegateHashtable[id] as UpdateViewDelegate;
+                    ListenerDelegate dele = m_listenerHashtable[id] as ListenerDelegate;
                     dele();
-                    updateViewIdList.Remove(id);
+                    m_listenerIdList.Remove(id);
                 }
             }
         }

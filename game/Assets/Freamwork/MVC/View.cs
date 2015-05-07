@@ -1,9 +1,10 @@
 ﻿using System;
+using System.Collections;
 using UnityEngine;
 
 namespace Freamwork.MVC
 {
-    public delegate void UpdateViewDelegate();
+    public delegate void ListenerDelegate();
 
     public class View : MonoBehaviour, IView
     {
@@ -11,24 +12,26 @@ namespace Freamwork.MVC
 
         protected bool isDestroyed = false;
 
+        private Hashtable listenerHashtable;
+
         virtual protected void Update()
         {
-            MVCCharge.instance.updateViewDoLater = true;
+            MVCCharge.instance.doLater = true;
         }
 
         virtual protected void LateUpdate()
         {
-            MVCCharge.instance.doUpdateViewDelegate();
+            MVCCharge.instance.doListenerDelegate();
         }
 
         virtual protected void OnEnable()
         {
-            addUpdateViewDelegate();
+            addListeners();
         }
 
         virtual protected void OnDisable()
         {
-            removeUpdateViewDelegate();
+            removeListeners();
         }
 
         public void sendCommand<TCommand, TParam>(TParam param = default(TParam)) where TCommand : Command, new()
@@ -40,14 +43,40 @@ namespace Freamwork.MVC
             MVCCharge.instance.sendCommand<TCommand, TParam>(param);
         }
 
-        virtual protected void addUpdateViewDelegate()
+        virtual protected void addListeners()
         {
 
         }
 
-        virtual protected void removeUpdateViewDelegate()
+        protected void addListener(string id, ListenerDelegate dele)
         {
+            if (listenerHashtable == null)
+            {
+                listenerHashtable = new Hashtable();
+            }
 
+            if (listenerHashtable.Contains(id))
+            {
+                ListenerDelegate listenerDele = listenerHashtable[id] as ListenerDelegate;
+                listenerDele += dele;
+            }
+            else
+            {
+                listenerHashtable.Add(id, dele);
+                MVCCharge.instance.addListener(id, dele);
+            }
+        }
+
+        private void removeListeners()
+        {
+            if (listenerHashtable != null)
+            {
+                foreach (string key in listenerHashtable.Keys)
+                {
+                    MVCCharge.instance.removeListener(key, listenerHashtable[key] as ListenerDelegate);
+                }
+                listenerHashtable = null;
+            }
         }
 
         virtual protected void OnDestroy()
