@@ -1,6 +1,6 @@
 ﻿using Freamwork.MVC;
 
-public class TestModel2 : Model<TestModel2>
+public class TestModel2 : Model
 {
 
 

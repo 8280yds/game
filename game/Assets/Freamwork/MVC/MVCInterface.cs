@@ -2,13 +2,13 @@
 {
     public interface IMVCObject
     {
-        void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command<TCommand>, new();
+        void sendCommand<TCommand, TParam>(TParam param = default(TParam)) where TCommand : Command, new();
         void dispose();
     }
 
     public interface ICommand : IMVCObject
     {
-        void execute<TParam>(TParam param);
+        void execute<TParam>(TParam param = default(TParam));
     }
 
     public interface IModel : IMVCObject

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Freamwork.MVC
 {
-    public class MVCObject<TClass> : IMVCObject where TClass : MVCObject<TClass>
+    public class MVCObject : IMVCObject
     {
         protected bool disposed = false;
 
@@ -17,7 +17,7 @@ namespace Freamwork.MVC
 
         }
 
-        public void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command<TCommand>, new()
+        public void sendCommand<TCommand, TParam>(TParam param = default(TParam)) where TCommand : Command, new()
         {
             if (disposed)
             {
@@ -36,9 +36,10 @@ namespace Freamwork.MVC
             disposed = true;
 
             MVCCharge mvcCharge = MVCCharge.instance;
-            if (mvcCharge.hasInstance<TClass>())
+            Type type = this.GetType();
+            if (mvcCharge.hasInstance(type))
             {
-                mvcCharge.delInstance<TClass>();
+                mvcCharge.delInstance(type);
             }
         }
     }

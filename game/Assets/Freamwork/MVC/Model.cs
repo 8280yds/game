@@ -2,12 +2,22 @@
 
 namespace Freamwork.MVC
 {
-    public class Model<TClass> : MVCObject<TClass>, IModel where TClass : Model<TClass>
+    public class Model : MVCObject, IModel
     {
         public Model()
             : base()
         {
 
+        }
+
+        protected void updateViewById(string updateId)
+        {
+            MVCCharge.instance.addUpdateViewId(updateId);
+        }
+
+        protected void removeUpdateViewById(string updateId)
+        {
+            MVCCharge.instance.addUpdateViewId(updateId);
         }
 
         override public void dispose()
