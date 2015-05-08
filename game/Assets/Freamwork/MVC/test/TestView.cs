@@ -26,22 +26,18 @@ public class TestView : View
         toggle.onValueChanged.AddListener(toggleValueChange);
     }
 
-
     protected override void addListeners()
     {
         base.addListeners();
 
         addListener(TestConstant.COUNT_CHANGE, updateText);
-        addListener(TestConstant.COUNT_CHANGE, updateText);
-        addListener(TestConstant.COUNT_CHANGE, updateText);
-        addListener(TestConstant.COUNT_CHANGE, updateText);
     }
 
-    int tt = 0;
     private void updateText()
     {
         txt.text = "当前总共点击了" + model.clickCount + "次";
-        tt++;
+
+        sendCommand<TestCommand>("Command： " + txt.text);
     }
 
     private void btnClicked()

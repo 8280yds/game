@@ -2,20 +2,34 @@
 
 namespace Freamwork.MVC
 {
+    /// <summary>
+    /// Command将作为具体的命令类的基类
+    /// </summary>
     public class Command : MVCObject, ICommand
     {
-        internal void doExecute<TParam>(TParam param = default(TParam))
+        /// <summary>
+        /// 执行
+        /// </summary>
+        /// <param name="param">携带的数据</param>
+        internal void doExecute(object param = null)
         {
-            execute<TParam>(param);
+            execute(param);
             dispose();
         }
 
-        virtual public void execute<TParam>(TParam param = default(TParam))
+        /// <summary>
+        /// 执行命令
+        /// </summary>
+        /// <param name="param">携带的数据</param>
+        virtual public void execute(object param)
         {
 
         }
 
-        sealed override public void dispose()
+        /// <summary>
+        /// 释放
+        /// </summary>
+        override public void dispose()
         {
             if (disposed)
             {
