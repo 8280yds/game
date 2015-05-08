@@ -26,6 +26,14 @@ namespace Freamwork.MVC
 
         }
 
+        public MVCCharge mvcCharge
+        {
+            get
+            {
+                return MVCCharge.instance;
+            }
+        }
+
         /// <summary>
         /// 发送命令
         /// </summary>
@@ -37,7 +45,7 @@ namespace Freamwork.MVC
             {
                 throw new Exception(this.GetType().FullName + "对象已经销毁，sendCommand失败");
             }
-            MVCCharge.instance.sendCommand<TCommand>(param);
+            mvcCharge.sendCommand<TCommand>(param);
         }
 
         /// <summary>
@@ -51,7 +59,7 @@ namespace Freamwork.MVC
                 return;
             }
             disposed = true;
-            MVCCharge.instance.delInstance(this.GetType());
+            mvcCharge.delInstance(this.GetType());
         }
     }
 }

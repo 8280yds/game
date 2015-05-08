@@ -280,14 +280,20 @@ namespace Freamwork.MVC
 
         /// <summary>
         /// 获取MVCObject实例，如果实例不存在将会创建
+        /// 注意：IView的实现者将不会主动创建实例，若实例不存在将返回null;
         /// </summary>
         /// <typeparam name="T">类型</typeparam>
         /// <returns>IMVCObject实例</returns>
         public T getInstance<T>() where T : IMVCObject, new()
         {
-            string fullName = typeof(T).FullName;
+            Type type = typeof(T);
+            string fullName = type.FullName;
             if (!m_instanceHashtable.ContainsKey(fullName))
             {
+                if (typeof(IView).IsAssignableFrom(type))
+                {
+                    return default(T);
+                }
                 m_instanceHashtable.Add(fullName, new T());
             }
             return (T)m_instanceHashtable[fullName];
@@ -322,19 +328,28 @@ namespace Freamwork.MVC
 
         /// <summary>
         /// 获取MVCObject实例，如果实例不存在将会创建
+        /// 注意：IView的实现者将不会主动创建实例，若实例不存在将返回null;
         /// </summary>
         /// <param name="type">类型</param>
         /// <returns>IMVCObject实例</returns>
         public IMVCObject getInstance(Type type)
         {
+            if (type.IsInterface)
+            {
+                return null;
+            }
             string fullName = type.FullName;
-            if (!type.IsAssignableFrom(typeof(IMVCObject)))
+            if (!typeof(IMVCObject).IsAssignableFrom(type))
             {
                 throw new Exception(fullName + "并未实现" + typeof(IMVCObject).FullName +
                     "接口，无法通过MVCCharge.instance.getInstance方法存储和获取其实例");
             }
             if (!m_instanceHashtable.ContainsKey(fullName))
             {
+                if (typeof(IView).IsAssignableFrom(type))
+                {
+                    return null;
+                }
                 m_instanceHashtable.Add(fullName, Activator.CreateInstance(type));
             }
             return m_instanceHashtable[fullName] as IMVCObject;
@@ -375,11 +390,12 @@ namespace Freamwork.MVC
         internal void saveInstance(IMVCObject instance)
         {
             string fullName = instance.GetType().FullName;
-            if (!m_instanceHashtable.ContainsKey(fullName))
+            IMVCObject inst = m_instanceHashtable[fullName] as IMVCObject;
+            if (inst == null)
             {
-                m_instanceHashtable.Add(fullName, instance);
+                m_instanceHashtable[fullName] = instance;
             }
-            else
+            else if (inst != instance)
             {
                 throw new Exception(fullName + "的实例已经存在，无法再次存储");
             }

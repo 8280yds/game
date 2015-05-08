@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-using System.Collections;
-using Freamwork.MVC;
+﻿using Freamwork.MVC;
 using UnityEngine.UI;
 
 public class TestView2 : View

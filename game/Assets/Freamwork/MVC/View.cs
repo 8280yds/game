@@ -30,12 +30,20 @@ namespace Freamwork.MVC
         /// </summary>
         private Hashtable listenerHashtable;
 
+        public MVCCharge mvcCharge
+        {
+            get
+            {
+                return MVCCharge.instance;
+            }
+        }
+
         /// <summary>
         /// Awake事件，在此处将实例交给MVCCharge托管
         /// </summary>
         virtual protected void Awake()
         {
-            MVCCharge.instance.saveInstance(this);
+            mvcCharge.saveInstance(this);
         }
 
         /// <summary>
@@ -43,7 +51,7 @@ namespace Freamwork.MVC
         /// </summary>
         virtual protected void Update()
         {
-            MVCCharge.instance.doLater = true;
+            mvcCharge.doLater = true;
         }
 
         /// <summary>
@@ -52,7 +60,7 @@ namespace Freamwork.MVC
         /// </summary>
         virtual protected void LateUpdate()
         {
-            MVCCharge.instance.doListenerDelegate();
+            mvcCharge.doListenerDelegate();
         }
 
         /// <summary>
@@ -83,7 +91,7 @@ namespace Freamwork.MVC
             {
                 throw new Exception(this.GetType().FullName + "对象已经销毁，sendCommand失败");
             }
-            MVCCharge.instance.sendCommand<TCommand>(param);
+            mvcCharge.sendCommand<TCommand>(param);
         }
 
         /// <summary>
@@ -115,7 +123,7 @@ namespace Freamwork.MVC
             else
             {
                 listenerHashtable.Add(id, dele);
-                MVCCharge.instance.addListener(id, dele);
+                mvcCharge.addListener(id, dele);
             }
         }
 
@@ -128,7 +136,7 @@ namespace Freamwork.MVC
             {
                 foreach (string key in listenerHashtable.Keys)
                 {
-                    MVCCharge.instance.removeListener(key, listenerHashtable[key] as ListenerDelegate);
+                    mvcCharge.removeListener(key, listenerHashtable[key] as ListenerDelegate);
                 }
                 listenerHashtable = null;
             }
@@ -159,7 +167,7 @@ namespace Freamwork.MVC
             }
             disposed = true;
 
-            MVCCharge.instance.delInstance(this.GetType());
+            mvcCharge.delInstance(this.GetType());
         }
 
     }

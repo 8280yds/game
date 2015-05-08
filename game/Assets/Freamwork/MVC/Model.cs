@@ -20,7 +20,7 @@ namespace Freamwork.MVC
         /// <param name="id">更新的名称</param>
         protected void dispatch(string id)
         {
-            MVCCharge.instance.dispatch(id);
+            mvcCharge.dispatch(id);
         }
 
         /// <summary>

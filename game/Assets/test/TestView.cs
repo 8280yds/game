@@ -1,5 +1,6 @@
 ﻿using Freamwork.MVC;
 using UnityEngine.UI;
+using UnityEngine;
 
 public class TestView : View
 {
@@ -35,9 +36,11 @@ public class TestView : View
 
     private void updateText()
     {
-        txt.text = "当前总共点击了" + model.clickCount + "次";
+        //txt.text = "当前总共点击了" + model.clickCount + "次";
 
-        sendCommand<TestCommand>("Command： " + txt.text);
+        //sendCommand<TestCommand>("Command： " + txt.text);
+        TestView2 view2 = MVCCharge.instance.getView<TestView2>();
+        Debug.Log(view2);
     }
 
     private void btnClicked()
