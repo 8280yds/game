@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<item id="1001" prefabName="Goods" speed="4" liftTime="20.0" score="30" type="1" materialName="A" musicName="1"/>
+	<item id="1002" prefabName="Goods" speed="4" liftTime="20.0" score="50" type="2" materialName="B" musicName="1"/>
+	<item id="1003" prefabName="Goods" speed="4" liftTime="20.0" score="80" type="3" materialName="C" musicName="1"/>
+	<item id="1004" prefabName="Goods" speed="4" liftTime="20.0" score="100" type="4" materialName="S" musicName="1"/>
+  
+  <item id="1100" prefabName="Goods" speed="4" liftTime="20.0" score="100" type="100" materialName="P" musicName="2"/>
+</data>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<item id="1001" prefabName="Player_1" fireSound="shoot" explosion="Explosion" speed="5" power="999" camp="1" life="3" score="0" fireCD="0.15" shellId="1001" isToward="false" isTrack="false" goodsID=""/>
+	
+	<item id="2001" prefabName="Enemy_1" fireSound="shoot" explosion="Explosion" speed="2" power="1" camp="2" life="3" score="10" fireCD="1.5" shellId="2001" isToward="false" isTrack="false" goodsID="1002-4"/>
+	<item id="2002" prefabName="Enemy_2" fireSound="shoot" explosion="Explosion" speed="1" power="1" camp="2" life="15" score="30" fireCD="3" shellId="2002" isToward="false" isTrack="false" goodsID="1002-10,1004-12"/>
+	<item id="2003" prefabName="Enemy_3" fireSound="shoot" explosion="Explosion" speed="8" power="1" camp="2" life="10" score="50" fireCD="0" shellId="0" isToward="false" isTrack="false" goodsID="1002-5,1003-10"/>
+  <item id="2004" prefabName="Enemy_4" fireSound="shoot" explosion="Explosion" speed="6" power="1" camp="2" life="6" score="50" fireCD="0" shellId="0" isToward="true" isTrack="false" goodsID="1002-5,1004-10"/>
+  <item id="2005" prefabName="Enemy_5" fireSound="shoot" explosion="Explosion" speed="1.5" power="1" camp="2" life="1" score="30" fireCD="0" shellId="0" isToward="false" isTrack="true" goodsID="1002-5,1003-7"/>
+</data>

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<data>
+  <item id="1" enemy="2001,2002,2003,2004,2005" probability="50,5,0,0,5" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+  <item id="2" enemy="2001,2002,2003,2004,2005" probability="45,10,5,0,5" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+  <item id="3" enemy="2001,2002,2003,2004,2005" probability="35,15,5,5,10" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+  <item id="4" enemy="2001,2002,2003,2004,2005" probability="35,20,5,5,10" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+  <item id="5" enemy="2001,2002,2003,2004,2005" probability="30,25,5,5,15" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+  <item id="6" enemy="2001,2002,2003,2004,2005" probability="30,30,5,5,15" creatCD="0.7,1.3" delay="100" score="0" kills="0"/>
+</data>

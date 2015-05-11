@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<data>
+	<item id="1001" prefabName="Shell_1" speed="10" power="1" camp="1" life="1" isToward="false" isTrack="false" canSmash="true"/>
+  
+	<item id="2001" prefabName="Shell_2" speed="3" power="1" camp="2" life="1" isToward="false" isTrack="false" canSmash="false"/>
+	<item id="2002" prefabName="Shell_1" speed="3" power="1" camp="2" life="1" isToward="true" isTrack="false" canSmash="true"/>
+  <item id="2003" prefabName="Shell_1" speed="3" power="1" camp="2" life="1" isToward="false" isTrack="true" canSmash="true"/>
+</data>
