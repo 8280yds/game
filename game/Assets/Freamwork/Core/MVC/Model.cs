@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Freamwork.MVC
+namespace Freamwork
 {
     /// <summary>
     /// Model将作为具体模块里的Model的基类，将用来处理和存储数据，

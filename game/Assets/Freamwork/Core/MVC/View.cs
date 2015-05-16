@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Freamwork.MVC
+namespace Freamwork
 {
     /// <summary>
     /// 更新侦听的Delegate

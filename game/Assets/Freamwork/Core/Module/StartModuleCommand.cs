@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Freamwork.MVC;
+using Freamwork;
 
 public class StartModuleData
 {

@@ -1,4 +1,4 @@
-﻿namespace Freamwork.MVC
+﻿namespace Freamwork
 {
     public interface IMVCObject
     {

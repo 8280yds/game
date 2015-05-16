@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Freamwork.MVC
+namespace Freamwork
 {
     /// <summary>
     /// MVCObject是Model、View、Command等MVC类的基类，继承它可以实现由MVCCharge来托管实例

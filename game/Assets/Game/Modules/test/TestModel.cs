@@ -1,4 +1,4 @@
-﻿using Freamwork.MVC;
+﻿using Freamwork;
 
 public class TestModel : Model
 {

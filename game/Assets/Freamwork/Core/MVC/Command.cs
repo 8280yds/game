@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Freamwork.MVC
+namespace Freamwork
 {
     /// <summary>
     /// Command将作为具体的命令类的基类

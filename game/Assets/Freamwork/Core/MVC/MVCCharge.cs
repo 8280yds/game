@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Freamwork.MVC
+namespace Freamwork
 {
     /// <summary>
     /// MVCCharge是单例，请使用MVCCharge.instance来获取其实例，
