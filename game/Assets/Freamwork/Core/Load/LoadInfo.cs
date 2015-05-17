@@ -32,7 +32,7 @@ namespace Freamwork
         /// <summary>
         /// 加载路径
         /// </summary>
-        public string path;
+        public string path = "/";
 
         /// <summary>
         /// 加载文件的名称(带后缀)

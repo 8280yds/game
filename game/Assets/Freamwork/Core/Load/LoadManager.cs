@@ -166,6 +166,33 @@ namespace Freamwork
         /// <summary>
         /// 加载资源，如果资源已经加载过，则直接从缓存中获取
         /// </summary>
+        /// <param name="fileName">加载文件的名称(带后缀)</param>
+        /// <param name="version">加载物件的版本号</param>
+        /// <param name="path">加载路径</param>
+        /// <param name="priority">加载优先级</param>
+        /// <param name="loadStart">加载开始前执行的方法</param>
+        /// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
+        /// <param name="loadEnd">加载结束后执行的方法</param>
+        /// <param name="loadFail">加载失败后执行的方法</param>
+        public void load(string fileName, int version, string path = "/", LoadPriority priority = LoadPriority.two,
+            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
+            LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
+        {
+            LoadInfo loadInfo = new LoadInfo();
+            loadInfo.fileName = fileName;
+            loadInfo.version = version;
+            loadInfo.path = path;
+            loadInfo.priority = priority;
+            loadInfo.loadStart = loadStart;
+            loadInfo.loadProgress = loadProgress;
+            loadInfo.loadEnd = loadEnd;
+            loadInfo.loadFail = loadFail;
+            load(loadInfo);
+        }
+
+        /// <summary>
+        /// 加载资源，如果资源已经加载过，则直接从缓存中获取
+        /// </summary>
         /// <param name="loadInfo">加载资源的相关信息</param>
         public void load(LoadInfo loadInfo)
         {
@@ -205,18 +232,9 @@ namespace Freamwork
                 {
                     loadInfo.loadStart(getStartLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
                 }
-                if (loadInfo.loadProgress != null)
-                {
-                    info.loadProgress = loadInfo.loadProgress + info.loadProgress;
-                }
-                if (loadInfo.loadEnd != null)
-                {
-                    info.loadEnd = loadInfo.loadEnd + info.loadEnd;
-                }
-                if (loadInfo.loadFail != null)
-                {
-                    info.loadFail = loadInfo.loadFail + info.loadFail;
-                }
+                delegateAddition(info.loadProgress, loadInfo.loadProgress);
+                delegateAddition(info.loadEnd, loadInfo.loadEnd);
+                delegateAddition(info.loadFail, loadInfo.loadFail);
                 return;
             }
 
@@ -224,28 +242,40 @@ namespace Freamwork
             info = getInWaitList(fullName_version);
             if (info != null)
             {
-                if (loadInfo.loadStart != null)
+                //如果优先级不一致，则转为优先级较高的（即数字小的）
+                if ((int)info.priority > (int)loadInfo.priority)
                 {
-                    info.loadStart = loadInfo.loadStart + info.loadStart;
+                    waitLists[(int)loadInfo.priority].add(fullName_version, info);
+                    waitLists[(int)info.priority].remove(fullName_version);
+                    info.priority = loadInfo.priority;
                 }
-                if (loadInfo.loadProgress != null)
-                {
-                    info.loadProgress = loadInfo.loadProgress + info.loadProgress;
-                }
-                if (loadInfo.loadEnd != null)
-                {
-                    info.loadEnd = loadInfo.loadEnd + info.loadEnd;
-                }
-                if (loadInfo.loadFail != null)
-                {
-                    info.loadFail = loadInfo.loadFail + info.loadFail;
-                }
+                delegateAddition(info.loadStart, loadInfo.loadStart);
+                delegateAddition(info.loadProgress, loadInfo.loadProgress);
+                delegateAddition(info.loadEnd, loadInfo.loadEnd);
+                delegateAddition(info.loadFail, loadInfo.loadFail);
                 return;
             }
 
             //添加到等待列表中
             waitLists[(int)loadInfo.priority].add(fullName_version, loadInfo);
             loadNext();
+        }
+
+        /// <summary>
+        /// LoadFunctionDele加法，将dele2加到dele1上
+        /// </summary>
+        /// <param name="dele1"></param>
+        /// <param name="dele2"></param>
+        private void delegateAddition(LoadFunctionDele dele1, LoadFunctionDele dele2)
+        {
+            if (dele1 != null)
+            {
+                dele1 += dele2;
+            }
+            else
+            {
+                dele1 = dele2;
+            }
         }
 
         private LoadInfo getStartLoadInfo(string path, string fileName, int version)
@@ -412,6 +442,41 @@ namespace Freamwork
             newInfo.progress = 1;
             newInfo.assetBundle = www.assetBundle;
             cacheDic.Add(newInfo.fullName + newInfo.version, newInfo);
+        }
+
+        /// <summary>
+        /// 停止加载或停止等待加载
+        /// 【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！
+        /// </summary>
+        /// <param name="fileName">加载文件的名称(带后缀)</param>
+        /// <param name="version">加载的版本号</param>
+        /// <param name="path">加载路径</param>
+        /// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
+        /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载</returns>
+        public bool stopLoad(string fileName, int version, string path = "/", bool stopIfLoading = false)
+        {
+            string fullName_version = path+fileName + version;
+            LoadInfo loadInfo = getInLoadingList(fullName_version);
+            if (loadInfo != null)
+            {
+                if (!stopIfLoading)
+                {
+                    return false;
+                }
+                Debug.Log(loadInfo.fullName + loadInfo.version + "在加载过程中被终止");
+                loadInfo.www.Dispose();
+                loadingList.remove(fullName_version);
+                loadNext();
+                return true;
+            }
+
+            loadInfo = getInWaitList(fullName_version);
+            if (loadInfo != null)
+            {
+                Debug.Log(loadInfo.fullName + loadInfo.version + "在等待加载过程中被终止");
+                waitLists[(int)loadInfo.priority].remove(fullName_version);
+            }
+            return true;
         }
 
     }
