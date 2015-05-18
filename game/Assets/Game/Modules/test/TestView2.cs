@@ -22,23 +22,23 @@ public class TestView2 : View
         info.loadStart = loadStart;
         info.loadEnd = loadEnd;
         info.loadFail = loadFail;
-        LoadManager.instance.load(info);
+        BundleLoadManager.instance.load(info);
 
-        LoadManager.instance.load("cube6.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        LoadManager.instance.load("cube7.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        LoadManager.instance.load("cube8.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        LoadManager.instance.load("cube9.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.load("cube6.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.load("cube7.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.load("cube8.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.load("cube9.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
 
         LoadInfo info3 = new LoadInfo();
         info3.fileName = "cube.assetbundle";
         info3.version = 222;
         info3.loadEnd = loadEnd;
         info3.loadFail = loadFail;
-        LoadManager.instance.load(info3);
+        BundleLoadManager.instance.load(info3);
 
-        LoadManager.instance.stopLoad("cube8.assetbundle", 222);
-        LoadManager.instance.stopLoad("cube6.assetbundle", 222);
-        LoadManager.instance.stopLoad("cube7.assetbundle", 222, "/", true);
+        BundleLoadManager.instance.stopLoad("cube8.assetbundle", 222);
+        BundleLoadManager.instance.stopLoad("cube6.assetbundle", 222);
+        BundleLoadManager.instance.stopLoad("cube7.assetbundle", 222, "/", true);
     }
 
     void loadStart(LoadInfo loadData)

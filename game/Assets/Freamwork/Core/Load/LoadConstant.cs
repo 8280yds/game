@@ -32,7 +32,7 @@
         public const int MAX_LOADERS = 3;
 
         /// <summary>
-        /// 是否在加载的时候删除旧的数据
+        /// 是否在加载的时候删除旧的文件
         /// </summary>
         public const bool DELETE_OLD_VERSION = true;
     }

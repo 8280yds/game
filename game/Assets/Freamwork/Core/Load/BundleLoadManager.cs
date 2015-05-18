@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
-using System.Xml;
 
 namespace Freamwork
 {
@@ -10,33 +9,33 @@ namespace Freamwork
     /// 加载管理类，具有排队，优先级，超时检测等功能，
     /// 并能根绝情况确定是否需要到网络加载
     /// </summary>
-    sealed public class LoadManager
+    sealed public class BundleLoadManager
     {
         /// <summary>
         /// 实例
         /// </summary>
-        static private LoadManager m_instance;
+        static private BundleLoadManager m_instance;
 
         /// <summary>
         /// 获取实例
         /// </summary>
-        static public LoadManager instance
+        static public BundleLoadManager instance
         {
             get
             {
                 if (m_instance == null)
                 {
-                    m_instance = new LoadManager();
+                    m_instance = new BundleLoadManager();
                 }
                 return m_instance;
             }
         }
 
-        private LoadManager()
+        private BundleLoadManager()
         {
             if (m_instance != null)
             {
-                throw new Exception("LoadManager是单例，请使用LoadManager.instance来获取其实例！");
+                throw new Exception("BundleLoadManager是单例，请使用BundleLoadManager.instance来获取其实例！");
             }
             m_instance = this;
             init();
@@ -89,14 +88,22 @@ namespace Freamwork
                     WWW www = loadingList.getValueAt(i).www;
                     if (www != null)
                     {
+                        if (www.assetBundle != null)
+                        {
+                            www.assetBundle.Unload(false);
+                        }
                         www.Dispose();
                         www = null;
                     }
                 }
             }
-
-            cacheDic.Clear();
             loadingList.clear();
+
+            foreach(string str in cacheDic.Keys)
+            {
+                deleteCacheItem(str);
+            }
+            cacheDic.Clear();
 
             for (int i = 0, len = waitLists.Length; i < len; i++)
             {
@@ -199,15 +206,15 @@ namespace Freamwork
         {
             //if (string.IsNullOrEmpty(loadInfo.path))
             //{
-            //    throw new Exception("LoadManager.instance.load()的loadInfo参数的path不能为空");
+            //    throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的path不能为空");
             //}
             if (string.IsNullOrEmpty(loadInfo.fileName))
             {
-                throw new Exception("LoadManager.instance.load()的loadInfo参数的fileName不能为空");
+                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的fileName不能为空");
             }
             if (loadInfo.version == 0)
             {
-                throw new Exception("LoadManager.instance.load()的loadInfo参数的version未设置");
+                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的version未设置");
             }
 
             string fullName_version = loadInfo.fullName + loadInfo.version;
@@ -279,7 +286,8 @@ namespace Freamwork
             }
         }
 
-        private LoadInfo getNewLoadInfo(string path, string fileName, int version, float progress = 0, string error = null)
+        private LoadInfo getNewLoadInfo(string path, string fileName, int version, float progress = 0,
+            string error = null, AssetBundle assetBundle = null)
         {
             LoadInfo info = new LoadInfo();
             info.path = path;
@@ -287,6 +295,7 @@ namespace Freamwork
             info.version = version;
             info.progress = progress;
             info.error = error;
+            info.assetBundle = assetBundle;
             return info;
         }
 
@@ -465,7 +474,7 @@ namespace Freamwork
         /// </summary>
         /// <param name="fullName_version">path + fileName + version</param>
         /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
-        private bool deleteCache(string fullName_version)
+        public bool deleteCacheItem(string fullName_version)
         {
             if (cacheDic.ContainsKey(fullName_version))
             {
@@ -477,12 +486,31 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 加载子物体或组件
+        /// 插队加载，每次会将此加载添加到当前优先级队列的最前面
         /// </summary>
-        /// <param name="xmlNode">加载信息xml</param>
-        private void loadChildrenAndComponents(XmlNode xmlNode)
+        /// <param name="fileName">加载文件的名称(带后缀)</param>
+        /// <param name="version">加载物件的版本号</param>
+        /// <param name="path">加载路径</param>
+        /// <param name="priority">加载优先级</param>
+        /// <param name="loadStart">加载开始前执行的方法</param>
+        /// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
+        /// <param name="loadEnd">加载结束后执行的方法</param>
+        /// <param name="loadFail">加载失败后执行的方法</param>
+        public void insertLoad(string fileName, int version, string path = "/", LoadPriority priority = LoadPriority.zero,
+            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
+            LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
         {
-
+            LoadInfo loadInfo = new LoadInfo();
+            loadInfo.fileName = fileName;
+            loadInfo.version = version;
+            loadInfo.path = path;
+            loadInfo.priority = priority;
+            loadInfo.loadStart = loadStart;
+            loadInfo.loadProgress = loadProgress;
+            loadInfo.loadEnd = loadEnd;
+            loadInfo.loadFail = loadFail;
+            waitLists[(int)priority].insert(0, loadInfo.fullName + loadInfo.version, loadInfo);
+            load(loadInfo);
         }
 
     }

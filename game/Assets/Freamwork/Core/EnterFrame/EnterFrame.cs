@@ -122,7 +122,7 @@ namespace Freamwork
         /// <summary>
         /// 执行帧频事件
         /// </summary>
-        internal void doEnterFrame()
+        public void doEnterFrame()
         {
             m_dele();
         }
@@ -130,7 +130,7 @@ namespace Freamwork
         ///// <summary>
         ///// 报告错误释放
         ///// </summary>
-        //internal void destroyError()
+        //public void destroyError()
         //{
         //    if(isEnterFrame)
         //    {

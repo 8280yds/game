@@ -11,7 +11,7 @@ namespace Freamwork
         /// 执行
         /// </summary>
         /// <param name="param">携带的数据</param>
-        internal void doExecute(object param = null)
+        public void doExecute(object param = null)
         {
             execute(param);
             dispose();

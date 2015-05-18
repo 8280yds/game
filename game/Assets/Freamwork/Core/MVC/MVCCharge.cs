@@ -384,7 +384,7 @@ namespace Freamwork
         /// 主要是为了解决那些在编辑器中拖拽上去的View的继承类无法通过MVCCharge管理的问题
         /// </summary>
         /// <param name="instance">实例(不能为null)</param>
-        internal void saveInstance(IMVCObject instance)
+        public void saveInstance(IMVCObject instance)
         {
             if(instance == null)
             {

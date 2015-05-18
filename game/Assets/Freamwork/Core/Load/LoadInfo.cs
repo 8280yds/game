@@ -12,22 +12,11 @@ namespace Freamwork
     /// </summary>
     public class LoadInfo
     {
-        //======================属性和字段===========================
+        //======================属性===========================
         /// <summary>
         /// 加载优先级
         /// </summary>
-        public LoadPriority priority
-        {
-            internal get
-            {
-                return m_priority;
-            }
-            set
-            {
-                m_priority = value;
-            }
-        }
-        private LoadPriority m_priority = LoadPriority.two;
+        public LoadPriority priority = LoadPriority.two;
 
         /// <summary>
         /// 加载路径
@@ -47,55 +36,22 @@ namespace Freamwork
         /// <summary>
         /// 加载进度
         /// </summary>
-        public float progress
-        {
-            get
-            {
-                return m_progress;
-            }
-            internal set
-            {
-                m_progress = value;
-            }
-        }
-        private float m_progress = 0f;
+        public float progress = 0f;
 
         /// <summary>
         /// 加载出来的数据
         /// </summary>
-        public AssetBundle assetBundle
-        {
-            get
-            {
-                return m_assetBundle;
-            }
-            internal set
-            {
-                m_assetBundle = value;
-            }
-        }
-        private AssetBundle m_assetBundle = null;
+        public AssetBundle assetBundle = null;
 
         /// <summary>
         /// 错误信息
         /// </summary>
-        public string error
-        {
-            get
-            {
-                return m_error;
-            }
-            internal set
-            {
-                m_error = value;
-            }
-        }
-        private string m_error = null;
+        public string error = null;
 
         /// <summary>
         /// WWW
         /// </summary>
-        internal WWW www;
+        public WWW www = null;
 
         /// <summary>
         /// 全名（路径+文件名）
@@ -108,70 +64,26 @@ namespace Freamwork
             }
         }
 
-        //======================方法和参数===========================
+        //======================方法===========================
         /// <summary>
         /// 加载开始前执行的方法
         /// </summary>
-        public LoadFunctionDele loadStart
-        {
-            internal get
-            {
-                return m_loadStart;
-            }
-            set
-            {
-                m_loadStart = value;
-            }
-        }
-        private LoadFunctionDele m_loadStart = null;
+        public LoadFunctionDele loadStart = null;
 
         /// <summary>
         /// 加载开始后且在结束前每帧执行的方法
         /// </summary>
-        public LoadFunctionDele loadProgress
-        {
-            internal get
-            {
-                return m_loadProgress;
-            }
-            set
-            {
-                m_loadProgress = value;
-            }
-        }
-        private LoadFunctionDele m_loadProgress = null;
+        public LoadFunctionDele loadProgress = null;
 
         /// <summary>
         /// 加载结束后执行的方法
         /// </summary>
-        public LoadFunctionDele loadEnd
-        {
-            internal get
-            {
-                return m_loadEnd;
-            }
-            set
-            {
-                m_loadEnd = value;
-            }
-        }
-        private LoadFunctionDele m_loadEnd = null;
+        public LoadFunctionDele loadEnd = null;
 
         /// <summary>
         /// 加载失败后执行的方法
         /// </summary>
-        public LoadFunctionDele loadFail
-        {
-            internal get
-            {
-                return m_loadFail;
-            }
-            set
-            {
-                m_loadFail = value;
-            }
-        }
-        private LoadFunctionDele m_loadFail = null;
+        public LoadFunctionDele loadFail = null;
 
         /// <summary>
         /// 克隆（浅克隆）
@@ -188,12 +100,11 @@ namespace Freamwork
             //事件中可能需要返回的数据
             newInfo.progress = progress;
             newInfo.error = error;
+            newInfo.assetBundle = assetBundle;
 
             //事件中不需要返回的数据
             newInfo.priority = priority;
             newInfo.www = www;
-            newInfo.assetBundle = assetBundle;
-
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;
             newInfo.loadEnd = loadEnd;
