@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using System.Xml;
 
 namespace Freamwork
 {
@@ -215,11 +216,11 @@ namespace Freamwork
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getStartLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
                 }
                 if (loadInfo.loadEnd != null)
                 {
-                    loadInfo.loadEnd(getEndLoadInfo(fullName_version));
+                    loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1));
                 }
                 return;
             }
@@ -230,7 +231,7 @@ namespace Freamwork
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getStartLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
                 }
                 delegateAddition(info.loadProgress, loadInfo.loadProgress);
                 delegateAddition(info.loadEnd, loadInfo.loadEnd);
@@ -278,36 +279,13 @@ namespace Freamwork
             }
         }
 
-        private LoadInfo getStartLoadInfo(string path, string fileName, int version)
-        {
-            LoadInfo info = new LoadInfo();
-            info.path = path;
-            info.fileName = fileName;
-            info.version = version;
-            return info;
-        }
-
-        private LoadInfo getProgressInfo(string path, string fileName, int version, float progress)
+        private LoadInfo getNewLoadInfo(string path, string fileName, int version, float progress = 0, string error = null)
         {
             LoadInfo info = new LoadInfo();
             info.path = path;
             info.fileName = fileName;
             info.version = version;
             info.progress = progress;
-            return info;
-        }
-
-        private LoadInfo getEndLoadInfo(string fullName_version)
-        {
-            return cacheDic[fullName_version].clone();
-        }
-
-        private LoadInfo getFailLoadInfo(string path, string fileName, int version, string error)
-        {
-            LoadInfo info = new LoadInfo();
-            info.path = path;
-            info.fileName = fileName;
-            info.version = version;
             info.error = error;
             return info;
         }
@@ -345,7 +323,7 @@ namespace Freamwork
             loadingList.add(loadInfo.fullName + loadInfo.version, loadInfo);
             if (loadInfo.loadStart != null)
             {
-                loadInfo.loadStart(getStartLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
             }
 
             string url = Application.persistentDataPath + "/" + loadInfo.fileName + loadInfo.version;
@@ -392,9 +370,10 @@ namespace Freamwork
                     Debug.LogWarning(loadInfo.fullName + loadInfo.version + "加载失败：" + www.error);
                     if (loadInfo.loadFail != null)
                     {
-                        loadInfo.loadFail(getFailLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.error));
+                        loadInfo.loadFail(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress, www.error));
                     }
                     www.Dispose();
+                    www = null;
                     loadingList.removeAt(i);
                     i--;
                     loadNext();
@@ -408,9 +387,10 @@ namespace Freamwork
                     store(loadInfo);
                     if (loadInfo.loadEnd != null)
                     {
-                        loadInfo.loadEnd(getEndLoadInfo(loadInfo.fullName + loadInfo.version));
+                        loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1));
                     }
                     www.Dispose();
+                    www = null;
                     loadingList.removeAt(i);
                     i--;
                     loadNext();
@@ -420,7 +400,7 @@ namespace Freamwork
                 //加载进度
                 if (loadInfo.loadProgress != null)
                 {
-                    loadInfo.loadProgress(getProgressInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress));
+                    loadInfo.loadProgress(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress));
                 }
             }
         }
@@ -465,6 +445,7 @@ namespace Freamwork
                 }
                 Debug.Log(loadInfo.fullName + loadInfo.version + "在加载过程中被终止");
                 loadInfo.www.Dispose();
+                loadInfo.www = null;
                 loadingList.remove(fullName_version);
                 loadNext();
                 return true;
@@ -477,6 +458,31 @@ namespace Freamwork
                 waitLists[(int)loadInfo.priority].remove(fullName_version);
             }
             return true;
+        }
+
+        /// <summary>
+        /// 清除指定的缓存
+        /// </summary>
+        /// <param name="fullName_version">path + fileName + version</param>
+        /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
+        private bool deleteCache(string fullName_version)
+        {
+            if (cacheDic.ContainsKey(fullName_version))
+            {
+                cacheDic[fullName_version].assetBundle.Unload(false);
+                cacheDic.Remove(fullName_version);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 加载子物体或组件
+        /// </summary>
+        /// <param name="xmlNode">加载信息xml</param>
+        private void loadChildrenAndComponents(XmlNode xmlNode)
+        {
+
         }
 
     }

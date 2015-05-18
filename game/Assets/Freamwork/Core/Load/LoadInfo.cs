@@ -63,7 +63,7 @@ namespace Freamwork
         /// <summary>
         /// 加载出来的数据
         /// </summary>
-        public object assetBundle
+        public AssetBundle assetBundle
         {
             get
             {
@@ -74,7 +74,7 @@ namespace Freamwork
                 m_assetBundle = value;
             }
         }
-        private object m_assetBundle = null;
+        private AssetBundle m_assetBundle = null;
 
         /// <summary>
         /// 错误信息
@@ -187,12 +187,13 @@ namespace Freamwork
 
             //事件中可能需要返回的数据
             newInfo.progress = progress;
-            newInfo.assetBundle = assetBundle;
             newInfo.error = error;
 
             //事件中不需要返回的数据
             newInfo.priority = priority;
             newInfo.www = www;
+            newInfo.assetBundle = assetBundle;
+
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;
             newInfo.loadEnd = loadEnd;
