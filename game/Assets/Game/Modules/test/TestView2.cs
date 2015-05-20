@@ -41,22 +41,22 @@ public class TestView2 : View
         BundleLoadManager.instance.stopLoad("cube7.assetbundle", 222, "/", true);
     }
 
-    void loadStart(LoadInfo loadData)
+    void loadStart(LoadData loadData)
     {
         Debug.Log(loadData.fileName + " loadStart");
     }
 
-    void loadProgress(LoadInfo loadData)
+    void loadProgress(LoadData loadData)
     {
         Debug.Log(loadData.fileName + " loadProgress:" + (int)(loadData.progress * 100) + "%");
     }
 
-    void loadEnd(LoadInfo loadData)
+    void loadEnd(LoadData loadData)
     {
         Debug.Log(loadData.fileName + " loadEnd:" + loadData);
     }
 
-    void loadFail(LoadInfo loadData)
+    void loadFail(LoadData loadData)
     {
         Debug.Log(loadData.fileName + " loadFail:" + loadData);
     }

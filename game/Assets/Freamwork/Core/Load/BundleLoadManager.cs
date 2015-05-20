@@ -223,11 +223,11 @@ namespace Freamwork
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
                 }
                 if (loadInfo.loadEnd != null)
                 {
-                    loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
+                    loadInfo.loadEnd(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
                         null, cacheDic[fullName_version].assetBundle));
                 }
                 return;
@@ -239,7 +239,7 @@ namespace Freamwork
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
                 }
                 delegateAddition(info.loadProgress, loadInfo.loadProgress);
                 delegateAddition(info.loadEnd, loadInfo.loadEnd);
@@ -287,17 +287,17 @@ namespace Freamwork
             }
         }
 
-        private LoadInfo getNewLoadInfo(string path, string fileName, int version, float progress = 0,
+        private LoadData getLoadData(string path, string fileName, int version, float progress = 0,
             string error = null, AssetBundle assetBundle = null)
         {
-            LoadInfo info = new LoadInfo();
-            info.path = path;
-            info.fileName = fileName;
-            info.version = version;
-            info.progress = progress;
-            info.error = error;
-            info.assetBundle = assetBundle;
-            return info;
+            LoadData data = new LoadData();
+            data.path = path;
+            data.fileName = fileName;
+            data.version = version;
+            data.progress = progress;
+            data.error = error;
+            data.assetBundle = assetBundle;
+            return data;
         }
 
         /// <summary>
@@ -333,7 +333,7 @@ namespace Freamwork
             loadingList.add(loadInfo.fullName + loadInfo.version, loadInfo);
             if (loadInfo.loadStart != null)
             {
-                loadInfo.loadStart(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
             }
 
             string url = Application.persistentDataPath + "/" + loadInfo.fileName + loadInfo.version;
@@ -380,7 +380,7 @@ namespace Freamwork
                     Debug.LogWarning(loadInfo.fullName + loadInfo.version + "加载失败：" + www.error);
                     if (loadInfo.loadFail != null)
                     {
-                        loadInfo.loadFail(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress, www.error));
+                        loadInfo.loadFail(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress, www.error));
                     }
                     www.Dispose();
                     www = null;
@@ -397,8 +397,7 @@ namespace Freamwork
                     store(loadInfo);
                     if (loadInfo.loadEnd != null)
                     {
-                        loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
-                            null, www.assetBundle));
+                        loadInfo.loadEnd(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, null, www.assetBundle));
                     }
                     www.Dispose();
                     www = null;
@@ -411,7 +410,7 @@ namespace Freamwork
                 //加载进度
                 if (loadInfo.loadProgress != null)
                 {
-                    loadInfo.loadProgress(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress));
+                    loadInfo.loadProgress(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress));
                 }
             }
         }
