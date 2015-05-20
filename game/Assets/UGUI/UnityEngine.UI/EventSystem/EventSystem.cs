@@ -49,6 +49,7 @@ namespace UnityEngine.EventSystems
         public GameObject firstSelectedGameObject
         {
             get { return m_FirstSelected; }
+            set { m_FirstSelected = value; }
         }
 
         public GameObject currentSelectedGameObject
@@ -62,7 +63,7 @@ namespace UnityEngine.EventSystems
         }
 
         protected EventSystem()
-        { }
+        {}
 
         public void UpdateModules()
         {
@@ -124,22 +125,31 @@ namespace UnityEngine.EventSystems
 
         private static int RaycastComparer(RaycastResult lhs, RaycastResult rhs)
         {
-            if (lhs.module.eventCamera != null && rhs.module.eventCamera != null && lhs.module.eventCamera.depth != rhs.module.eventCamera.depth)
+            if (lhs.module != rhs.module)
             {
-                // need to reverse the standard compareTo
-                if (lhs.module.eventCamera.depth < rhs.module.eventCamera.depth)
-                    return 1;
-                else if (lhs.module.eventCamera.depth == rhs.module.eventCamera.depth)
-                    return 0;
-                else
+                if (lhs.module.eventCamera != null && rhs.module.eventCamera != null && lhs.module.eventCamera.depth != rhs.module.eventCamera.depth)
+                {
+                    // need to reverse the standard compareTo
+                    if (lhs.module.eventCamera.depth < rhs.module.eventCamera.depth)
+                        return 1;
+                    if (lhs.module.eventCamera.depth == rhs.module.eventCamera.depth)
+                        return 0;
+
                     return -1;
+                }
+
+                if (lhs.module.sortOrderPriority != rhs.module.sortOrderPriority)
+                    return rhs.module.sortOrderPriority.CompareTo(lhs.module.sortOrderPriority);
+
+                if (lhs.module.renderOrderPriority != rhs.module.renderOrderPriority)
+                    return rhs.module.renderOrderPriority.CompareTo(lhs.module.renderOrderPriority);
             }
 
-            if (lhs.module.sortOrderPriority != rhs.module.sortOrderPriority)
-                return rhs.module.sortOrderPriority.CompareTo(lhs.module.sortOrderPriority);
+            if (lhs.sortingLayer != rhs.sortingLayer)
+                return rhs.sortingLayer.CompareTo(lhs.sortingLayer);
 
-            if (lhs.module.renderOrderPriority != rhs.module.renderOrderPriority)
-                return rhs.module.renderOrderPriority.CompareTo(lhs.module.renderOrderPriority);
+            if (lhs.sortingOrder != rhs.sortingOrder)
+                return rhs.sortingOrder.CompareTo(lhs.sortingOrder);
 
             if (lhs.depth != rhs.depth)
                 return rhs.depth.CompareTo(lhs.depth);
@@ -159,7 +169,7 @@ namespace UnityEngine.EventSystems
             for (int i = 0; i < modules.Count; ++i)
             {
                 var module = modules[i];
-                if (module == null || !module.enabled)
+                if (module == null || !module.IsActive())
                     continue;
 
                 module.Raycast(eventData, raycastResults);

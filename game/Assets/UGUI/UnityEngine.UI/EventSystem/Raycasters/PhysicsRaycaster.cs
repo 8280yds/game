@@ -23,7 +23,7 @@ namespace UnityEngine.EventSystems
         protected LayerMask m_EventMask = kNoEventMaskSet;
 
         protected PhysicsRaycaster()
-        { }
+        {}
 
         public override Camera eventCamera
         {
@@ -86,7 +86,9 @@ namespace UnityEngine.EventSystems
                         gameObject = hits[b].collider.gameObject,
                         module = this,
                         distance = hits[b].distance,
-                        index = resultAppendList.Count
+                        index = resultAppendList.Count,
+                        sortingLayer = 0,
+                        sortingOrder = 0
                     };
                     resultAppendList.Add(result);
                 }

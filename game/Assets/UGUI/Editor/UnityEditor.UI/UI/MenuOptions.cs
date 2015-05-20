@@ -24,6 +24,8 @@ namespace UnityEditor.UI
         private static Vector2 s_ThinGUIElementSize     = new Vector2(kWidth, kThinHeight);
         private static Vector2 s_ImageGUIElementSize    = new Vector2(100f, 100f);
         private static Color   s_DefaultSelectableColor = new Color(1f, 1f, 1f, 1f);
+        private static Color   s_PanelColor             = new Color(1f, 1f, 1f, 0.392f);
+        private static Color   s_TextColor              = new Color(50f / 255f, 50f / 255f, 50f / 255f, 1f);
 
         private static void SetPositionVisibleinSceneView(RectTransform canvasRTransform, RectTransform itemTransform)
         {
@@ -77,9 +79,12 @@ namespace UnityEditor.UI
             {
                 parent = GetOrCreateCanvasGameObject();
             }
-            GameObject child = new GameObject(name);
 
-            Undo.RegisterCreatedObjectUndo(child, "Create " + name);
+            string uniqueName = GameObjectUtility.GetUniqueNameForSibling(parent.transform, name);
+
+            GameObject child = new GameObject(uniqueName);
+
+            Undo.RegisterCreatedObjectUndo(child, "Create " + uniqueName);
             Undo.SetTransformParent(child.transform, parent.transform, "Parent " + child.name);
             GameObjectUtility.SetParentAndAlign(child, parent);
 
@@ -97,6 +102,7 @@ namespace UnityEditor.UI
         static public void AddPanel(MenuCommand menuCommand)
         {
             GameObject panelRoot = CreateUIElementRoot("Panel", menuCommand, s_ThickGUIElementSize);
+            panelRoot.layer = LayerMask.NameToLayer(kUILayerName);
 
             // Set RectTransform to stretch
             RectTransform rectTransform = panelRoot.GetComponent<RectTransform>();
@@ -108,7 +114,7 @@ namespace UnityEditor.UI
             Image image = panelRoot.AddComponent<Image>();
             image.sprite = AssetDatabase.GetBuiltinExtraResource<Sprite>(kBackgroundSpriteResourcePath);
             image.type = Image.Type.Sliced;
-            image.color = new Color(1f, 1f, 1f, 0.392f);
+            image.color = s_PanelColor;
         }
 
         [MenuItem("GameObject/UI/Button", false, 2001)]
@@ -130,7 +136,7 @@ namespace UnityEditor.UI
             Text text = childText.AddComponent<Text>();
             text.text = "Button";
             text.alignment = TextAnchor.MiddleCenter;
-            text.color = new Color(0.196f, 0.196f, 0.196f);
+            SetDefaultTextValues(text);
 
             RectTransform textRectTransform = childText.GetComponent<RectTransform>();
             textRectTransform.anchorMin = Vector2.zero;
@@ -150,7 +156,10 @@ namespace UnityEditor.UI
 
         private static void SetDefaultTextValues(Text lbl)
         {
-            lbl.color = new Color(0.1953125f, 0.1953125f, 0.1953125f, 1f);
+            // Set text values we want across UI elements in default controls.
+            // Don't set values which are the same as the default values for the Text component,
+            // since there's no point in that, and it's good to keep them as consistent as possible.
+            lbl.color = s_TextColor;
         }
 
         [MenuItem("GameObject/UI/Image", false, 2003)]
@@ -160,7 +169,7 @@ namespace UnityEditor.UI
             go.AddComponent<Image>();
         }
 
-        [MenuItem("GameObject/UI/RawImage", false, 2004)]
+        [MenuItem("GameObject/UI/Raw Image", false, 2004)]
         static public void AddRawImage(MenuCommand menuCommand)
         {
             GameObject go = CreateUIElementRoot("RawImage", menuCommand, s_ImageGUIElementSize);
@@ -301,8 +310,6 @@ namespace UnityEditor.UI
 
             Text label = childLabel.AddComponent<Text>();
             label.text = "Toggle";
-            label.fontSize = 14;
-            label.alignment = TextAnchor.UpperLeft;
             SetDefaultTextValues(label);
 
             toggle.graphic = checkmarkImage;
@@ -328,7 +335,7 @@ namespace UnityEditor.UI
             labelRect.offsetMax        = new Vector2(-5f, -2f);
         }
 
-        [MenuItem("GameObject/UI/InputField", false, 2008)]
+        [MenuItem("GameObject/UI/Input Field", false, 2008)]
         public static void AddInputField(MenuCommand menuCommand)
         {
             GameObject root = CreateUIElementRoot("InputField", menuCommand, s_ThickGUIElementSize);
@@ -347,12 +354,10 @@ namespace UnityEditor.UI
             Text text = childText.AddComponent<Text>();
             text.text = "";
             text.supportRichText = false;
-            text.alignment = TextAnchor.UpperLeft;
             SetDefaultTextValues(text);
 
             Text placeholder = childPlaceholder.AddComponent<Text>();
             placeholder.text = "Enter text...";
-            placeholder.alignment = TextAnchor.UpperLeft;
             placeholder.fontStyle = FontStyle.Italic;
             // Make placeholder color half as opaque as normal text color.
             Color placeholderColor = text.color;
@@ -409,7 +414,7 @@ namespace UnityEditor.UI
             return root;
         }
 
-        [MenuItem("GameObject/UI/EventSystem", false, 2010)]
+        [MenuItem("GameObject/UI/Event System", false, 2010)]
         public static void CreateEventSystem(MenuCommand menuCommand)
         {
             GameObject parent = menuCommand.context as GameObject;

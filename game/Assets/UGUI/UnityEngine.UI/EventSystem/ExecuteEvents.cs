@@ -247,8 +247,8 @@ namespace UnityEngine.EventSystems
         {
             var internalHandlers = s_HandlerListPool.Get();
             GetEventList<T>(target, internalHandlers);
-            //	if (s_InternalHandlers.Count > 0)
-            //		Debug.Log("Executinng " + typeof (T) + " on " + target);
+            //  if (s_InternalHandlers.Count > 0)
+            //      Debug.Log("Executinng " + typeof (T) + " on " + target);
 
             for (var i = 0; i < internalHandlers.Count; i++)
             {
@@ -261,7 +261,7 @@ namespace UnityEngine.EventSystems
                 {
                     var temp = internalHandlers[i];
                     Debug.LogException(new Exception(string.Format("Type {0} expected {1} received.", typeof(T).Name, temp.GetType().Name), e));
-                    continue;;
+                    continue;
                 }
 
                 try
@@ -305,7 +305,7 @@ namespace UnityEngine.EventSystems
 
             var behaviour = component as Behaviour;
             if (behaviour != null)
-                return behaviour.enabled;
+                return behaviour.enabled && behaviour.isActiveAndEnabled;
             return true;
         }
 

@@ -12,7 +12,7 @@ namespace UnityEngine.UI
     {
         [SerializeField] private FontData m_FontData = FontData.defaultFontData;
 
-        [TextArea(3, 10)][SerializeField] private string m_Text = String.Empty;
+        [TextArea(3, 10)][SerializeField] protected string m_Text = String.Empty;
 
         private TextGenerator m_TextCache;
         private TextGenerator m_TextCacheForLayout;
@@ -21,10 +21,10 @@ namespace UnityEngine.UI
         static protected Material s_DefaultText = null;
 
         // We use this flag instead of Unregistering/Registering the callback to avoid allocation.
-        [NonSerialized] private bool m_DisableFontTextureChangedCallback = false;
+        [NonSerialized] private bool m_DisableFontTextureRebuiltCallback = false;
 
         protected Text()
-        { }
+        {}
 
         /// <summary>
         /// Get or set the material used by this Text.
@@ -76,7 +76,7 @@ namespace UnityEngine.UI
                 return;
             }
 
-            if (m_DisableFontTextureChangedCallback)
+            if (m_DisableFontTextureRebuiltCallback)
                 return;
 
             cachedTextGenerator.Invalidate();
@@ -119,7 +119,7 @@ namespace UnityEngine.UI
         /// Text that's being displayed by the Text.
         /// </summary>
 
-        public string text
+        public virtual string text
         {
             get
             {
@@ -327,7 +327,7 @@ namespace UnityEngine.UI
             }
         }
 
-        public float pixelsPerUnit
+        public float  pixelsPerUnit
         {
             get
             {
@@ -338,7 +338,7 @@ namespace UnityEngine.UI
                 if (!font || font.dynamic)
                     return localCanvas.scaleFactor;
                 // For non-dynamic fonts, calculate pixels per unit based on specified font size relative to font object's own font size.
-                if (m_FontData.fontSize <= 0)
+                if (m_FontData.fontSize <= 0 || font.fontSize <= 0)
                     return 1;
                 return font.fontSize / (float)m_FontData.fontSize;
             }
@@ -382,9 +382,9 @@ namespace UnityEngine.UI
             settings.generationExtents = extents * pixelsPerUnitCached + Vector2.one * kEpsilon;
             if (font != null && font.dynamic)
             {
-                settings.fontSize = Mathf.FloorToInt(m_FontData.fontSize * pixelsPerUnitCached);
-                settings.resizeTextMinSize = Mathf.FloorToInt(m_FontData.minSize * pixelsPerUnitCached);
-                settings.resizeTextMaxSize = Mathf.FloorToInt(m_FontData.maxSize * pixelsPerUnitCached);
+                settings.fontSize = Mathf.Min(Mathf.FloorToInt(m_FontData.fontSize * pixelsPerUnitCached), 1000);
+                settings.resizeTextMinSize = Mathf.Min(Mathf.FloorToInt(m_FontData.minSize * pixelsPerUnitCached), 1000);
+                settings.resizeTextMaxSize = Mathf.Min(Mathf.FloorToInt(m_FontData.maxSize * pixelsPerUnitCached), 1000);
             }
 
             // Other settings
@@ -432,7 +432,7 @@ namespace UnityEngine.UI
             // We dont care if we the font Texture changes while we are doing our Update.
             // The end result of cachedTextGenerator will be valid for this instance.
             // Otherwise we can get issues like Case 619238.
-            m_DisableFontTextureChangedCallback = true;
+            m_DisableFontTextureRebuiltCallback = true;
 
             Vector2 extents = rectTransform.rect.size;
 
@@ -473,11 +473,11 @@ namespace UnityEngine.UI
                     vbo.Add(uiv);
                 }
             }
-            m_DisableFontTextureChangedCallback = false;
+            m_DisableFontTextureRebuiltCallback = false;
         }
 
-        public virtual void CalculateLayoutInputHorizontal() { }
-        public virtual void CalculateLayoutInputVertical() { }
+        public virtual void CalculateLayoutInputHorizontal() {}
+        public virtual void CalculateLayoutInputVertical() {}
 
         public virtual float minWidth
         {

@@ -64,10 +64,10 @@ namespace UnityEngine.UI
         public delegate char OnValidateInput(string text, int charIndex, char addedChar);
 
         [Serializable]
-        public class SubmitEvent : UnityEvent<string> { }
+        public class SubmitEvent : UnityEvent<string> {}
 
         [Serializable]
-        public class OnChangeEvent : UnityEvent<string> { }
+        public class OnChangeEvent : UnityEvent<string> {}
 
         static protected TouchScreenKeyboard m_Keyboard;
         static private readonly char[] kSeparators = { ' ', '.', ',' };
@@ -200,7 +200,7 @@ namespace UnityEngine.UI
         const string kEmailSpecialCharacters = "!#$%&'*+-/=?^_`{|}~";
 
         protected InputField()
-        { }
+        {}
 
 
         protected TextGenerator cachedInputTextGenerator
@@ -267,7 +267,7 @@ namespace UnityEngine.UI
 #endif
 
                 if (m_Keyboard != null)
-                    m_Keyboard.text = text;
+                    m_Keyboard.text = m_Text;
 
                 if (m_CaretPosition > m_Text.Length)
                     m_CaretPosition = m_CaretSelectPosition = m_Text.Length;
@@ -378,6 +378,9 @@ namespace UnityEngine.UI
                 m_TextComponent.UnregisterDirtyVerticesCallback(UpdateLabel);
             }
             CanvasUpdateRegistry.UnRegisterCanvasElementForRebuild(this);
+
+            if (m_CachedInputRenderer)
+                m_CachedInputRenderer.SetVertices(null, 0);
 
             base.OnDisable();
         }
@@ -508,7 +511,21 @@ namespace UnityEngine.UI
         // TODO: Make LateUpdate a coroutine instead. Allows us to control the update to only be when the field is active.
         protected virtual void LateUpdate()
         {
-            if (!isFocused || InPlaceEditing())
+            // Only activate if we are not already activated.
+            if (m_ShouldActivateNextUpdate)
+            {
+                if (!isFocused)
+                {
+                    ActivateInputFieldInternal();
+                    m_ShouldActivateNextUpdate = false;
+                    return;
+                }
+
+                // Reset as we are already activated.
+                m_ShouldActivateNextUpdate = false;
+            }
+
+            if (InPlaceEditing() || !isFocused)
                 return;
 
             AssignPositioningIfNeeded();
@@ -837,6 +854,7 @@ namespace UnityEngine.UI
                     {
                         clipboard = GetSelectedString();
                         Delete();
+                        SendOnValueChangedAndUpdateLabel();
                         return EditState.Continue;
                     }
                     break;
@@ -932,13 +950,6 @@ namespace UnityEngine.UI
 
         public virtual void OnUpdateSelected(BaseEventData eventData)
         {
-            if (m_ShouldActivateNextUpdate)
-            {
-                ActivateInputField();
-                m_ShouldActivateNextUpdate = false;
-                return;
-            }
-
             if (!isFocused)
                 return;
 
@@ -956,6 +967,7 @@ namespace UnityEngine.UI
                     }
                 }
             }
+
             if (consumedEvent)
                 UpdateLabel();
 
@@ -1187,7 +1199,6 @@ namespace UnityEngine.UI
                 m_Text = text.Substring(0, caretSelectPos) + text.Substring(caretPosition, text.Length - caretPosition);
                 caretPosition = caretSelectPos;
             }
-            SendOnValueChangedAndUpdateLabel();
         }
 
         private void ForwardSpace()
@@ -1195,6 +1206,7 @@ namespace UnityEngine.UI
             if (hasSelection)
             {
                 Delete();
+                SendOnValueChangedAndUpdateLabel();
             }
             else
             {
@@ -1211,6 +1223,7 @@ namespace UnityEngine.UI
             if (hasSelection)
             {
                 Delete();
+                SendOnValueChangedAndUpdateLabel();
             }
             else
             {
@@ -1400,7 +1413,7 @@ namespace UnityEngine.UI
                 {
                     // Caret comes after drawEnd, so we need to move drawEnd to a later line end that comes after caret.
                     drawEnd = GetLineEndPosition(gen, caretLine);
-                    for (int i = caretLine; i >= 0; --i)
+                    for (int i = caretLine; i >= 0 && i < lines.Count; --i)
                     {
                         height -= lines[i].height;
                         if (height < 0)
@@ -1437,6 +1450,7 @@ namespace UnityEngine.UI
                             if (height < lines[startLine].height)
                                 break;
                             drawStart = GetLineStartPosition(gen, startLine);
+
                             height -= lines[startLine].height;
                         }
                         else
@@ -1523,6 +1537,10 @@ namespace UnityEngine.UI
                 caretRectTrans = go.AddComponent<RectTransform>();
                 m_CachedInputRenderer = go.AddComponent<CanvasRenderer>();
                 m_CachedInputRenderer.SetMaterial(Graphic.defaultGraphicMaterial, null);
+
+                // Needed as if any layout is present we want the caret to always be the same as the text area.
+                go.AddComponent<LayoutElement>().ignoreLayout = true;
+
                 AssignPositioningIfNeeded();
             }
 
@@ -1843,10 +1861,6 @@ namespace UnityEngine.UI
 
         public void ActivateInputField()
         {
-            // Already activated do nothing.
-            if (m_AllowInput)
-                return;
-
             if (m_TextComponent == null || m_TextComponent.font == null || !IsActive() || !IsInteractable())
                 return;
 
@@ -1857,10 +1871,15 @@ namespace UnityEngine.UI
                     m_Keyboard.active = true;
                     m_Keyboard.text = m_Text;
                 }
-
-                m_ShouldActivateNextUpdate = true;
-                return;
             }
+
+            m_ShouldActivateNextUpdate = true;
+        }
+
+        private void ActivateInputFieldInternal()
+        {
+            if (EventSystem.current.currentSelectedGameObject != gameObject)
+                EventSystem.current.SetSelectedGameObject(gameObject);
 
             if (TouchScreenKeyboard.isSupported)
             {
@@ -1906,8 +1925,8 @@ namespace UnityEngine.UI
             if (!m_AllowInput)
                 return;
 
-            m_AllowInput = false;
             m_HasDoneFocusTransition = false;
+            m_AllowInput = false;
 
             if (m_TextComponent != null && IsActive() && IsInteractable())
             {

@@ -227,7 +227,8 @@ namespace Freamwork
                 }
                 if (loadInfo.loadEnd != null)
                 {
-                    loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1));
+                    loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
+                        null, cacheDic[fullName_version].assetBundle));
                 }
                 return;
             }
@@ -396,7 +397,8 @@ namespace Freamwork
                     store(loadInfo);
                     if (loadInfo.loadEnd != null)
                     {
-                        loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1));
+                        loadInfo.loadEnd(getNewLoadInfo(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
+                            null, www.assetBundle));
                     }
                     www.Dispose();
                     www = null;
@@ -444,7 +446,7 @@ namespace Freamwork
         /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载</returns>
         public bool stopLoad(string fileName, int version, string path = "/", bool stopIfLoading = false)
         {
-            string fullName_version = path+fileName + version;
+            string fullName_version = path + fileName + version;
             LoadInfo loadInfo = getInLoadingList(fullName_version);
             if (loadInfo != null)
             {

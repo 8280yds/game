@@ -386,11 +386,14 @@ namespace UnityEngine.UI
         /// <summary>
         /// Make the Graphic have the native size of its content.
         /// </summary>
-        public virtual void SetNativeSize() { }
+        public virtual void SetNativeSize() {}
         public virtual bool Raycast(Vector2 sp, Camera eventCamera)
         {
             var t = transform;
             var components = ComponentListPool.Get();
+
+            bool ignoreParentGroups = false;
+
             while (t != null)
             {
                 t.GetComponents(components);
@@ -401,7 +404,25 @@ namespace UnityEngine.UI
                     if (filter == null)
                         continue;
 
-                    if (!filter.IsRaycastLocationValid(sp, eventCamera))
+                    var raycastValid = true;
+
+                    var group = components[i] as CanvasGroup;
+                    if (group != null)
+                    {
+                        if (ignoreParentGroups == false && group.ignoreParentGroups)
+                        {
+                            ignoreParentGroups = true;
+                            raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
+                        }
+                        else if (!ignoreParentGroups)
+                            raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
+                    }
+                    else
+                    {
+                        raycastValid = filter.IsRaycastLocationValid(sp, eventCamera);
+                    }
+
+                    if (!raycastValid)
                     {
                         ComponentListPool.Release(components);
                         return false;

@@ -104,7 +104,7 @@ namespace UnityEngine.UI
         public float eventAlphaThreshold { get { return m_EventAlphaThreshold; } set { m_EventAlphaThreshold = value; } }
 
         protected Image()
-        { }
+        {}
 
         /// <summary>
         /// Image's texture comes from the UnityEngine.Image.
@@ -150,7 +150,7 @@ namespace UnityEngine.UI
             }
         }
 
-        public virtual void OnBeforeSerialize() { }
+        public virtual void OnBeforeSerialize() {}
 
         public virtual void OnAfterDeserialize()
         {
@@ -317,6 +317,7 @@ namespace UnityEngine.UI
 
             Rect rect = GetPixelAdjustedRect();
             border = GetAdjustedBorders(border / pixelsPerUnit, rect);
+            padding = padding / pixelsPerUnit;
 
             s_VertScratch[0] = new Vector2(padding.x, padding.y);
             s_VertScratch[3] = new Vector2(rect.width - padding.z, rect.height - padding.w);
@@ -850,8 +851,8 @@ namespace UnityEngine.UI
 
         #endregion
 
-        public virtual void CalculateLayoutInputHorizontal() { }
-        public virtual void CalculateLayoutInputVertical() { }
+        public virtual void CalculateLayoutInputHorizontal() {}
+        public virtual void CalculateLayoutInputVertical() {}
 
         public virtual float minWidth { get { return 0; } }
 
