@@ -16,49 +16,49 @@ public class TestView2 : View
         txt = transform.FindChild("Text").GetComponent<Text>();
         txt2 = transform.FindChild("Text2").GetComponent<Text>();
 
-        LoadInfo info = new LoadInfo();
-        info.fileName = "cube.assetbundle";
+        BundleLoadInfo info = new BundleLoadInfo();
+        info.fullName = "cube.assetbundle";
         info.version = 222;
         info.loadStart = loadStart;
         info.loadEnd = loadEnd;
         info.loadFail = loadFail;
-        BundleLoadManager.instance.load(info);
+        BundleLoadManager.instance.addLoad(info);
 
-        BundleLoadManager.instance.load("cube6.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.load("cube7.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.load("cube8.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.load("cube9.assetbundle", 222, "/", LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.addLoad("cube6.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.addLoad("cube7.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.addLoad("cube8.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
+        BundleLoadManager.instance.addLoad("cube9.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
 
-        LoadInfo info3 = new LoadInfo();
-        info3.fileName = "cube.assetbundle";
+        BundleLoadInfo info3 = new BundleLoadInfo();
+        info3.fullName = "cube.assetbundle";
         info3.version = 222;
         info3.loadEnd = loadEnd;
         info3.loadFail = loadFail;
-        BundleLoadManager.instance.load(info3);
+        BundleLoadManager.instance.addLoad(info3);
 
-        BundleLoadManager.instance.stopLoad("cube8.assetbundle", 222);
-        BundleLoadManager.instance.stopLoad("cube6.assetbundle", 222);
-        BundleLoadManager.instance.stopLoad("cube7.assetbundle", 222, "/", true);
+        BundleLoadManager.instance.removeLoad("/cube8.assetbundle222");
+        BundleLoadManager.instance.removeLoad("/cube6.assetbundle222");
+        BundleLoadManager.instance.removeLoad("/cube7.assetbundle222", true);
     }
 
     void loadStart(LoadData loadData)
     {
-        Debug.Log(loadData.fileName + " loadStart");
+        Debug.Log(loadData.fullName + " loadStart");
     }
 
     void loadProgress(LoadData loadData)
     {
-        Debug.Log(loadData.fileName + " loadProgress:" + (int)(loadData.progress * 100) + "%");
+        Debug.Log(loadData.fullName + " loadProgress:" + (int)(loadData.loadProgressNum * 100) + "%");
     }
 
     void loadEnd(LoadData loadData)
     {
-        Debug.Log(loadData.fileName + " loadEnd:" + loadData);
+        Debug.Log(loadData.fullName + " loadEnd:" + loadData);
     }
 
     void loadFail(LoadData loadData)
     {
-        Debug.Log(loadData.fileName + " loadFail:" + loadData);
+        Debug.Log(loadData.fullName + " loadFail:" + loadData);
     }
     
     public void showText(string str)

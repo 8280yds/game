@@ -10,14 +10,9 @@ namespace Freamwork
     public class LoadData
     {
         /// <summary>
-        /// 加载路径
+        /// 加载文件的名称(带路径带后缀)
         /// </summary>
-        public string path = "/";
-
-        /// <summary>
-        /// 加载文件的名称(带后缀)
-        /// </summary>
-        public string fileName;
+        public string fullName;
 
         /// <summary>
         /// 加载物件的版本号
@@ -27,7 +22,12 @@ namespace Freamwork
         /// <summary>
         /// 加载进度
         /// </summary>
-        public float progress = 0f;
+        public float loadProgressNum = 0f;
+
+        /// <summary>
+        /// 加载进度
+        /// </summary>
+        public float unZipProgressNum = 0f;
 
         /// <summary>
         /// 加载出来的数据
@@ -40,15 +40,25 @@ namespace Freamwork
         public string error = null;
 
         /// <summary>
-        /// 全名（路径+文件名）
+        /// 创建一个的LoadData
         /// </summary>
-        public string fullName
+        /// <param name="fullName"></param>
+        /// <param name="version"></param>
+        /// <param name="progress"></param>
+        /// <param name="error"></param>
+        /// <param name="assetBundle"></param>
+        /// <returns></returns>
+        public static LoadData getLoadData(string fullName, int version, float loadProgressNum = 0,
+            string error = null, AssetBundle assetBundle = null, float unZipProgressNum = 0)
         {
-            get
-            {
-                return path + fileName;
-            }
+            LoadData data = new LoadData();
+            data.fullName = fullName;
+            data.version = version;
+            data.loadProgressNum = loadProgressNum;
+            data.error = error;
+            data.assetBundle = assetBundle;
+            data.unZipProgressNum = unZipProgressNum;
+            return data;
         }
-        
     }
 }

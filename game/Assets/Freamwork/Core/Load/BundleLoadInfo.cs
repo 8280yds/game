@@ -3,9 +3,9 @@
 namespace Freamwork
 {
     /// <summary>
-    /// 加载信息的集合类
+    /// 加载Bundle信息的集合类
     /// </summary>
-    public class LoadInfo : LoadData
+    public class BundleLoadInfo : LoadData
     {
         //======================属性===========================
         /// <summary>
@@ -14,9 +14,9 @@ namespace Freamwork
         public LoadPriority priority = LoadPriority.two;
 
         /// <summary>
-        /// request
+        /// WWW
         /// </summary>
-        public AssetBundleRequest request = null;
+        public WWW www = null;
 
         //======================方法===========================
         /// <summary>
@@ -40,52 +40,10 @@ namespace Freamwork
         public LoadFunctionDele loadFail = null;
 
         /// <summary>
-        /// 解压开始前执行的方法
-        /// </summary>
-        public LoadFunctionDele unZipStart = null;
-
-        /// <summary>
-        /// 解压开始后且在结束前每帧执行的方法
-        /// </summary>
-        public LoadFunctionDele unZipProgress = null;
-
-        /// <summary>
-        /// 解压完毕后执行的方法
-        /// </summary>
-        public LoadFunctionDele unZipEnd = null;
-
-        /// <summary>
         /// 克隆（浅克隆）
         /// </summary>
-        /// <returns>一个新的LoadInfo实例</returns>
-        public LoadInfo clone()
-        {
-            LoadInfo newInfo = new LoadInfo();
-            newInfo.fullName = fullName;
-            newInfo.version = version;
-
-            newInfo.loadProgressNum = loadProgressNum;
-            newInfo.unZipProgressNum = unZipProgressNum;
-            newInfo.error = error;
-            newInfo.assetBundle = assetBundle;
-
-            newInfo.priority = priority;
-
-            newInfo.loadStart = loadStart;
-            newInfo.loadProgress = loadProgress;
-            newInfo.loadEnd = loadEnd;
-            newInfo.loadFail = loadFail;
-            newInfo.unZipStart = unZipStart;
-            newInfo.unZipProgress = unZipProgress;
-            newInfo.unZipEnd = unZipEnd;
-            return newInfo;
-        }
-
-        /// <summary>
-        /// 根据本实例获取一个BundleLoadInfo实例
-        /// </summary>
-        /// <returns></returns>
-        public BundleLoadInfo getBundleLoadInfo()
+        /// <returns>一个新的BundleLoadInfo实例</returns>
+        public BundleLoadInfo clone()
         {
             BundleLoadInfo newInfo = new BundleLoadInfo();
             newInfo.fullName = fullName;
@@ -97,12 +55,12 @@ namespace Freamwork
             newInfo.assetBundle = assetBundle;
 
             newInfo.priority = priority;
+            newInfo.www = www;
 
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;
             newInfo.loadEnd = loadEnd;
             newInfo.loadFail = loadFail;
-
             return newInfo;
         }
 

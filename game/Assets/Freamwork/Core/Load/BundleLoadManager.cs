@@ -6,8 +6,9 @@ using UnityEngine;
 namespace Freamwork
 {
     /// <summary>
-    /// 加载管理类，具有排队，优先级，超时检测等功能，
-    /// 并能根绝情况确定是否需要到网络加载
+    /// assetBundle加载管理类，具有排队，优先级等功能
+    /// <para>能根绝情况确定是否需要到网络加载</para>
+    /// <para>能够自动加载依赖包</para>
     /// </summary>
     sealed public class BundleLoadManager
     {
@@ -44,17 +45,17 @@ namespace Freamwork
         /// <summary>
         /// 已加载资源的缓存
         /// </summary>
-        private Dictionary<string, LoadInfo> cacheDic;
+        private Dictionary<string, BundleLoadInfo> cacheDic;
 
         /// <summary>
-        /// 加载队列，数组下标就是优先级
+        /// 等待队列，数组下标就是优先级
         /// </summary>
-        private HashList<string, LoadInfo>[] waitLists;
+        private HashList<string, BundleLoadInfo>[] waitLists;
 
         /// <summary>
-        /// 加载中的队列
+        /// 加载队列
         /// </summary>
-        private HashList<string, LoadInfo> loadingList;
+        private HashList<string, BundleLoadInfo> loadingList;
 
         /// <summary>
         /// 初始化
@@ -62,14 +63,14 @@ namespace Freamwork
         private void init()
         {
             m_isIdle = true;
-            cacheDic = new Dictionary<string, LoadInfo>();
-            loadingList = new HashList<string, LoadInfo>();
+            cacheDic = new Dictionary<string, BundleLoadInfo>();
+            loadingList = new HashList<string, BundleLoadInfo>();
 
             int len = Enum.GetValues(typeof(LoadPriority)).Length;
-            waitLists = new HashList<string, LoadInfo>[len];
+            waitLists = new HashList<string, BundleLoadInfo>[len];
             for (int i = 0; i < len; i++)
             {
-                waitLists[i] = new HashList<string, LoadInfo>();
+                waitLists[i] = new HashList<string, BundleLoadInfo>();
             }
         }
 
@@ -113,6 +114,32 @@ namespace Freamwork
 
         //=====================================================================
         /// <summary>
+        /// 加载的总依赖信息表
+        /// </summary>
+        public AssetBundleManifest mainfest
+        {
+            get
+            {
+                return m_mainfest;
+            }
+        }
+        private AssetBundleManifest m_mainfest;
+
+        /// <summary>
+        /// 获取依赖列表(其中包括自身,排在最后一个)
+        /// </summary>
+        /// <returns></returns>
+        public string[] getAllDependencies(string fullName)
+        {
+            string[] dependencies = new string[] { fullName };
+            if (m_mainfest != null)
+            {
+                m_mainfest.GetAllDependencies(fullName).CopyTo(dependencies, 0);
+            }
+            return dependencies;
+        }
+
+        /// <summary>
         /// 当前是否闲置
         /// </summary>
         public bool isIdle
@@ -125,11 +152,34 @@ namespace Freamwork
         private bool m_isIdle;
 
         /// <summary>
+        /// 资源的加载状态
+        /// <para>【注意】需要便利一些列表，在不必要的时候少用</para>
+        /// </summary>
+        /// <param name="str">fullName+Version</param>
+        /// <returns>LoadStatus</returns>
+        public LoadStatus getLoadStatus(string str)
+        {
+            if (cacheDic.ContainsKey(str))
+            {
+                return LoadStatus.loaded;
+            }
+            if(getInLoadingList(str) != null)
+            {
+                return LoadStatus.loading;
+            }
+            if (getInWaitList(str) != null)
+            {
+                return LoadStatus.wait;
+            }
+            return LoadStatus.none;
+        }
+
+        /// <summary>
         /// 从等待队列中获取
         /// </summary>
         /// <param name="str">fullName+Version</param>
         /// <returns></returns>
-        private LoadInfo getInWaitList(string str)
+        private BundleLoadInfo getInWaitList(string str)
         {
             for (int i = 0, len = waitLists.Length; i < len; i++ )
             {
@@ -146,7 +196,7 @@ namespace Freamwork
         /// </summary>
         /// <param name="str">fullName+Version</param>
         /// <returns></returns>
-        private LoadInfo getInLoadingList(string str)
+        private BundleLoadInfo getInLoadingList(string str)
         {
             if (loadingList.containsKey(str))
             {
@@ -159,7 +209,7 @@ namespace Freamwork
         /// 根据优先级在等待队列中删除并返回第一条信息
         /// </summary>
         /// <returns></returns>
-        private LoadInfo deleteFirstInInWaitList()
+        private BundleLoadInfo deleteFirstInInWaitList()
         {
             for (int i = 0, len = waitLists.Length; i < len; i++)
             {
@@ -174,72 +224,83 @@ namespace Freamwork
         /// <summary>
         /// 加载资源，如果资源已经加载过，则直接从缓存中获取
         /// </summary>
-        /// <param name="fileName">加载文件的名称(带后缀)</param>
-        /// <param name="version">加载物件的版本号</param>
-        /// <param name="path">加载路径</param>
-        /// <param name="priority">加载优先级</param>
+        /// <param name="fullName">全名</param>
+        /// <param name="version">版本号</param>
+        /// <param name="priority">优先级</param>
         /// <param name="loadStart">加载开始前执行的方法</param>
         /// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
         /// <param name="loadEnd">加载结束后执行的方法</param>
         /// <param name="loadFail">加载失败后执行的方法</param>
-        public void load(string fileName, int version, string path = "/", LoadPriority priority = LoadPriority.two,
+        public void addLoad(string fullName, int version, LoadPriority priority = LoadPriority.two,
             LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
         {
-            LoadInfo loadInfo = new LoadInfo();
-            loadInfo.fileName = fileName;
+            BundleLoadInfo loadInfo = new BundleLoadInfo();
+            loadInfo.fullName = fullName;
             loadInfo.version = version;
-            loadInfo.path = path;
             loadInfo.priority = priority;
             loadInfo.loadStart = loadStart;
             loadInfo.loadProgress = loadProgress;
             loadInfo.loadEnd = loadEnd;
             loadInfo.loadFail = loadFail;
-            load(loadInfo);
+            addLoad(loadInfo);
         }
 
         /// <summary>
         /// 加载资源，如果资源已经加载过，则直接从缓存中获取
         /// </summary>
         /// <param name="loadInfo">加载资源的相关信息</param>
-        public void load(LoadInfo loadInfo)
+        public void addLoad(BundleLoadInfo loadInfo)
         {
-            //if (string.IsNullOrEmpty(loadInfo.path))
-            //{
-            //    throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的path不能为空");
-            //}
-            if (string.IsNullOrEmpty(loadInfo.fileName))
+            if (string.IsNullOrEmpty(loadInfo.fullName))
             {
-                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的fileName不能为空");
+                throw new Exception("BundleLoadManager.instance.load()的loadInfo的fullName不能为空");
             }
             if (loadInfo.version == 0)
             {
-                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的version未设置");
+                throw new Exception("BundleLoadManager.instance.load()的loadInfo的version未设置");
             }
 
+            string fullName_version = loadInfo.fullName + loadInfo.version;
+            string[] dependencies = getAllDependencies(fullName_version);
+            BundleLoadInfo newInfo;
+            for (int i = 0, len = dependencies.Length; i < len; i++ )
+            {
+                newInfo = loadInfo.clone();
+                newInfo.fullName = dependencies[i];
+                addLoadItem(newInfo);
+            }
+        }
+
+        /// <summary>
+        /// 加载具体的项
+        /// </summary>
+        /// <param name="loadInfo"></param>
+        private void addLoadItem(BundleLoadInfo loadInfo)
+        {
             string fullName_version = loadInfo.fullName + loadInfo.version;
             //已经在缓存中
             if (cacheDic.ContainsKey(fullName_version))
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version));
                 }
                 if (loadInfo.loadEnd != null)
                 {
-                    loadInfo.loadEnd(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, 
+                    loadInfo.loadEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1,
                         null, cacheDic[fullName_version].assetBundle));
                 }
                 return;
             }
 
             //已经在加载过程中
-            LoadInfo info = getInLoadingList(fullName_version);
+            BundleLoadInfo info = getInLoadingList(fullName_version);
             if (info != null)
             {
                 if (loadInfo.loadStart != null)
                 {
-                    loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                    loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version));
                 }
                 delegateAddition(info.loadProgress, loadInfo.loadProgress);
                 delegateAddition(info.loadEnd, loadInfo.loadEnd);
@@ -275,7 +336,7 @@ namespace Freamwork
         /// </summary>
         /// <param name="dele1"></param>
         /// <param name="dele2"></param>
-        private void delegateAddition(LoadFunctionDele dele1, LoadFunctionDele dele2)
+        private LoadFunctionDele delegateAddition(LoadFunctionDele dele1, LoadFunctionDele dele2)
         {
             if (dele1 != null)
             {
@@ -285,19 +346,7 @@ namespace Freamwork
             {
                 dele1 = dele2;
             }
-        }
-
-        private LoadData getLoadData(string path, string fileName, int version, float progress = 0,
-            string error = null, AssetBundle assetBundle = null)
-        {
-            LoadData data = new LoadData();
-            data.path = path;
-            data.fileName = fileName;
-            data.version = version;
-            data.progress = progress;
-            data.error = error;
-            data.assetBundle = assetBundle;
-            return data;
+            return dele1;
         }
 
         /// <summary>
@@ -311,7 +360,7 @@ namespace Freamwork
                 return;
             }
 
-            LoadInfo loadInfo = deleteFirstInInWaitList();
+            BundleLoadInfo loadInfo = deleteFirstInInWaitList();
             //等待列表已空
             if (loadInfo == null)
             {
@@ -333,32 +382,41 @@ namespace Freamwork
             loadingList.add(loadInfo.fullName + loadInfo.version, loadInfo);
             if (loadInfo.loadStart != null)
             {
-                loadInfo.loadStart(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version));
+                loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version));
             }
 
-            string url = Application.persistentDataPath + "/" + loadInfo.fileName + loadInfo.version;
+            string url = Application.persistentDataPath + "/" + loadInfo.fullName + loadInfo.version;
             if (File.Exists(url))
             {
-                url = LoadConstant.LOCAL_TITLE + Application.persistentDataPath + loadInfo.fullName + loadInfo.version;
+                url = LoadConstant.LOCAL_TITLE + url;
             }
             else
             {
-                url = loadInfo.fullName;
+                url = LoadConstant.CDN + loadInfo.fullName;
 
                 //删除本地的过期版本
                 if (LoadConstant.DELETE_OLD_VERSION)
                 {
-                    string[] files = Directory.GetFiles(Application.persistentDataPath + loadInfo.path,
-                        loadInfo.fileName + "*", SearchOption.TopDirectoryOnly);
+                    string[] files = Directory.GetFiles(Application.persistentDataPath,
+                        getFileName(loadInfo.fullName) + "*", SearchOption.AllDirectories);
                     for (int i = 0, len = files.Length; i < len; i++ )
                     {
                         File.Delete(files[i]);
                         Debug.Log("删除了本地过期文件：" + files[i]);
                     }
                 }
-
             }
             loadInfo.www = new WWW(url);
+        }
+
+        /// <summary>
+        /// 获取文件名
+        /// </summary>
+        /// <returns></returns>
+        private string getFileName(string fullName)
+        {
+            int lastIndexOf = fullName.LastIndexOf("\\");
+            return fullName.Substring(lastIndexOf + 1, fullName.Length - 1 - lastIndexOf);
         }
 
         /// <summary>
@@ -367,7 +425,7 @@ namespace Freamwork
         private void enterFrame()
         {
             WWW www;
-            LoadInfo loadInfo;
+            BundleLoadInfo loadInfo;
 
             for (int i = 0; i < loadingList.count; i++)
             {
@@ -380,7 +438,7 @@ namespace Freamwork
                     Debug.LogWarning(loadInfo.fullName + loadInfo.version + "加载失败：" + www.error);
                     if (loadInfo.loadFail != null)
                     {
-                        loadInfo.loadFail(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress, www.error));
+                        loadInfo.loadFail(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, www.progress, www.error));
                     }
                     www.Dispose();
                     www = null;
@@ -397,7 +455,7 @@ namespace Freamwork
                     store(loadInfo);
                     if (loadInfo.loadEnd != null)
                     {
-                        loadInfo.loadEnd(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, 1, null, www.assetBundle));
+                        loadInfo.loadEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, www.assetBundle));
                     }
                     www.Dispose();
                     www = null;
@@ -410,7 +468,7 @@ namespace Freamwork
                 //加载进度
                 if (loadInfo.loadProgress != null)
                 {
-                    loadInfo.loadProgress(getLoadData(loadInfo.path, loadInfo.fileName, loadInfo.version, www.progress));
+                    loadInfo.loadProgress(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, www.progress));
                 }
             }
         }
@@ -418,35 +476,31 @@ namespace Freamwork
         /// <summary>
         /// 存储数据
         /// </summary>
-        private void store(LoadInfo loadInfo)
+        private void store(BundleLoadInfo loadInfo)
         {
             WWW www = loadInfo.www;
             if(!www.url.Contains(LoadConstant.LOCAL_TITLE))
             {
                 File.WriteAllBytes(loadInfo.fullName + loadInfo.version, www.bytes);
             }
-            LoadInfo newInfo = new LoadInfo();
-            newInfo.path = loadInfo.path;
-            newInfo.fileName = loadInfo.fileName;
+            BundleLoadInfo newInfo = new BundleLoadInfo();
+            newInfo.fullName = loadInfo.fullName;
             newInfo.version = loadInfo.version;
-            newInfo.progress = 1;
+            newInfo.loadProgressNum = 1;
             newInfo.assetBundle = www.assetBundle;
             cacheDic.Add(newInfo.fullName + newInfo.version, newInfo);
         }
 
         /// <summary>
-        /// 停止加载或停止等待加载
-        /// 【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！
+        /// 停止加载或停止等待加载，并移除
+        /// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
         /// </summary>
-        /// <param name="fileName">加载文件的名称(带后缀)</param>
-        /// <param name="version">加载的版本号</param>
-        /// <param name="path">加载路径</param>
+        /// <param name="fullName_version">fullName+Version</param>
         /// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
-        /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载</returns>
-        public bool stopLoad(string fileName, int version, string path = "/", bool stopIfLoading = false)
+        /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
+        public bool removeLoad(string fullName_version, bool stopIfLoading = false)
         {
-            string fullName_version = path + fileName + version;
-            LoadInfo loadInfo = getInLoadingList(fullName_version);
+            BundleLoadInfo loadInfo = getInLoadingList(fullName_version);
             if (loadInfo != null)
             {
                 if (!stopIfLoading)
@@ -473,7 +527,7 @@ namespace Freamwork
         /// <summary>
         /// 清除指定的缓存
         /// </summary>
-        /// <param name="fullName_version">path + fileName + version</param>
+        /// <param name="fullName_version">fullName+Version</param>
         /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
         public bool deleteCacheItem(string fullName_version)
         {
@@ -489,29 +543,27 @@ namespace Freamwork
         /// <summary>
         /// 插队加载，每次会将此加载添加到当前优先级队列的最前面
         /// </summary>
-        /// <param name="fileName">加载文件的名称(带后缀)</param>
-        /// <param name="version">加载物件的版本号</param>
-        /// <param name="path">加载路径</param>
-        /// <param name="priority">加载优先级</param>
+        /// <param name="fullName">名称</param>
+        /// <param name="version">版本号</param>
+        /// <param name="priority">优先级</param>
         /// <param name="loadStart">加载开始前执行的方法</param>
         /// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
         /// <param name="loadEnd">加载结束后执行的方法</param>
         /// <param name="loadFail">加载失败后执行的方法</param>
-        public void insertLoad(string fileName, int version, string path = "/", LoadPriority priority = LoadPriority.zero,
+        public void insertLoad(string fullName, int version, LoadPriority priority = LoadPriority.zero,
             LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
         {
-            LoadInfo loadInfo = new LoadInfo();
-            loadInfo.fileName = fileName;
+            BundleLoadInfo loadInfo = new BundleLoadInfo();
+            loadInfo.fullName = fullName;
             loadInfo.version = version;
-            loadInfo.path = path;
             loadInfo.priority = priority;
             loadInfo.loadStart = loadStart;
             loadInfo.loadProgress = loadProgress;
             loadInfo.loadEnd = loadEnd;
             loadInfo.loadFail = loadFail;
             waitLists[(int)priority].insert(0, loadInfo.fullName + loadInfo.version, loadInfo);
-            load(loadInfo);
+            addLoad(loadInfo);
         }
 
     }
