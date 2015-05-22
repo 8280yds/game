@@ -22,24 +22,24 @@ def cur_file_dir():
          return os.path.dirname(_path)
 		 
 #获取指定路径下的所有“xlsx”文件名
-def getFileNamea():
+def getFileNames():
 	fileNameArr = []
-	for filePath in glob.glob(path + "/*" + extension):
+	for filePath in glob.glob(excelDirPath + "*" + extension):
 		fileNameArr.append(os.path.basename(filePath)[:-len(extension)])
 	return fileNameArr
 
 #获取一个数据表的第一个页签的数据
 def getSheetData(filename):
-	workbook = load_workbook(filename+extension)
+	workbook = load_workbook(excelDirPath + filename + extension)
 	sheetnames = workbook.get_sheet_names()
 	sheet = workbook.get_sheet_by_name(sheetnames[0])
-	print   "load: ", filename+extension, "/", sheet.title
+	print   "load: ", filename + extension, "/", sheet.title
 	if (sheet.get_highest_row()<2 or sheet.get_highest_column()<1) :
 		print u"当前数据表标题不完整，按任意键退出:", ord(msvcrt.getch())
 		
 	if packVO :
 		creatVOBySheet(changeStr(filename), sheet)
-	if packXml or packBytes :
+	if packXml or packBytes or packTotleXML:
 		return creatXmlBySheet(filename, sheet)
 	return ''
 	
@@ -55,7 +55,7 @@ def changeStr(_str):
 def creatVOBySheet(_name, sheet):
 	voName = _name + 'DBVO'
 	#处理数据
-	voStr1 = 'using System.Xml;\n\npublic class ' + voName + ' : DBVO\n{'
+	voStr1 = 'using Freamwork;\nusing System.Xml;\n\npublic class ' + voName + ' : DBVO\n{'
 	voStr2 = "\n\n\tpublic override void xmlToVo(XmlNode node)\n\t{"
 	voStr2 += "\n\t\tXmlElement xmlelement = (XmlElement)node;"
 	
@@ -81,7 +81,7 @@ def creatVOBySheet(_name, sheet):
 	voStr1 += "\n}"
 	
 	#写入
-	csFile = open(voPath + voName + ".cs", 'w')
+	csFile = open(voDirPath + voName + ".cs", 'w')
 	csFile.write(voStr1)
 	csFile.close()
 	
@@ -122,22 +122,25 @@ def creatXmlBySheet(filename, sheet):
 	
 	#写入
 	if packXml :
-		xmlFile = open(xmlPath + filename + ".xml", 'w')
+		xmlFile = open(xmlDirPath + filename + ".xml", 'w')
 		xmlFile.write(xmlStr2)
 		xmlFile.close()
 	return xmlStr
 
 #配置数据
 xmlTitleStr = '<?xml version="1.0" encoding="UTF-8"?>'
-extension = '.xlsx'		#excel表格式
-packVO = True			#是否需要打包DBVO.CS文件
-packXml = True			#是否需要打包XML文件
-packBytes = True		#是否需要打包二进制文件
+extension = '.xlsx'			#excel文件后缀
+packVO = True				#是否需要打包DBVO.CS文件
+packXml = True				#是否需要打包XML文件
+packTotleXML = True			#是否需要打包XML总文档
+packBytes = False			#是否需要打包二进制文件
 deleteAllVoBeforePack = True		#是否在打包前删除VO文件夹
 deleteAllXmlBeforePack = True		#是否在打包前删除XML文件夹
-voDirPath = '/DBVO/'	#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-xmlDirPath = '/XML/'	#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-byteDirPath = '/'		#打包后存放Bytes的位置（相对于本python打包工具的位置）
+excelDirPath = './Excel/'	#excel所在的文件夹
+voDirPath = '../DBVO/'		#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+xmlDirPath = './XML/'		#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+totleXMLPath = './'			#打包后存放XML总文档的位置（相对于本python打包工具的位置）
+byteDirPath = './'			#打包后存放Bytes的位置（相对于本python打包工具的位置）
 
 typeDic = {}
 typeDic['int'] = 'int.Parse(xmlelement.GetAttribute("{0}"));'
@@ -154,37 +157,36 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 	
 startTime = time.time()
-path = cur_file_dir()
-fileNameArr = getFileNamea()
+#path = cur_file_dir()
+fileNameArr = getFileNames()
 
 #VO文件夹处理
 if packVO :
-	voPath = path + voDirPath
-	if deleteAllVoBeforePack and os.path.exists(voPath):
-		shutil.rmtree(voPath);
-	os.makedirs(voPath)
+	if deleteAllVoBeforePack and os.path.exists(voDirPath):
+		shutil.rmtree(voDirPath);
+	os.makedirs(voDirPath)
 
 #XML文件夹处理
 if packXml :
-	xmlPath = path + xmlDirPath
-	if deleteAllXmlBeforePack and os.path.exists(xmlPath):
-		shutil.rmtree(xmlPath);
-	os.makedirs(xmlPath)
+	if deleteAllXmlBeforePack and os.path.exists(xmlDirPath):
+		shutil.rmtree(xmlDirPath);
+	os.makedirs(xmlDirPath)
 
 #执行打包
 totalXmlStr = ''
 for filename in fileNameArr:
 	totalXmlStr += getSheetData(filename)
 	
-if packBytes :
+if packTotleXML :
 	totalXmlStr = '<root>' + totalXmlStr + '</root>'
 	#写入all.xml
-	totalXmlFile = open(path + byteDirPath + "all.xml", 'w')
+	totalXmlFile = open(byteDirPath + "all.xml", 'w')
 	totalXmlFile.write(totalXmlStr)
 	totalXmlFile.close()
 	
+if packBytes :
 	compress = zlib.compressobj(1)
-	byteFile = open(path + byteDirPath + "all.zbin", 'wb')
+	byteFile = open(byteDirPath + "all.zbin", 'wb')
 	byteFile.write(compress.compress(totalXmlStr))
 	byteFile.write(compress.flush())
 	byteFile.close()

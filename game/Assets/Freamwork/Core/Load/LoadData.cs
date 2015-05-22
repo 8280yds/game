@@ -30,9 +30,14 @@ namespace Freamwork
         public float unZipProgressNum = 0f;
 
         /// <summary>
-        /// 加载出来的数据
+        /// 加载出来的assetBundle
         /// </summary>
         public AssetBundle assetBundle = null;
+
+        /// <summary>
+        /// 加载出来的Object[]
+        /// </summary>
+        public Object[] objects = null;
 
         /// <summary>
         /// 错误信息
@@ -48,8 +53,8 @@ namespace Freamwork
         /// <param name="error"></param>
         /// <param name="assetBundle"></param>
         /// <returns></returns>
-        public static LoadData getLoadData(string fullName, int version, float loadProgressNum = 0,
-            string error = null, AssetBundle assetBundle = null, float unZipProgressNum = 0)
+        public static LoadData getLoadData(string fullName, int version, float loadProgressNum = 0, string error = null,
+            AssetBundle assetBundle = null, float unZipProgressNum = 0, Object[] objects = null)
         {
             LoadData data = new LoadData();
             data.fullName = fullName;
@@ -58,6 +63,7 @@ namespace Freamwork
             data.error = error;
             data.assetBundle = assetBundle;
             data.unZipProgressNum = unZipProgressNum;
+            data.objects = objects;
             return data;
         }
     }

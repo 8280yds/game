@@ -110,6 +110,10 @@ namespace Freamwork
             {
                 waitLists[i].clear();
             }
+
+            //强制垃圾回收
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
         }
 
         //=====================================================================
@@ -398,7 +402,7 @@ namespace Freamwork
                 if (LoadConstant.DELETE_OLD_VERSION)
                 {
                     string[] files = Directory.GetFiles(Application.persistentDataPath,
-                        getFileName(loadInfo.fullName) + "*", SearchOption.AllDirectories);
+                        StringUtil.getFileName(loadInfo.fullName) + "*", SearchOption.AllDirectories);
                     for (int i = 0, len = files.Length; i < len; i++ )
                     {
                         File.Delete(files[i]);
@@ -407,16 +411,6 @@ namespace Freamwork
                 }
             }
             loadInfo.www = new WWW(url);
-        }
-
-        /// <summary>
-        /// 获取文件名
-        /// </summary>
-        /// <returns></returns>
-        private string getFileName(string fullName)
-        {
-            int lastIndexOf = fullName.LastIndexOf("\\");
-            return fullName.Substring(lastIndexOf + 1, fullName.Length - 1 - lastIndexOf);
         }
 
         /// <summary>
@@ -525,7 +519,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 清除指定的缓存
+        /// 清除缓存的assetBundle
         /// </summary>
         /// <param name="fullName_version">fullName+Version</param>
         /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
@@ -541,7 +535,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 插队加载，每次会将此加载添加到当前优先级队列的最前面
+        /// 插队加载，每次会将此加载添加到当前优先级队列的最前面，勿乱用！！！
         /// </summary>
         /// <param name="fullName">名称</param>
         /// <param name="version">版本号</param>
@@ -551,7 +545,7 @@ namespace Freamwork
         /// <param name="loadEnd">加载结束后执行的方法</param>
         /// <param name="loadFail">加载失败后执行的方法</param>
         public void insertLoad(string fullName, int version, LoadPriority priority = LoadPriority.zero,
-            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
+            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null,
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
         {
             BundleLoadInfo loadInfo = new BundleLoadInfo();

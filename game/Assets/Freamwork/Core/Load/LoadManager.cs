@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml;
 using UnityEngine;
 
 namespace Freamwork
@@ -70,18 +69,6 @@ namespace Freamwork
 
         //=====================================================================
         /// <summary>
-        /// 配置总表的XML信息
-        /// </summary>
-        public XmlNode dbXmlNode
-        {
-            get
-            {
-                return m_dbXmlNode;
-            }
-        }
-        private XmlNode m_dbXmlNode;
-
-        /// <summary>
         /// 加载资源，如果资源已经加载过，则直接从缓存中获取
         /// </summary>
         /// <param name="fullName">名称</param>
@@ -143,10 +130,29 @@ namespace Freamwork
             }
             else
             {
-                ///
-                ///??如果在加压中呢？
-                ///
-                loadDic.Add(fullName_version, loadInfo);
+                if (unZipList.containsKey(fullName_version))
+                {
+                    LoadInfo info = unZipList.getValue(fullName_version);
+                    if (loadInfo.loadStart != null)
+                    {
+                        loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version));
+                    }
+                    if (loadInfo.loadEnd != null)
+                    {
+                        loadInfo.loadEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, info.assetBundle));
+                    }
+                    if (loadInfo.unZipStart != null)
+                    {
+                        loadInfo.unZipStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1));
+                    }
+                    delegateAddition(info.unZipProgress, loadInfo.unZipProgress);
+                    delegateAddition(info.unZipEnd, loadInfo.unZipEnd);
+                    return;
+                }
+                else
+                {
+                    loadDic.Add(fullName_version, loadInfo);
+                }
             }
             BundleLoadInfo newInfo = loadInfo.getBundleLoadInfo();
             newInfo.loadEnd = loadInfo.loadEnd + this.loadEnd;
@@ -190,10 +196,7 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void loadFail(LoadData loadData)
         {
-            if (loadDic.ContainsKey(loadData.fullName + loadData.version))
-            {
-
-            }
+            //预留，以备以后添加特殊处理
         }
 
         /// <summary>
@@ -205,7 +208,6 @@ namespace Freamwork
             string fullName_version = loadData.fullName + loadData.version;
             LoadInfo loadInfo = loadDic[fullName_version];
             loadInfo.request = loadData.assetBundle.LoadAllAssetsAsync();
-            loadData.assetBundle = null;
 
             if (loadInfo.unZipStart != null)
             {
@@ -225,17 +227,18 @@ namespace Freamwork
         {
             string fullName_version = loadData.fullName + loadData.version;
             LoadInfo loadInfo = unZipList.getValue(fullName_version);
-            loadInfo.request = null;
 
             if (loadInfo.unZipEnd != null)
             {
                 loadInfo.unZipEnd(loadData);
             }
 
-            if (unZipList.count <= 0)
+            if (unZipList.count == 0)
             {
                 EnterFrame.instance.removeEnterFrame(enterFrame);
             }
+            loadData.assetBundle = null;
+            loadInfo.request = null;
         }
 
         /// <summary>
@@ -255,7 +258,7 @@ namespace Freamwork
                 if (request.isDone)
                 {
                     Debug.Log(loadInfo.fullName + loadInfo.version + "解压完成");
-                    unZipEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, null, 1));
+                    unZipEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, null, 1, request.allAssets));
                     unZipList.removeAt(i);
                     i--;
                     continue;
@@ -270,40 +273,40 @@ namespace Freamwork
             }
         }
 
-        /// <summary>
-        /// 停止加载或停止等待加载，并移除
-        /// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
-        /// </summary>
-        /// <param name="fullName_version">fullName+Version</param>
-        /// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
-        /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
-        public bool removeLoad(string fullName_version, bool stopIfLoading = false)
-        {
-            if (!loadDic.ContainsKey(fullName_version))
-            {
-                return true;
-            }
+        ///// <summary>
+        ///// 停止加载或停止等待加载，并移除
+        ///// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
+        ///// </summary>
+        ///// <param name="fullName_version">fullName+Version</param>
+        ///// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
+        ///// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
+        //public bool removeLoad(string fullName_version, bool stopIfLoading = false)
+        //{
+        //    if (!loadDic.ContainsKey(fullName_version))
+        //    {
+        //        return true;
+        //    }
 
-            BundleLoadManager blm = BundleLoadManager.instance;
-            LoadStatus status = blm.getLoadStatus(fullName_version);
-            switch (status)
-            {
-                case LoadStatus.loading:
-                    if (!blm.removeLoad(fullName_version, stopIfLoading))
-                    {
-                        return false;
-                    }
-                    break;
-                case LoadStatus.wait:
-                    blm.removeLoad(fullName_version);
-                    break;
-            }
-            //?????????????
-            //?????????????
-            //?????????????
-            loadDic.Remove(fullName_version);
-            return true;
-        }
+        //    BundleLoadManager blm = BundleLoadManager.instance;
+        //    LoadStatus status = blm.getLoadStatus(fullName_version);
+        //    switch (status)
+        //    {
+        //        case LoadStatus.loading:
+        //            if (!blm.removeLoad(fullName_version, stopIfLoading))
+        //            {
+        //                return false;
+        //            }
+        //            break;
+        //        case LoadStatus.wait:
+        //            blm.removeLoad(fullName_version);
+        //            break;
+        //    }
+        //    //?????????????
+        //    //?????????????
+        //    //?????????????
+        //    loadDic.Remove(fullName_version);
+        //    return true;
+        //}
 
     }
 }
