@@ -3,9 +3,14 @@ using System.Xml;
 
 public class AaaSssDdDBVO : DBVO
 {
-	//id
+	/// <summary>
+	/// id
+	/// </summary>
 	public int id;
-	//年龄
+
+	/// <summary>
+	/// 年龄
+	/// </summary>
 	public int age;
 
 	public override void xmlToVo(XmlNode node)

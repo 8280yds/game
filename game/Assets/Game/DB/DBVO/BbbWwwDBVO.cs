@@ -3,11 +3,19 @@ using System.Xml;
 
 public class BbbWwwDBVO : DBVO
 {
-	//id
+	/// <summary>
+	/// id
+	/// </summary>
 	public int id;
-	//名字
+
+	/// <summary>
+	/// 名字
+	/// </summary>
 	public string name;
-	//年龄
+
+	/// <summary>
+	/// 年龄
+	/// </summary>
 	public int age;
 
 	public override void xmlToVo(XmlNode node)

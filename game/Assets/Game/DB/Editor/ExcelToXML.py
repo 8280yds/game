@@ -21,6 +21,17 @@ def cur_file_dir():
      elif os.path.isfile(_path):
          return os.path.dirname(_path)
 		 
+#将相对路径转化为绝对路径
+def relatively_to_abs(relaPath):
+	relaPath = relaPath.strip()
+	count = relaPath.index('/')
+	relaPath = relaPath[count:].replace("/", "\\");
+	
+	absPath = path
+	for i in range(1, count):
+		absPath = absPath[:absPath.rindex('\\')]
+	return absPath + relaPath
+		 
 #获取指定路径下的所有“xlsx”文件名
 def getFileNames():
 	fileNameArr = []
@@ -56,7 +67,7 @@ def creatVOBySheet(_name, sheet):
 	voName = _name + 'DBVO'
 	#处理数据
 	voStr1 = 'using Freamwork;\nusing System.Xml;\n\npublic class ' + voName + ' : DBVO\n{'
-	voStr2 = "\n\n\tpublic override void xmlToVo(XmlNode node)\n\t{"
+	voStr2 = "\n\tpublic override void xmlToVo(XmlNode node)\n\t{"
 	voStr2 += "\n\t\tXmlElement xmlelement = (XmlElement)node;"
 	
 	cols = sheet.get_highest_column()
@@ -68,8 +79,10 @@ def creatVOBySheet(_name, sheet):
 		if len(_strArr)>=2 and len(_strArr[0])>0 and len(_strArr[1])>0 :
 			_attr = _strArr[0]
 			_type = _strArr[1]
-			voStr1 += "\n\t//" + sheet.cell(row = 1, column = _col).value
-			voStr1 += "\n\tpublic " + _type +" "+ _attr + ";"
+			voStr1 += "\n\t/// <summary>"
+			voStr1 += "\n\t/// " + sheet.cell(row = 1, column = _col).value
+			voStr1 += "\n\t/// </summary>"
+			voStr1 += "\n\tpublic " + _type +" "+ _attr + ";\n"
 			
 			if typeDic.has_key(_type):
 				voStr2 += "\n\t\t" + _attr + " = " + typeDic[_type].replace("{0}", _attr);
@@ -157,7 +170,14 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 	
 startTime = time.time()
-#path = cur_file_dir()
+path = cur_file_dir()
+
+excelDirPath = relatively_to_abs(excelDirPath)
+voDirPath = relatively_to_abs(voDirPath)
+xmlDirPath = relatively_to_abs(xmlDirPath)
+totleXMLPath = relatively_to_abs(totleXMLPath)
+byteDirPath = relatively_to_abs(byteDirPath)
+
 fileNameArr = getFileNames()
 
 #VO文件夹处理
