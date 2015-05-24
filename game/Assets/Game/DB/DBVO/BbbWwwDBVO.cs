@@ -4,11 +4,6 @@ using System.Xml;
 public class BbbWwwDBVO : DBVO
 {
 	/// <summary>
-	/// id
-	/// </summary>
-	public int id;
-
-	/// <summary>
 	/// 名字
 	/// </summary>
 	public string name;

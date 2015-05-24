@@ -4,11 +4,6 @@ using System.Xml;
 public class AaaSssDdDBVO : DBVO
 {
 	/// <summary>
-	/// id
-	/// </summary>
-	public int id;
-
-	/// <summary>
 	/// 年龄
 	/// </summary>
 	public int age;

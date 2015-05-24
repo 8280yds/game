@@ -79,10 +79,11 @@ def creatVOBySheet(_name, sheet):
 		if len(_strArr)>=2 and len(_strArr[0])>0 and len(_strArr[1])>0 :
 			_attr = _strArr[0]
 			_type = _strArr[1]
-			voStr1 += "\n\t/// <summary>"
-			voStr1 += "\n\t/// " + sheet.cell(row = 1, column = _col).value
-			voStr1 += "\n\t/// </summary>"
-			voStr1 += "\n\tpublic " + _type +" "+ _attr + ";\n"
+			if _attr != 'id' :
+				voStr1 += "\n\t/// <summary>"
+				voStr1 += "\n\t/// " + sheet.cell(row = 1, column = _col).value
+				voStr1 += "\n\t/// </summary>"
+				voStr1 += "\n\tpublic " + _type +" "+ _attr + ";\n"
 			
 			if typeDic.has_key(_type):
 				voStr2 += "\n\t\t" + _attr + " = " + typeDic[_type].replace("{0}", _attr);
