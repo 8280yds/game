@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ExcelToXMLMenu : ScriptableObject
 {
-    private const string path = "./Resources/DB/ExcelToXML.py";
+    private const string path = "/Freamwork/Editor/ExcelToXML.py";
 
     [MenuItem("Game/Excel To XML", false, 1)]
     static void ExcelToXML()

@@ -149,11 +149,11 @@ packTotleXML = True					#是否需要打包XML总文档
 packBytes = False					#是否需要打包二进制文件
 deleteAllVoBeforePack = True		#是否在打包前删除VO文件夹
 deleteAllXmlBeforePack = True		#是否在打包前删除XML文件夹
-excelDirPath = './Excel/'				#excel所在的文件夹
-voDirPath = '.../Assets/Game/DB/DBVO/'	#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-xmlDirPath = './XML/'					#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-totleXMLPath = './'						#打包后存放XML总文档的位置（相对于本python打包工具的位置）
-byteDirPath = './'						#打包后存放Bytes的位置（相对于本python打包工具的位置）
+excelDirPath = '..../Resources/DB/Excel/'#excel所在的文件夹
+voDirPath = '.../Game/DB/DBVO/'			#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+xmlDirPath = '..../Resources/DB/XML/'	#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+totleXMLPath = '..../Resources/DB/'		#打包后存放XML总文档的位置（相对于本python打包工具的位置）
+byteDirPath = '..../Resources/DB/'		#打包后存放Bytes的位置（相对于本python打包工具的位置）
 
 typeDic = {}
 typeDic['int'] = 'int.Parse(xmlelement.GetAttribute("{0}"));'
