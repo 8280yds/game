@@ -142,18 +142,18 @@ def creatXmlBySheet(filename, sheet):
 
 #配置数据
 xmlTitleStr = '<?xml version="1.0" encoding="UTF-8"?>'
-extension = '.xlsx'			#excel文件后缀
-packVO = True				#是否需要打包DBVO.CS文件
-packXml = True				#是否需要打包XML文件
-packTotleXML = True			#是否需要打包XML总文档
-packBytes = False			#是否需要打包二进制文件
+extension = '.xlsx'				#excel文件后缀
+packVO = True						#是否需要打包DBVO.CS文件
+packXml = True						#是否需要打包XML文件
+packTotleXML = True					#是否需要打包XML总文档
+packBytes = False					#是否需要打包二进制文件
 deleteAllVoBeforePack = True		#是否在打包前删除VO文件夹
 deleteAllXmlBeforePack = True		#是否在打包前删除XML文件夹
-excelDirPath = './Excel/'	#excel所在的文件夹
-voDirPath = '../DBVO/'		#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-xmlDirPath = './XML/'		#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-totleXMLPath = './'			#打包后存放XML总文档的位置（相对于本python打包工具的位置）
-byteDirPath = './'			#打包后存放Bytes的位置（相对于本python打包工具的位置）
+excelDirPath = './Excel/'				#excel所在的文件夹
+voDirPath = '.../Assets/Game/DB/DBVO/'	#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+xmlDirPath = './XML/'					#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+totleXMLPath = './'						#打包后存放XML总文档的位置（相对于本python打包工具的位置）
+byteDirPath = './'						#打包后存放Bytes的位置（相对于本python打包工具的位置）
 
 typeDic = {}
 typeDic['int'] = 'int.Parse(xmlelement.GetAttribute("{0}"));'
@@ -199,14 +199,14 @@ for filename in fileNameArr:
 	
 if packTotleXML :
 	totalXmlStr = '<root>' + totalXmlStr + '</root>'
-	#写入all.xml
-	totalXmlFile = open(byteDirPath + "all.xml", 'w')
+	#写入db.xml
+	totalXmlFile = open(byteDirPath + "db.xml", 'w')
 	totalXmlFile.write(totalXmlStr)
 	totalXmlFile.close()
 	
 if packBytes :
 	compress = zlib.compressobj(1)
-	byteFile = open(byteDirPath + "all.zbin", 'wb')
+	byteFile = open(byteDirPath + "db.zbin", 'wb')
 	byteFile.write(compress.compress(totalXmlStr))
 	byteFile.write(compress.flush())
 	byteFile.close()
