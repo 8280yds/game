@@ -10,14 +10,9 @@ namespace Freamwork
     public class LoadData
     {
         /// <summary>
-        /// 加载文件的名称(带路径带后缀)
+        /// 加载文件的名称
         /// </summary>
         public string fullName;
-
-        /// <summary>
-        /// 加载物件的版本号
-        /// </summary>
-        public int version = 0;
 
         /// <summary>
         /// 加载进度
@@ -25,7 +20,7 @@ namespace Freamwork
         public float loadProgressNum = 0f;
 
         /// <summary>
-        /// 加载进度
+        /// 解压进度
         /// </summary>
         public float unZipProgressNum = 0f;
 
@@ -35,9 +30,9 @@ namespace Freamwork
         public AssetBundle assetBundle = null;
 
         /// <summary>
-        /// 加载出来的Object[]
+        /// 解压出来的Object[]
         /// </summary>
-        public Object[] objects = null;
+        public Object[] assets = null;
 
         /// <summary>
         /// 错误信息
@@ -48,22 +43,22 @@ namespace Freamwork
         /// 创建一个的LoadData
         /// </summary>
         /// <param name="fullName"></param>
-        /// <param name="version"></param>
-        /// <param name="progress"></param>
+        /// <param name="loadProgressNum"></param>
         /// <param name="error"></param>
         /// <param name="assetBundle"></param>
+        /// <param name="unZipProgressNum"></param>
+        /// <param name="objects"></param>
         /// <returns></returns>
-        public static LoadData getLoadData(string fullName, int version, float loadProgressNum = 0, string error = null,
-            AssetBundle assetBundle = null, float unZipProgressNum = 0, Object[] objects = null)
+        public static LoadData getLoadData(string fullName, float loadProgressNum = 0, string error = null,
+            AssetBundle assetBundle = null, float unZipProgressNum = 0, Object[] assets = null)
         {
             LoadData data = new LoadData();
             data.fullName = fullName;
-            data.version = version;
             data.loadProgressNum = loadProgressNum;
             data.error = error;
             data.assetBundle = assetBundle;
             data.unZipProgressNum = unZipProgressNum;
-            data.objects = objects;
+            data.assets = assets;
             return data;
         }
     }

@@ -16,51 +16,51 @@ public class TestView2 : View
         txt = transform.FindChild("Text").GetComponent<Text>();
         txt2 = transform.FindChild("Text2").GetComponent<Text>();
 
-        BundleLoadInfo info = new BundleLoadInfo();
-        info.fullName = "cube.assetbundle";
-        info.version = 222;
-        info.loadStart = loadStart;
-        info.loadEnd = loadEnd;
-        info.loadFail = loadFail;
-        BundleLoadManager.instance.addLoad(info);
+        ManifestManager.instance.init(loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
 
-        BundleLoadManager.instance.addLoad("cube6.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.addLoad("cube7.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.addLoad("cube8.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-        BundleLoadManager.instance.addLoad("cube9.assetbundle", 222, LoadPriority.two, loadStart, loadProgress, loadEnd, loadFail);
-
-        BundleLoadInfo info3 = new BundleLoadInfo();
-        info3.fullName = "cube.assetbundle";
-        info3.version = 222;
-        info3.loadEnd = loadEnd;
-        info3.loadFail = loadFail;
-        BundleLoadManager.instance.addLoad(info3);
-
-        BundleLoadManager.instance.removeLoad("/cube8.assetbundle222");
-        BundleLoadManager.instance.removeLoad("/cube6.assetbundle222");
-        BundleLoadManager.instance.removeLoad("/cube7.assetbundle222", true);
     }
 
     void loadStart(LoadData loadData)
     {
-        Debug.Log(loadData.fullName + " loadStart");
+        Debug.Log(loadData.fullName + " 开始加载");
     }
 
     void loadProgress(LoadData loadData)
     {
-        Debug.Log(loadData.fullName + " loadProgress:" + (int)(loadData.loadProgressNum * 100) + "%");
+        Debug.Log(loadData.fullName + " 加载进度:" + (int)(loadData.loadProgressNum * 100) + "%");
     }
 
     void loadEnd(LoadData loadData)
     {
-        Debug.Log(loadData.fullName + " loadEnd:" + loadData);
+        Debug.Log(loadData.fullName + " 加载完毕");
     }
 
     void loadFail(LoadData loadData)
     {
-        Debug.Log(loadData.fullName + " loadFail:" + loadData);
+        Debug.Log(loadData.fullName + " 加载失败");
     }
-    
+
+    void unZipStart(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 开始解压");
+    }
+
+    void unZipProgress(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 解压进度:" + (int)(loadData.loadProgressNum * 100) + "%");
+    }
+
+    void unZipEnd(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 解压完毕");
+        BundleLoadManager.instance.addLoad("db",LoadPriority.two, LoadType.localOrWeb, 
+            loadStart, loadProgress,loadEnd,loadFail);
+        Debug.Log("Application.persistentDataPath: " + Application.persistentDataPath);
+    }
+
+
+
+
     public void showText(string str)
     {
         txt.text = str;

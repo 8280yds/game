@@ -14,6 +14,11 @@ namespace Freamwork
         public LoadPriority priority = LoadPriority.two;
 
         /// <summary>
+        /// 加载类型
+        /// </summary>
+        public LoadType loadType = LoadType.local;
+
+        /// <summary>
         /// WWW
         /// </summary>
         public WWW www = null;
@@ -47,7 +52,6 @@ namespace Freamwork
         {
             BundleLoadInfo newInfo = new BundleLoadInfo();
             newInfo.fullName = fullName;
-            newInfo.version = version;
 
             newInfo.loadProgressNum = loadProgressNum;
             newInfo.unZipProgressNum = unZipProgressNum;
@@ -55,7 +59,9 @@ namespace Freamwork
             newInfo.assetBundle = assetBundle;
 
             newInfo.priority = priority;
+            newInfo.loadType = loadType;
             newInfo.www = www;
+            newInfo.assets = assets;
 
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;

@@ -71,9 +71,9 @@ namespace Freamwork
         /// <summary>
         /// 加载资源，如果资源已经加载过，则直接从缓存中获取
         /// </summary>
-        /// <param name="fullName">名称</param>
-        /// <param name="version">版本号</param>
+        /// <param name="fullName">全名</param>
         /// <param name="priority">优先级</param>
+        /// <param name="loadType">加载类型</param>
         /// <param name="loadStart">加载开始前执行的方法</param>
         /// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
         /// <param name="loadEnd">加载结束后执行的方法</param>
@@ -81,16 +81,16 @@ namespace Freamwork
         /// <param name="unZipStart">解压开始前执行的方法</param>
         /// <param name="unZipProgress">解压开始后且在结束前每帧执行的方法</param>
         /// <param name="unZipEnd">解压完毕后执行的方法</param>
-        public void addLoad(string fullName, int version, LoadPriority priority = LoadPriority.two,
-            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null,
+        public void addLoad(string fullName, LoadPriority priority = LoadPriority.two, LoadType loadType = LoadType.local,
+            LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null,
             LoadFunctionDele unZipStart = null, LoadFunctionDele unZipProgress = null, 
             LoadFunctionDele unZipEnd = null)
         {
             LoadInfo loadInfo = new LoadInfo();
             loadInfo.fullName = fullName;
-            loadInfo.version = version;
             loadInfo.priority = priority;
+            loadInfo.loadType = loadType;
             loadInfo.loadStart = loadStart;
             loadInfo.loadProgress = loadProgress;
             loadInfo.loadEnd = loadEnd;
@@ -109,17 +109,11 @@ namespace Freamwork
         {
             if (string.IsNullOrEmpty(loadInfo.fullName))
             {
-                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的fullName不能为空");
+                throw new Exception("LoadManager.instance.load()的fullName不能为空");
             }
-            if (loadInfo.version == 0)
+            if (loadDic.ContainsKey(loadInfo.fullName))
             {
-                throw new Exception("BundleLoadManager.instance.load()的loadInfo参数的version未设置");
-            }
-
-            string fullName_version = loadInfo.fullName + loadInfo.version;
-            if (loadDic.ContainsKey(fullName_version))
-            {
-                LoadInfo info = loadDic[fullName_version];
+                LoadInfo info = loadDic[loadInfo.fullName];
                 delegateAddition(info.loadStart, loadInfo.loadStart);
                 delegateAddition(info.loadProgress, loadInfo.loadProgress);
                 delegateAddition(info.loadEnd, loadInfo.loadEnd);
@@ -130,20 +124,20 @@ namespace Freamwork
             }
             else
             {
-                if (unZipList.containsKey(fullName_version))
+                if (unZipList.containsKey(loadInfo.fullName))
                 {
-                    LoadInfo info = unZipList.getValue(fullName_version);
+                    LoadInfo info = unZipList.getValue(loadInfo.fullName);
                     if (loadInfo.loadStart != null)
                     {
-                        loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version));
+                        loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName));
                     }
                     if (loadInfo.loadEnd != null)
                     {
-                        loadInfo.loadEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, info.assetBundle));
+                        loadInfo.loadEnd(LoadData.getLoadData(loadInfo.fullName, 1, null, info.assetBundle));
                     }
                     if (loadInfo.unZipStart != null)
                     {
-                        loadInfo.unZipStart(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1));
+                        loadInfo.unZipStart(LoadData.getLoadData(loadInfo.fullName, 1));
                     }
                     delegateAddition(info.unZipProgress, loadInfo.unZipProgress);
                     delegateAddition(info.unZipEnd, loadInfo.unZipEnd);
@@ -151,7 +145,7 @@ namespace Freamwork
                 }
                 else
                 {
-                    loadDic.Add(fullName_version, loadInfo);
+                    loadDic.Add(loadInfo.fullName, loadInfo);
                 }
             }
             BundleLoadInfo newInfo = loadInfo.getBundleLoadInfo();
@@ -184,7 +178,7 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void loadEnd(LoadData loadData)
         {
-            if (loadDic.ContainsKey(loadData.fullName + loadData.version))
+            if (loadDic.ContainsKey(loadData.fullName))
             {
                 unZipStart(loadData);
             }
@@ -205,8 +199,7 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void unZipStart(LoadData loadData)
         {
-            string fullName_version = loadData.fullName + loadData.version;
-            LoadInfo loadInfo = loadDic[fullName_version];
+            LoadInfo loadInfo = loadDic[loadData.fullName];
             loadInfo.request = loadData.assetBundle.LoadAllAssetsAsync();
 
             if (loadInfo.unZipStart != null)
@@ -214,8 +207,8 @@ namespace Freamwork
                 loadInfo.unZipStart(loadData);
             }
 
-            unZipList.add(fullName_version, loadInfo);
-            loadDic.Remove(fullName_version);
+            unZipList.add(loadData.fullName, loadInfo);
+            loadDic.Remove(loadData.fullName);
             EnterFrame.instance.addEnterFrame(enterFrame);
         }
 
@@ -225,8 +218,7 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void unZipEnd(LoadData loadData)
         {
-            string fullName_version = loadData.fullName + loadData.version;
-            LoadInfo loadInfo = unZipList.getValue(fullName_version);
+            LoadInfo loadInfo = unZipList.getValue(loadData.fullName);
 
             if (loadInfo.unZipEnd != null)
             {
@@ -257,18 +249,17 @@ namespace Freamwork
                 //解压完成
                 if (request.isDone)
                 {
-                    Debug.Log(loadInfo.fullName + loadInfo.version + "解压完成");
-                    unZipEnd(LoadData.getLoadData(loadInfo.fullName, loadInfo.version, 1, null, null, 1, request.allAssets));
+                    Debug.Log(loadInfo.fullName + "解压完成");
+                    unZipEnd(LoadData.getLoadData(loadInfo.fullName, 1, null, null, 1, request.allAssets));
                     unZipList.removeAt(i);
                     i--;
                     continue;
                 }
 
-                //加载进度
+                //解压进度
                 if (loadInfo.unZipProgress != null)
                 {
-                    loadInfo.unZipProgress(LoadData.getLoadData(loadInfo.fullName, loadInfo.version,
-                        1, null, null, request.progress));
+                    loadInfo.unZipProgress(LoadData.getLoadData(loadInfo.fullName, 1, null, null, request.progress));
                 }
             }
         }
@@ -277,34 +268,34 @@ namespace Freamwork
         ///// 停止加载或停止等待加载，并移除
         ///// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
         ///// </summary>
-        ///// <param name="fullName_version">fullName+Version</param>
+        ///// <param name="fullName">fullName</param>
         ///// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
         ///// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
-        //public bool removeLoad(string fullName_version, bool stopIfLoading = false)
+        //public bool removeLoad(string fullName, bool stopIfLoading = false)
         //{
-        //    if (!loadDic.ContainsKey(fullName_version))
+        //    if (!loadDic.ContainsKey(fullName))
         //    {
         //        return true;
         //    }
 
         //    BundleLoadManager blm = BundleLoadManager.instance;
-        //    LoadStatus status = blm.getLoadStatus(fullName_version);
+        //    LoadStatus status = blm.getLoadStatus(fullName);
         //    switch (status)
         //    {
         //        case LoadStatus.loading:
-        //            if (!blm.removeLoad(fullName_version, stopIfLoading))
+        //            if (!blm.removeLoad(fullName, stopIfLoading))
         //            {
         //                return false;
         //            }
         //            break;
         //        case LoadStatus.wait:
-        //            blm.removeLoad(fullName_version);
+        //            blm.removeLoad(fullName);
         //            break;
         //    }
         //    //?????????????
         //    //?????????????
         //    //?????????????
-        //    loadDic.Remove(fullName_version);
+        //    loadDic.Remove(fullName);
         //    return true;
         //}
 

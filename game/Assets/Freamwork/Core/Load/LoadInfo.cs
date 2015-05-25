@@ -14,6 +14,11 @@ namespace Freamwork
         public LoadPriority priority = LoadPriority.two;
 
         /// <summary>
+        /// 加载类型
+        /// </summary>
+        public LoadType loadType = LoadType.local;
+
+        /// <summary>
         /// request
         /// </summary>
         public AssetBundleRequest request = null;
@@ -62,14 +67,16 @@ namespace Freamwork
         {
             LoadInfo newInfo = new LoadInfo();
             newInfo.fullName = fullName;
-            newInfo.version = version;
 
             newInfo.loadProgressNum = loadProgressNum;
             newInfo.unZipProgressNum = unZipProgressNum;
             newInfo.error = error;
             newInfo.assetBundle = assetBundle;
 
+            newInfo.loadType = loadType;
             newInfo.priority = priority;
+            newInfo.request = request;
+            newInfo.assets = assets;
 
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;
@@ -89,7 +96,6 @@ namespace Freamwork
         {
             BundleLoadInfo newInfo = new BundleLoadInfo();
             newInfo.fullName = fullName;
-            newInfo.version = version;
 
             newInfo.loadProgressNum = loadProgressNum;
             newInfo.unZipProgressNum = unZipProgressNum;
@@ -97,12 +103,13 @@ namespace Freamwork
             newInfo.assetBundle = assetBundle;
 
             newInfo.priority = priority;
+            newInfo.loadType = loadType;
+            newInfo.assets = assets;
 
             newInfo.loadStart = loadStart;
             newInfo.loadProgress = loadProgress;
             newInfo.loadEnd = loadEnd;
             newInfo.loadFail = loadFail;
-
             return newInfo;
         }
 

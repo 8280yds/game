@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Freamwork;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -38,58 +39,51 @@ public class PackBundlesMenu : ScriptableObject
     {
         //确保目标文件夹存在
         AssetDatabase.Refresh();
-        if (!Directory.Exists(bundlesDirePath))
+        if (!Directory.Exists(bundlesDirePath + "/.Temporary"))
         {
-            Directory.CreateDirectory(bundlesDirePath);
+            Directory.CreateDirectory(bundlesDirePath + "/.Temporary");
         }
 
-        //删除manifest
-        string direName = getLastStr(bundlesDirePath);
-        string manifestPath = bundlesDirePath + "/" + direName + ".manifest";
-        if (File.Exists(manifestPath))
+        //确保db.xml存在，并先单独打包db.xml
+        if (!File.Exists(dbPath + "/db.xml"))
         {
-            File.Delete(manifestPath);
+            Directory.Delete(bundlesDirePath + "/.Temporary", true);
+            EditorUtility.DisplayDialog("出错啦", "db.xml未找到！", "确定");
+            return;
         }
+        File.Copy(dbPath + "/db.xml", "Assets/db.xml", true);
+        AssetDatabase.Refresh();
+        AssetBundleBuild[] buildMap = new AssetBundleBuild[1];
+        buildMap[0].assetBundleName = "db";
+        buildMap[0].assetNames = new string[] { "Assets/db.xml" };
+        BuildPipeline.BuildAssetBundles(bundlesDirePath + "/.Temporary", buildMap, 
+            BuildAssetBundleOptions.None, BuildTarget.Android);
+        File.Copy(bundlesDirePath + "/.Temporary/db", bundlesDirePath + "/db", true);
+        File.Copy(bundlesDirePath + "/.Temporary/db.manifest", bundlesDirePath + "/db.manifest", true);
+        File.Delete("Assets/db.xml");
 
         //打包资源
         AssetDatabase.Refresh();
         BuildPipeline.BuildAssetBundles(bundlesDirePath, BuildAssetBundleOptions.None, BuildTarget.Android);
+
+        //写入manifest.xml
         string xmlStr = "<manifest>" + getXMLStr() + "</manifest>";
         File.WriteAllText(bundlesDirePath + "/manifest.xml", xmlStr);
 
-        //单独打包manifest.xml和db.xml
-        bool packDB = File.Exists(dbPath + "/db.xml");
-        if (packDB)
-        {
-            File.Copy(dbPath + "/db.xml", "Assets/db.xml");
-        }
-        else
-        {
-            Debug.LogWarning ("未找到db.xml");
-        }
-        File.Copy(bundlesDirePath + "/manifest.xml", "Assets/manifest.xml");
-
+        //单独打包manifest.xml
+        File.Copy(bundlesDirePath + "/manifest.xml", "Assets/manifest.xml", true);
         AssetDatabase.Refresh();
-        List<AssetBundleBuild> buildMapList = new List<AssetBundleBuild>();
-        AssetBundleBuild build = new AssetBundleBuild();
-        build.assetBundleName = "manifest";
-        build.assetNames = new string[] { "Assets/manifest.xml" };
-        buildMapList.Add(build);
-        if (packDB)
-        {
-            build = new AssetBundleBuild();
-            build.assetBundleName = "db";
-            build.assetNames = new string[] { "Assets/db.xml" };
-            buildMapList.Add(build);
-        }
-        BuildPipeline.BuildAssetBundles(bundlesDirePath, buildMapList.ToArray(), BuildAssetBundleOptions.None, BuildTarget.Android);
-
-        if (packDB)
-        {
-            File.Delete("Assets/db.xml");
-        }
+        buildMap = new AssetBundleBuild[1];
+        buildMap[0].assetBundleName = "manifest";
+        buildMap[0].assetNames = new string[] { "Assets/manifest.xml" };
+        BuildPipeline.BuildAssetBundles(bundlesDirePath + "/.Temporary", buildMap, 
+            BuildAssetBundleOptions.None, BuildTarget.Android);
+        File.Copy(bundlesDirePath + "/.Temporary/manifest", bundlesDirePath + "/manifest", true);
+        File.Copy(bundlesDirePath + "/.Temporary/manifest.manifest", bundlesDirePath + "/manifest.manifest", true);
         File.Delete("Assets/manifest.xml");
 
+        //打包完成
+        Directory.Delete(bundlesDirePath + "/.Temporary", true);
         AssetDatabase.Refresh();
         EditorUtility.DisplayDialog("提示", "资源打包完毕", "确定");
     }
@@ -100,7 +94,7 @@ public class PackBundlesMenu : ScriptableObject
     /// <returns></returns>
     private static string getXMLStr()
     {
-        string direName = getLastStr(bundlesDirePath);
+        string direName = StringUtil.getLastStr(bundlesDirePath);
         string manifestPath = bundlesDirePath + "/" + direName + ".manifest";
         if (!File.Exists(manifestPath))
         {
@@ -108,6 +102,10 @@ public class PackBundlesMenu : ScriptableObject
         }
 
         Dictionary<string, ManifestVO> voDic = new Dictionary<string, ManifestVO>();
+        ManifestVO manifestVO = new ManifestVO();
+        manifestVO.name = "db";
+        voDic.Add(manifestVO.name, manifestVO);
+
         StreamReader fs = new StreamReader(manifestPath);
         string line;
 
@@ -197,31 +195,4 @@ public class PackBundlesMenu : ScriptableObject
         }
         return allStr;
     }
-
-    /// <summary>
-    /// 获取最后一个“/”后面的字符
-    /// </summary>
-    /// <param name="targetStr"></param>
-    /// <returns></returns>
-    private static string getLastStr(string targetStr)
-    {
-        string str = targetStr;
-        int index = targetStr.LastIndexOf("/");
-        if (index >= 0)
-        {
-            str = targetStr.Substring(index + 1);
-        }
-        return str;
-    }
-}
-
-/// <summary>
-/// 数据VO
-/// </summary>
-public class ManifestVO
-{
-    public string name;
-    public string crc;
-    public string deps;
-    public string assets;
 }

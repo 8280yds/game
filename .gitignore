@@ -14,6 +14,7 @@ UnityVS/
 *.suo
 *.csproj
 *.pidb
+*.manifest
 
 #================
 #去除其他文件类型
