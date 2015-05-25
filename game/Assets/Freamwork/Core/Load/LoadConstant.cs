@@ -72,6 +72,11 @@
         public const string LOCAL_LOAD_ERROR = "本地不存在该文件，无法加载";
 
         /// <summary>
+        /// 在加载过程中被终止的报错信息
+        /// </summary>
+        public const string LOADING_STOP_ERROR = "在加载过程中被终止";
+
+        /// <summary>
         /// 加载信息文件的名称
         /// </summary>
         public const string MANIFEST_FILE = "manifest";

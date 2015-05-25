@@ -60,6 +60,11 @@ namespace Freamwork
         public LoadFunctionDele unZipEnd = null;
 
         /// <summary>
+        /// 解压完毕后执行的方法
+        /// </summary>
+        public LoadFunctionDele unZipFail = null;
+
+        /// <summary>
         /// 克隆（浅克隆）
         /// </summary>
         /// <returns>一个新的LoadInfo实例</returns>
@@ -85,6 +90,7 @@ namespace Freamwork
             newInfo.unZipStart = unZipStart;
             newInfo.unZipProgress = unZipProgress;
             newInfo.unZipEnd = unZipEnd;
+            newInfo.unZipFail = unZipFail;
             return newInfo;
         }
 

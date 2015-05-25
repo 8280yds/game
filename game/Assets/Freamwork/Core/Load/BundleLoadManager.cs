@@ -184,6 +184,15 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// 获取当前正在加载中的资源的名称列表
+        /// </summary>
+        /// <returns></returns>
+        public List<string> getLoadingFullNames()
+        {
+            return loadingList.keys;
+        }
+
+        /// <summary>
         /// 根据优先级在等待队列中删除并返回第一条信息
         /// </summary>
         /// <returns></returns>
@@ -514,11 +523,18 @@ namespace Freamwork
                 {
                     return false;
                 }
+
                 Debug.Log(loadInfo.fullName + "在加载过程中被终止");
+                if (loadInfo.loadFail != null)
+                {
+                    loadInfo.loadFail(LoadData.getLoadData(loadInfo.fullName, loadInfo.www.progress, 
+                        LoadConstant.LOADING_STOP_ERROR));
+                }
                 loadInfo.www.Dispose();
                 loadInfo.www = null;
                 loadingList.remove(fullName);
                 loadNext();
+                LoadManager.instance.removeInLists(fullName);
                 return true;
             }
 
@@ -528,11 +544,12 @@ namespace Freamwork
                 Debug.Log(loadInfo.fullName + "在等待加载过程中被终止");
                 waitLists[(int)loadInfo.priority].remove(fullName);
             }
+            LoadManager.instance.removeInLists(fullName);
             return true;
         }
 
         /// <summary>
-        /// 清除缓存的assetBundle
+        /// 删除缓存的assetBundle
         /// </summary>
         /// <param name="fullName">fullName</param>
         /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
@@ -546,31 +563,6 @@ namespace Freamwork
             }
             return false;
         }
-
-        ///// <summary>
-        ///// 插队加载，每次会将此加载添加到当前优先级队列的最前面，勿乱用！！！
-        ///// </summary>
-        ///// <param name="fullName">名称</param>
-        ///// <param name="priority">优先级</param>
-        ///// <param name="loadType">加载类型</param>
-        ///// <param name="loadStart">加载开始前执行的方法</param>
-        ///// <param name="loadProgress">加载开始后且在结束前每帧执行的方法</param>
-        ///// <param name="loadEnd">加载结束后执行的方法</param>
-        ///// <param name="loadFail">加载失败后执行的方法</param>
-        //public void insertLoad(string fullName, LoadPriority priority = LoadPriority.zero, LoadType loadType = LoadType.local,
-        //    LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null,
-        //    LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null)
-        //{
-        //    BundleLoadInfo loadInfo = new BundleLoadInfo();
-        //    loadInfo.fullName = fullName;
-        //    loadInfo.priority = priority;
-        //    loadInfo.loadStart = loadStart;
-        //    loadInfo.loadProgress = loadProgress;
-        //    loadInfo.loadEnd = loadEnd;
-        //    loadInfo.loadFail = loadFail;
-        //    waitLists[(int)priority].insert(0, loadInfo.fullName, loadInfo);
-        //    addLoad(loadInfo);
-        //}
 
     }
 }

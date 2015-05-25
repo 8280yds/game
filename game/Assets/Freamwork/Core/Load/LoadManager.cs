@@ -63,6 +63,7 @@ namespace Freamwork
         /// </summary>
         public void clear()
         {
+            EnterFrame.instance.removeEnterFrame(enterFrame);
             loadDic.Clear();
             unZipList.clear();
         }
@@ -81,11 +82,12 @@ namespace Freamwork
         /// <param name="unZipStart">解压开始前执行的方法</param>
         /// <param name="unZipProgress">解压开始后且在结束前每帧执行的方法</param>
         /// <param name="unZipEnd">解压完毕后执行的方法</param>
+        /// <param name="unZipFail">解压失败后执行的方法</param>
         public void addLoad(string fullName, LoadPriority priority = LoadPriority.two, LoadType loadType = LoadType.local,
             LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null, 
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null,
-            LoadFunctionDele unZipStart = null, LoadFunctionDele unZipProgress = null, 
-            LoadFunctionDele unZipEnd = null)
+            LoadFunctionDele unZipStart = null, LoadFunctionDele unZipProgress = null,
+            LoadFunctionDele unZipEnd = null, LoadFunctionDele unZipFail = null)
         {
             LoadInfo loadInfo = new LoadInfo();
             loadInfo.fullName = fullName;
@@ -98,6 +100,7 @@ namespace Freamwork
             loadInfo.unZipStart = unZipStart;
             loadInfo.unZipProgress = unZipProgress;
             loadInfo.unZipEnd = unZipEnd;
+            loadInfo.unZipFail = unZipFail;
             addLoad(loadInfo);
         }
 
@@ -121,6 +124,7 @@ namespace Freamwork
                 delegateAddition(info.unZipStart, loadInfo.unZipStart);
                 delegateAddition(info.unZipProgress, loadInfo.unZipProgress);
                 delegateAddition(info.unZipEnd, loadInfo.unZipEnd);
+                delegateAddition(info.unZipFail, loadInfo.unZipFail);
             }
             else
             {
@@ -141,6 +145,7 @@ namespace Freamwork
                     }
                     delegateAddition(info.unZipProgress, loadInfo.unZipProgress);
                     delegateAddition(info.unZipEnd, loadInfo.unZipEnd);
+                    delegateAddition(info.unZipFail, loadInfo.unZipFail);
                     return;
                 }
                 else
@@ -150,7 +155,6 @@ namespace Freamwork
             }
             BundleLoadInfo newInfo = loadInfo.getBundleLoadInfo();
             newInfo.loadEnd = loadInfo.loadEnd + this.loadEnd;
-            newInfo.loadFail = loadInfo.loadFail + this.loadFail;
             BundleLoadManager.instance.addLoad(newInfo);
         }
 
@@ -182,15 +186,6 @@ namespace Freamwork
             {
                 unZipStart(loadData);
             }
-        }
-
-        /// <summary>
-        /// 加载失败
-        /// </summary>
-        /// <param name="loadData"></param>
-        private void loadFail(LoadData loadData)
-        {
-            //预留，以备以后添加特殊处理
         }
 
         /// <summary>
@@ -264,40 +259,41 @@ namespace Freamwork
             }
         }
 
-        ///// <summary>
-        ///// 停止加载或停止等待加载，并移除
-        ///// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
-        ///// </summary>
-        ///// <param name="fullName">fullName</param>
-        ///// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
-        ///// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
-        //public bool removeLoad(string fullName, bool stopIfLoading = false)
-        //{
-        //    if (!loadDic.ContainsKey(fullName))
-        //    {
-        //        return true;
-        //    }
+        /// <summary>
+        /// 停止加载或停止等待加载，并移除，如果已经在解压中也会终止解压
+        /// <param>【注意】本方法会停止当前所有地方对本资源的加载，慎用！！！</param>
+        /// </summary>
+        /// <param name="fullName">fullName</param>
+        /// <param name="stopIfLoading">如果已经开始了对本资源的加载，是否仍要强制停止加载</param>
+        /// <returns>true：已停止加载或停止等待加载； false：当前已经开始加载，且未停止</returns>
+        public bool removeLoad(string fullName, bool stopIfLoading = false)
+        {
+            return BundleLoadManager.instance.removeLoad(fullName, stopIfLoading);
+        }
 
-        //    BundleLoadManager blm = BundleLoadManager.instance;
-        //    LoadStatus status = blm.getLoadStatus(fullName);
-        //    switch (status)
-        //    {
-        //        case LoadStatus.loading:
-        //            if (!blm.removeLoad(fullName, stopIfLoading))
-        //            {
-        //                return false;
-        //            }
-        //            break;
-        //        case LoadStatus.wait:
-        //            blm.removeLoad(fullName);
-        //            break;
-        //    }
-        //    //?????????????
-        //    //?????????????
-        //    //?????????????
-        //    loadDic.Remove(fullName);
-        //    return true;
-        //}
+        /// <summary>
+        /// 从加载和解压列表中移除
+        /// <param>【注意】请调用removeLoad方法，因为此方法无法保证真正停止加载，只是从列表中移除</param>
+        /// </summary>
+        /// <param name="fullName"></param>
+        public void removeInLists(string fullName)
+        {
+            loadDic.Remove(fullName);
+
+            LoadInfo loadInfo = unZipList.remove(fullName);
+            if (loadInfo != null)
+            {
+                Debug.Log(fullName + "在解压过程中被终止");
+                if (loadInfo.unZipFail != null)
+                {
+                    loadInfo.unZipFail(LoadData.getLoadData(fullName, 1));
+                }
+            }
+            if (unZipList.count == 0)
+            {
+                EnterFrame.instance.removeEnterFrame(enterFrame);
+            }
+        }
 
     }
 }
