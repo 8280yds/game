@@ -118,7 +118,7 @@ def creatXmlBySheet(filename, sheet):
 			
 			for _row in range(3, rows+1) :
 				cell = sheet.cell(row = _row, column = _col)
-				if str(cell.value).strip() == '' :
+				if not cell.value or str(cell.value).strip() == '' :
 					addStr = ''
 				else :
 					addStr = str(cell.value)

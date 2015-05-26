@@ -263,7 +263,7 @@ namespace Freamwork
                 throw new Exception("未找到" + loadInfo.fullName + "相关的ManifestVO信息");
             }
 
-            if (File.Exists(Application.persistentDataPath + "/" + loadInfo.fullName + "_" + vo.crc))
+            if (File.Exists(Application.persistentDataPath + "/" + loadInfo.fullName + "@" + vo.crc))
             {
                 if (loadInfo.loadType == LoadType.web)
                 {
@@ -412,7 +412,7 @@ namespace Freamwork
             if (loadInfo.loadType == LoadType.local)
             {
                 ManifestVO vo = ManifestManager.instance.getManifestVO(loadInfo.fullName);
-                url = LoadConstant.LOCAL_TITLE + Application.persistentDataPath + "/" + loadInfo.fullName + "_" + vo.crc;
+                url = LoadConstant.LOCAL_TITLE + Application.persistentDataPath + "/" + loadInfo.fullName + "@" + vo.crc;
             }
             else
             {
@@ -422,7 +422,7 @@ namespace Freamwork
                 if (LoadConstant.DELETE_OLD_VERSION)
                 {
                     string[] files = Directory.GetFiles(Application.persistentDataPath, 
-                        loadInfo.fullName + "_*", SearchOption.AllDirectories);
+                        loadInfo.fullName + "@*", SearchOption.AllDirectories);
                     for (int i = 0, len = files.Length; i < len; i++ )
                     {
                         File.Delete(files[i]);
@@ -498,7 +498,7 @@ namespace Freamwork
             if (www.url.Contains(LoadConstant.CDN))
             {
                 ManifestVO vo = ManifestManager.instance.getManifestVO(loadInfo.fullName);
-                File.WriteAllBytes(Application.persistentDataPath + "/" + loadInfo.fullName + "_" + vo.crc, www.bytes);
+                File.WriteAllBytes(Application.persistentDataPath + "/" + loadInfo.fullName + "@" + vo.crc, www.bytes);
             }
             BundleLoadInfo newInfo = new BundleLoadInfo();
             newInfo.fullName = loadInfo.fullName;
