@@ -24,13 +24,12 @@ namespace Freamwork
         /// <summary>
         /// 初始化数据
         /// </summary>
-        virtual protected void initDBModel(string path = "", bool order = false)
+        /// <param name="name">数据表名称，不带后缀</param>
+        /// <param name="order">数据是否有顺序性</param>
+        virtual protected void initDBModel(string name = "", bool order = false)
         {
             m_order = order;
-            XmlDocument xmldoc = new XmlDocument();
-            xmldoc.Load(path);
-
-            xmlNode = xmldoc.SelectSingleNode("data");
+            xmlNode = DBXMLManager.instance.extractXmlNode(name);
             m_count = xmlNode.ChildNodes.Count;
             m_dataDic = new Dictionary<int, TDBVO>();
             if (order)
@@ -200,7 +199,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 清除数据
+        /// 清除数据，在dispose中会调用
         /// </summary>
         override public void clearAll()
         {

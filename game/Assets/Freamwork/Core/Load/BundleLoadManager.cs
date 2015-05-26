@@ -100,16 +100,12 @@ namespace Freamwork
             }
             loadingList.clear();
 
-            foreach(string str in cacheDic.Keys)
-            {
-                deleteCacheItem(str);
-            }
-            cacheDic.Clear();
-
             for (int i = 0, len = waitLists.Length; i < len; i++)
             {
                 waitLists[i].clear();
             }
+
+            clearAllCache();
 
             //强制清除并垃圾回收
             Resources.UnloadUnusedAssets();
@@ -290,6 +286,7 @@ namespace Freamwork
             {
                 if (loadInfo.loadType == LoadType.local)
                 {
+                    Debug.LogWarning(loadInfo.fullName + "加载失败：" + LoadConstant.LOCAL_LOAD_ERROR);
                     if (loadInfo.loadStart != null)
                     {
                         loadInfo.loadStart(LoadData.getLoadData(loadInfo.fullName));
@@ -421,7 +418,7 @@ namespace Freamwork
             {
                 url = LoadConstant.CDN + loadInfo.fullName;
 
-                //删除本地的过期版本
+                //删除本地的过期版本的资源
                 if (LoadConstant.DELETE_OLD_VERSION)
                 {
                     string[] files = Directory.GetFiles(Application.persistentDataPath, 
@@ -453,14 +450,15 @@ namespace Freamwork
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     Debug.LogWarning(loadInfo.fullName + "加载失败：" + www.error);
+                    loadingList.removeAt(i);
+                    i--;
+
                     if (loadInfo.loadFail != null)
                     {
                         loadInfo.loadFail(LoadData.getLoadData(loadInfo.fullName, www.progress, www.error));
                     }
                     www.Dispose();
                     www = null;
-                    loadingList.removeAt(i);
-                    i--;
                     loadNext();
                     continue;
                 }
@@ -469,6 +467,9 @@ namespace Freamwork
                 if (www.isDone)
                 {
                     Debug.Log(loadInfo.fullName + "加载完成");
+                    loadingList.removeAt(i);
+                    i--;
+
                     store(loadInfo);
                     if (loadInfo.loadEnd != null)
                     {
@@ -476,8 +477,6 @@ namespace Freamwork
                     }
                     www.Dispose();
                     www = null;
-                    loadingList.removeAt(i);
-                    i--;
                     loadNext();
                     continue;
                 }
@@ -496,9 +495,10 @@ namespace Freamwork
         private void store(BundleLoadInfo loadInfo)
         {
             WWW www = loadInfo.www;
-            if(!www.url.Contains(LoadConstant.LOCAL_TITLE))
+            if (www.url.Contains(LoadConstant.CDN))
             {
-                File.WriteAllBytes(loadInfo.fullName, www.bytes);
+                ManifestVO vo = ManifestManager.instance.getManifestVO(loadInfo.fullName);
+                File.WriteAllBytes(Application.persistentDataPath + "/" + loadInfo.fullName + "_" + vo.crc, www.bytes);
             }
             BundleLoadInfo newInfo = new BundleLoadInfo();
             newInfo.fullName = loadInfo.fullName;
@@ -549,7 +549,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 删除缓存的assetBundle
+        /// 删除一条缓存资源
         /// </summary>
         /// <param name="fullName">fullName</param>
         /// <returns>true:存在该缓存并且清除 false:不存在该缓存</returns>
@@ -562,6 +562,19 @@ namespace Freamwork
                 return true;
             }
             return false;
+        }
+
+        /// <summary>
+        /// 清空缓存的资源
+        /// </summary>
+        public void clearAllCache()
+        {
+            foreach(BundleLoadInfo info in cacheDic.Values)
+            {
+                info.assetBundle.Unload(false);
+                info.assetBundle = null;
+            }
+            cacheDic.Clear();
         }
 
     }

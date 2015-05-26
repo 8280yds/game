@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Freamwork
 {
-    public class ManifestManager
+    sealed public class ManifestManager
     {
         /// <summary>
         /// 实例
@@ -54,6 +54,17 @@ namespace Freamwork
         }
         private bool m_isInit = false;
 
+        /// <summary>
+        /// 获取所有资源的名称
+        /// </summary>
+        public List<string> getAllFullName
+        {
+            get
+            {
+                return new List<string>(dic.Keys);
+            }
+        }
+
         private LoadFunctionDele m_loadStart, m_loadProgress, m_loadEnd, m_loadFail, m_unZipStart,
             m_unZipProgress, m_unZipEnd;
 
@@ -70,7 +81,7 @@ namespace Freamwork
             if (isInit)
             {
                 throw new Exception("ManifestManager试图重复初始化，初始化将清空所有Manifest信息" +
-                    "重新从网络加载，如果确信这么做请在Clear()后调用此方法");
+                    "重新从网络加载，如果确信要这么做请在clear()后调用此方法");
             }
 
             Debug.Log("ManifestManager开始初始化……");
@@ -85,7 +96,7 @@ namespace Freamwork
             m_unZipEnd = unZipEnd;
 
             EnterFrame.instance.addEnterFrame(enterframe);
-            www = new WWW(LoadConstant.CDN + "/" + LoadConstant.MANIFEST_FILE);
+            www = new WWW(LoadConstant.CDN + LoadConstant.MANIFEST_FILE);
             if (m_loadStart != null)
             {
                 m_loadStart(LoadData.getLoadData(LoadConstant.MANIFEST_FILE));

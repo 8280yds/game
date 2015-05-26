@@ -197,14 +197,14 @@ namespace Freamwork
             LoadInfo loadInfo = loadDic[loadData.fullName];
             loadInfo.request = loadData.assetBundle.LoadAllAssetsAsync();
 
+            unZipList.add(loadData.fullName, loadInfo);
+            loadDic.Remove(loadData.fullName);
+            EnterFrame.instance.addEnterFrame(enterFrame);
+
             if (loadInfo.unZipStart != null)
             {
                 loadInfo.unZipStart(loadData);
             }
-
-            unZipList.add(loadData.fullName, loadInfo);
-            loadDic.Remove(loadData.fullName);
-            EnterFrame.instance.addEnterFrame(enterFrame);
         }
 
         /// <summary>
@@ -213,19 +213,18 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void unZipEnd(LoadData loadData)
         {
-            LoadInfo loadInfo = unZipList.getValue(loadData.fullName);
-
-            if (loadInfo.unZipEnd != null)
-            {
-                loadInfo.unZipEnd(loadData);
-            }
+            LoadInfo loadInfo = unZipList.remove(loadData.fullName);
+            Debug.Log(loadInfo.fullName + "解压完成");
 
             if (unZipList.count == 0)
             {
                 EnterFrame.instance.removeEnterFrame(enterFrame);
             }
-            loadData.assetBundle = null;
-            loadInfo.request = null;
+
+            if (loadInfo.unZipEnd != null)
+            {
+                loadInfo.unZipEnd(loadData);
+            }
         }
 
         /// <summary>
@@ -244,9 +243,7 @@ namespace Freamwork
                 //解压完成
                 if (request.isDone)
                 {
-                    Debug.Log(loadInfo.fullName + "解压完成");
                     unZipEnd(LoadData.getLoadData(loadInfo.fullName, 1, null, null, 1, request.allAssets));
-                    unZipList.removeAt(i);
                     i--;
                     continue;
                 }

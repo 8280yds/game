@@ -16,8 +16,8 @@ public class TestView2 : View
         txt = transform.FindChild("Text").GetComponent<Text>();
         txt2 = transform.FindChild("Text2").GetComponent<Text>();
 
-        ManifestManager.instance.init(loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
-
+        Debug.Log(Application.persistentDataPath);
+        ManifestManager.instance.init(loadStart, null, loadEnd, loadFail, null, null, unZipEnd);
     }
 
     void loadStart(LoadData loadData)
@@ -53,11 +53,26 @@ public class TestView2 : View
     void unZipEnd(LoadData loadData)
     {
         Debug.Log(loadData.fullName + " 解压完毕");
-        BundleLoadManager.instance.addLoad("db",LoadPriority.two, LoadType.localOrWeb, 
-            loadStart, loadProgress,loadEnd,loadFail);
-        Debug.Log("Application.persistentDataPath: " + Application.persistentDataPath);
+        LoadManager.instance.addLoad("db",LoadPriority.two, LoadType.localOrWeb, 
+            loadStart, null,loadEnd2,loadFail, null, null, unZipEnd2, unZipFail);
     }
 
+    void unZipEnd2(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 解压完毕");
+        Debug.Log((loadData.assets[0] as TextAsset).text);
+    }
+
+    void unZipFail(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 解压失败");
+    }
+
+
+    void loadEnd2(LoadData loadData)
+    {
+        Debug.Log(loadData.fullName + " 加载完毕");
+    }
 
 
 

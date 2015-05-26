@@ -44,7 +44,11 @@ namespace Freamwork
 
         public V getValue(K key)
         {
-            return dic[key];
+            if (dic.ContainsKey(key))
+            {
+                return dic[key];
+            }
+            return default(V);
         }
 
         public V getValueAt(int index)

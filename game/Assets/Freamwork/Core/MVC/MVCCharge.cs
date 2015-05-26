@@ -62,6 +62,10 @@ namespace Freamwork
 
         public void clear()
         {
+            foreach (IMVCObject mvcObject in m_instanceDic.Values)
+            {
+                mvcObject.dispose();
+            }
             m_instanceDic.Clear();
             m_listenerIdList.Clear();
             m_listenerDic.Clear();
