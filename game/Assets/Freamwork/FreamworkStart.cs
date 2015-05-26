@@ -1,7 +1,7 @@
 ﻿using Freamwork;
 using UnityEngine;
 
-public class GameStart : MonoBehaviour
+public class FreamworkStart : MonoBehaviour
 {
     void Start()
     {
