@@ -85,13 +85,13 @@ namespace Freamwork
         /// </summary>
         /// <typeparam name="TCommand">命令类型</typeparam>
         /// <param name="param">需要传递的数据</param>
-        public void sendCommand<TCommand>(object param = null) where TCommand : Command, new()
+        public void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command, new()
         {
             if (disposed)
             {
                 throw new Exception(this.GetType().FullName + "对象已经销毁，sendCommand失败");
             }
-            mvcCharge.sendCommand<TCommand>(param);
+            mvcCharge.sendCommand<TCommand, TParam>(param);
         }
 
         /// <summary>

@@ -2,7 +2,7 @@
 
 public class TestCommand : Command
 {
-    public override void execute(object param)
+    public override void execute<TParam>(TParam param)
     {
         if (MVCCharge.instance.hasView<TestView2>())
         {

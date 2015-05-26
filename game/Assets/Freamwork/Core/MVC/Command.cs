@@ -8,20 +8,10 @@ namespace Freamwork
     public abstract class Command : MVCObject, ICommand
     {
         /// <summary>
-        /// 执行
-        /// </summary>
-        /// <param name="param">携带的数据</param>
-        public void doExecute(object param = null)
-        {
-            execute(param);
-            dispose();
-        }
-
-        /// <summary>
         /// 执行命令
         /// </summary>
         /// <param name="param">携带的数据</param>
-        abstract public void execute(object param);
+        abstract public void execute<TParam>(TParam param);
 
         /// <summary>
         /// 释放

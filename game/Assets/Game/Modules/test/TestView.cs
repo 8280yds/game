@@ -38,7 +38,7 @@ public class TestView : View
     {
         txt.text = "当前总共点击了" + model.clickCount + "次";
 
-        sendCommand<TestCommand>("Command： " + txt.text);
+        sendCommand<TestCommand, string>("Command： " + txt.text);
     }
 
     private void btnClicked()
