@@ -8,6 +8,6 @@
         /// <summary>
         /// 游戏开始的时候加载的第一个场景
         /// </summary>
-        public const string FIRST_SCENE = "first_Scene";
+        public const string FIRST_SCENE = "first_scene";
     }
 }
