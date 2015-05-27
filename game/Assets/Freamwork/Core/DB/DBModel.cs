@@ -72,30 +72,33 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 存储所有数据vo的dictionary
+        /// 存储所有数据vo的dictionary(返回的是浅克隆的列表)
         /// </summary>
         protected Dictionary<int, TDBVO> dataDic
         {
             get
             {
-                return m_dataDic;
+                return new Dictionary<int, TDBVO>(m_dataDic);
             }
         }
 
         /// <summary>
         /// 当数据具有顺序性时用来存储数据排序的数组，当数据不具有顺序性时，其值为null,
-        /// 数组中存储的是Id，可以通过dataDic[ids[index]]来获取数据VO
+        /// <param>数组中存储的是Id，可以通过dataDic[ids[index]]来获取数据VO</param>
+        /// <param>(返回的是克隆列表)</param>
         /// </summary>
         protected int[] ids
         {
             get
             {
-                return m_ids;
+                int[] arr = new int[count];
+                m_ids.CopyTo(arr, 0);
+                return arr;
             }
         }
 
         /// <summary>
-        /// 解析全表，调用此方法后表中所有的数据将都会被加载到dataDic中，
+        /// 解析全表，调用此方法后表中所有的数据将都会被加载到列表中，
         /// xmlNodeList和xmlNode将被置为null
         /// </summary>
         protected void analysis()
@@ -107,16 +110,16 @@ namespace Freamwork
 
                 if (order)
                 {
-                    for (int i = 0, len = ids.Length; i < len; i++)
+                    for (int i = 0, len = m_ids.Length; i < len; i++)
                     {
-                        if (ids[i] == 0)
+                        if (m_ids[i] == 0)
                         {
                             vo = new TDBVO();
                             node = xmlNode.FirstChild;
                             vo.xmlToVo(node);
                             xmlNode.RemoveChild(node);
-                            ids[i] = vo.id;
-                            dataDic.Add(vo.id, vo);
+                            m_ids[i] = vo.id;
+                            m_dataDic.Add(vo.id, vo);
 
                             if (!xmlNode.HasChildNodes)
                             {
@@ -133,7 +136,7 @@ namespace Freamwork
                         node = xmlNode.FirstChild;
                         vo.xmlToVo(node);
                         xmlNode.RemoveChild(node);
-                        dataDic.Add(vo.id, vo);
+                        m_dataDic.Add(vo.id, vo);
                     }
                 }
             }
@@ -147,9 +150,9 @@ namespace Freamwork
         /// <returns>TDBVO</returns>
         public TDBVO getVoById(int id)
         {
-            if (dataDic.ContainsKey(id))
+            if (m_dataDic.ContainsKey(id))
             {
-                return dataDic[id];
+                return m_dataDic[id];
             }
 
             if (analysised)
@@ -165,10 +168,10 @@ namespace Freamwork
 
             TDBVO vo = new TDBVO();
             vo.xmlToVo(node);
-            dataDic.Add(vo.id, vo);
+            m_dataDic.Add(vo.id, vo);
             if (order)
             {
-                ids[findIndex(node)] = vo.id;
+                m_ids[findIndex(node)] = vo.id;
             }
             xmlNode.RemoveChild(node);
             return vo;

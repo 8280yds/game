@@ -54,11 +54,11 @@ namespace Freamwork
         {
             m_started = false;
 
-            LoadManager.instance.clear();
-            BundleLoadManager.instance.clear();
+            EnterFrame.instance.clear();
             ManifestManager.instance.clear();
             MVCCharge.instance.clear();
-            EnterFrame.instance.clear();
+            LoadManager.instance.clear();
+            BundleLoadManager.instance.clear();
         }
 
         //=====================================================================
@@ -84,11 +84,17 @@ namespace Freamwork
                 throw new Exception("试图重复启动框架，重启框架将意味着整个游戏重新运行，" +
                     "如果确定需要重启，如果确信要这么做请在clear()后调用此方法");
             }
+
             if (Application.loadedLevelName != FreamworkConstant.FIRST_SCENE)
             {
                 Application.LoadLevel(FreamworkConstant.FIRST_SCENE);
                 return;
             }
+
+            //强制清除并垃圾回收
+            Resources.UnloadUnusedAssets();
+            GC.Collect();
+
             ManifestManager.instance.init(loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
         }
 

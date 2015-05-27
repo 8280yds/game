@@ -108,8 +108,8 @@ namespace Freamwork
             clearAllCache();
 
             //强制清除并垃圾回收
-            Resources.UnloadUnusedAssets();
-            GC.Collect();
+            //Resources.UnloadUnusedAssets();
+            //GC.Collect();
         }
 
         //=====================================================================
@@ -559,6 +559,7 @@ namespace Freamwork
             {
                 cacheDic[fullName].assetBundle.Unload(false);
                 cacheDic.Remove(fullName);
+                Resources.UnloadUnusedAssets();
                 return true;
             }
             return false;
@@ -575,6 +576,7 @@ namespace Freamwork
                 info.assetBundle = null;
             }
             cacheDic.Clear();
+            Resources.UnloadUnusedAssets();
         }
 
     }
