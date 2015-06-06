@@ -16,6 +16,11 @@ public class PackBundlesMenu : ScriptableObject
     /// </summary>
     private const string dbPath = "./Resources/DB";
 
+    /// <summary>
+    /// moduless.dll的相对位置
+    /// </summary>
+    private const string dllPath = "../modules/bin/Debug";
+
     [MenuItem("Game/Pack Bundles/Pack(Not Clear)", false, 2)]
     static void Pack()
     {
@@ -44,7 +49,7 @@ public class PackBundlesMenu : ScriptableObject
             Directory.CreateDirectory(bundlesDirePath + "/.Temporary");
         }
 
-        //确保db.xml存在，并先单独打包db.xml
+        //确保db.xml存在
         if (!File.Exists(dbPath + "/db.xml"))
         {
             Directory.Delete(bundlesDirePath + "/.Temporary", true);
@@ -52,15 +57,40 @@ public class PackBundlesMenu : ScriptableObject
             return;
         }
         File.Copy(dbPath + "/db.xml", "Assets/db.xml", true);
+
+        //确保modules.dll存在
+        if (!File.Exists(dllPath + "/modules.dll"))
+        {
+            Directory.Delete(bundlesDirePath + "/.Temporary", true);
+            EditorUtility.DisplayDialog("出错啦", "modules.dll未找到！", "确定");
+            return;
+        }
+        File.Copy(dllPath + "/modules.dll", "Assets/modules.bytes", true);
+
+        //确保modules.pdb存在
+        if (!File.Exists(dllPath + "/modules.pdb"))
+        {
+            Directory.Delete(bundlesDirePath + "/.Temporary", true);
+            EditorUtility.DisplayDialog("出错啦", "modules.pdb未找到！", "确定");
+            return;
+        }
+        File.Copy(dllPath + "/modules.pdb", "Assets/Code/Freamwork/Editor/Resources/modules.pdb.bytes", true);
+
+        //单独打包db.xml和modules.dll
         AssetDatabase.Refresh();
-        AssetBundleBuild[] buildMap = new AssetBundleBuild[1];
+        AssetBundleBuild[] buildMap = new AssetBundleBuild[2];
         buildMap[0].assetBundleName = "db";
         buildMap[0].assetNames = new string[] { "Assets/db.xml" };
+        buildMap[1].assetBundleName = "modules";
+        buildMap[1].assetNames = new string[] { "Assets/modules.bytes" };
         BuildPipeline.BuildAssetBundles(bundlesDirePath + "/.Temporary", buildMap, 
             BuildAssetBundleOptions.None, BuildTarget.Android);
         File.Copy(bundlesDirePath + "/.Temporary/db", bundlesDirePath + "/db", true);
         File.Copy(bundlesDirePath + "/.Temporary/db.manifest", bundlesDirePath + "/db.manifest", true);
+        File.Copy(bundlesDirePath + "/.Temporary/modules", bundlesDirePath + "/modules", true);
+        File.Copy(bundlesDirePath + "/.Temporary/modules.manifest", bundlesDirePath + "/modules.manifest", true);
         File.Delete("Assets/db.xml");
+        File.Delete("Assets/modules.bytes");
 
         //打包资源
         AssetDatabase.Refresh();
@@ -102,8 +132,13 @@ public class PackBundlesMenu : ScriptableObject
         }
 
         Dictionary<string, ManifestVO> voDic = new Dictionary<string, ManifestVO>();
+        //手动添加db
         ManifestVO manifestVO = new ManifestVO();
         manifestVO.name = "db";
+        voDic.Add(manifestVO.name, manifestVO);
+        //手动添加modules
+        manifestVO = new ManifestVO();
+        manifestVO.name = "modules";
         voDic.Add(manifestVO.name, manifestVO);
 
         StreamReader fs = new StreamReader(manifestPath);

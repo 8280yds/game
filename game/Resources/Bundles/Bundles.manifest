@@ -2,12 +2,12 @@ ManifestFileVersion: 0
 AssetBundleManifest:
   AssetBundleInfos:
     Info_0:
-      Name: cube
+      Name: aurora_00
       Dependencies: {}
     Info_1:
       Name: sphere
       Dependencies:
         Dependency_0: aurora_00
     Info_2:
-      Name: aurora_00
+      Name: cube
       Dependencies: {}

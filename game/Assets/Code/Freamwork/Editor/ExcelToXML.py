@@ -152,7 +152,7 @@ deleteAllVoBeforePack = True		#是否在打包前删除VO文件夹
 deleteAllXmlBeforePack = True		#是否在打包前删除XML文件夹
 excelDirPath = '...../Resources/DB/Excel/'	#excel所在的文件夹
 xmlDirPath = '...../Resources/DB/XML/'		#打包后存放XML的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
-voDirPath = '.../Game/DB/DBVO/'			#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
+voDirPath = '....../modules/Code/Game/DB/DBVO/'	#打包后存放VO的文件夹（相对于本python打包工具的位置，最好是独立文件夹）
 totleXMLPath = '...../Resources/DB/'		#打包后存放XML总文档的位置（相对于本python打包工具的位置）
 byteDirPath = '...../Resources/DB/'		#打包后存放Bytes的位置（相对于本python打包工具的位置）
 

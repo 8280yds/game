@@ -71,7 +71,7 @@ namespace Mono.Cecil {
 
 	public abstract class BaseAssemblyResolver : IAssemblyResolver {
 
-		static readonly bool on_mono = Type.GetType ("Mono.Runtime") != null;
+        //??static readonly bool on_mono = Type.GetType ("Mono.Runtime") != null;
 
 		readonly Collection<string> directories;
 

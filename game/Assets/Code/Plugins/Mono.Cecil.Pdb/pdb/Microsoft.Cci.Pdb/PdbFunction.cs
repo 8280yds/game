@@ -37,7 +37,7 @@ namespace Microsoft.Cci.Pdb {
     internal string[] usedNamespaces;
     internal PdbLines[] lines;
     internal ushort[]/*?*/ usingCounts;
-    internal IEnumerable<INamespaceScope>/*?*/ namespaceScopes;
+    //??internal IEnumerable<INamespaceScope>/*?*/ namespaceScopes;
     internal string/*?*/ iteratorClass;
     internal List<ILocalScope>/*?*/ iteratorScopes;
 
@@ -101,7 +101,7 @@ namespace Microsoft.Cci.Pdb {
         ushort rec;
 
         bits.ReadUInt16(out siz);
-        int star = bits.Position;
+        //??int star = bits.Position;
         int stop = bits.Position + siz;
         bits.ReadUInt16(out rec);
 

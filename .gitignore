@@ -5,6 +5,9 @@ Library/
 obj/
 Temp/
 UnityVS/
+bin/
+Properties/
+dll/
 
 #================
 #去除项目文件类型
