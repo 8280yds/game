@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CLRSharp;
+using System;
 using System.Collections.Generic;
 
 namespace Freamwork
@@ -41,7 +42,7 @@ namespace Freamwork
             init();
         }
 
-        private Dictionary<string, IMVCObject> m_instanceDic;
+        private Dictionary<string, object> m_instanceDic;
         private List<string> m_listenerIdList;
         private Dictionary<string, ListenerDelegate> m_listenerDic;
 
@@ -51,7 +52,7 @@ namespace Freamwork
 
         private void init()
         {
-            m_instanceDic = new Dictionary<string, IMVCObject>();
+            m_instanceDic = new Dictionary<string, object>();
             m_listenerIdList = new List<string>();
             m_listenerDic = new Dictionary<string, ListenerDelegate>();
 
@@ -60,11 +61,15 @@ namespace Freamwork
             m_disabledIdList = new List<string>();
         }
 
+        /// <summary>
+        /// 清理
+        /// </summary>
         public void clear()
         {
-            foreach (IMVCObject mvcObject in m_instanceDic.Values)
+            List<string> keys = new List<string>(m_instanceDic.Keys);
+            for (int i = 0, len = keys.Count; i < len; i++)
             {
-                mvcObject.dispose();
+                delInstance(CLRSharpManager.instance.getCLRType(keys[i]));
             }
             m_instanceDic.Clear();
             m_listenerIdList.Clear();
@@ -73,18 +78,6 @@ namespace Freamwork
             m_listenerDisabled = false;
             m_doLater = false;
             m_disabledIdList.Clear();
-        }
-
-        //********************************* 发送命令 *************************************
-        /// <summary>
-        /// 发送命令
-        /// </summary>
-        /// <typeparam name="TCommand">命令类型</typeparam>
-        /// <param name="param">需要传递的数据</param>
-        public void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command, new()
-        {
-            TCommand command = new TCommand();
-            command.execute<TParam>(param);
         }
 
         //********************************* 更新管理 *************************************
@@ -218,193 +211,67 @@ namespace Freamwork
             }
         }
 
+        //********************************* 发送命令 *************************************
+        /// <summary>
+        /// 发送命令
+        /// </summary>
+        /// <param name="type">L#类型，必须是ICLRType的实现者</param>
+        /// <param name="param">命令携带的参数</param>
+        public void sendCommand(object type, object param)
+        {
+            ICLRType clrType = type as ICLRType;
+            ICommand command = CLRSharpManager.instance.creatCLRInstance(clrType) as ICommand;
+            command.execute(param);
+        }
+
         //********************************* 单例管理 *************************************
         /// <summary>
-        /// 获取Model实例，如果实例不存在将会创建
-        /// </summary>
-        /// <typeparam name="T">Model类型</typeparam>
-        /// <returns>IModel实例</returns>
-        public T getModel<T>() where T : IModel, new()
-        {
-            return getInstance<T>();
-        }
-
-        /// <summary>
-        /// 是否存在Model实例
-        /// </summary>
-        /// <typeparam name="T">Model类型</typeparam>
-        /// <returns>bool</returns>
-        public bool hasModel<T>() where T : IModel
-        {
-            return hasInstance<T>();
-        }
-
-        /// <summary>
-        /// 删除存储的Model实例
-        /// </summary>
-        /// <typeparam name="T">Model的类型</typeparam>
-        /// <returns>bool</returns>
-        public bool delModel<T>() where T : IModel
-        {
-            return delInstance<T>();
-        }
-
-        /// <summary>
-        /// 获取View实例，如果实例不存在将会创建
-        /// </summary>
-        /// <typeparam name="T">View类型</typeparam>
-        /// <returns>IView实例</returns>
-        public T getView<T>() where T : IView, new()
-        {
-            return getInstance<T>();
-        }
-
-        /// <summary>
-        /// 是否存在View实例
-        /// </summary>
-        /// <typeparam name="T">View类型</typeparam>
-        /// <returns>bool</returns>
-        public bool hasView<T>() where T : IView
-        {
-            return hasInstance<T>();
-        }
-
-        /// <summary>
-        /// 删除存储的View实例
-        /// </summary>
-        /// <typeparam name="T">View的类型</typeparam>
-        /// <returns>bool</returns>
-        public bool delView<T>() where T : IView
-        {
-            return delInstance<T>();
-        }
-
-        /// <summary>
         /// 获取MVCObject实例，如果实例不存在将会创建
-        /// 注意：IView的实现者将不会主动创建实例，若实例不存在将返回null;
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
-        /// <returns>IMVCObject实例</returns>
-        public T getInstance<T>() where T : IMVCObject, new()
+        /// <param name="type">L#类型</param>
+        /// <returns>IMVCObject</returns>
+        public object getInstance(ICLRType clrType)
         {
-            Type type = typeof(T);
-            string fullName = type.FullName;
+            string fullName = clrType.FullName;
             if (!m_instanceDic.ContainsKey(fullName))
             {
-                if (typeof(IView).IsAssignableFrom(type))
+                List<ICLRType> list = CLRSharpManager.instance.getInterfaces(clrType as Type_Common_CLRSharp);
+                if (!list.Contains(typeof(IMVCObject) as ICLRType))
                 {
-                    return default(T);
+                    throw new Exception(fullName + "并非IMVCObject的实现者，无法通过MVCCharge来管理");
                 }
-                m_instanceDic.Add(fullName, new T());
+                object mvcObject = CLRSharpManager.instance.creatCLRInstance(clrType);
+                m_instanceDic.Add(fullName, mvcObject);
             }
-            return (T)m_instanceDic[fullName];
+            return m_instanceDic[fullName];
         }
 
         /// <summary>
         /// 是否存在实例
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
+        /// <param name="type">L#类型</param>
         /// <returns>bool</returns>
-        public bool hasInstance<T>() where T : IMVCObject
+        public bool hasInstance(ICLRType clrType)
         {
-            string fullName = typeof(T).FullName;
-            return m_instanceDic.ContainsKey(fullName);
+            return m_instanceDic.ContainsKey(clrType.FullName);
         }
 
         /// <summary>
         /// 删除存储的实例
         /// </summary>
-        /// <typeparam name="T">类型</typeparam>
+        /// <param name="type">L#类型</param>
         /// <returns>bool</returns>
-        public bool delInstance<T>() where T : IMVCObject
+        public bool delInstance(ICLRType clrType)
         {
-            string fullName = typeof(T).FullName;
-            if (m_instanceDic.ContainsKey(fullName))
+            if (m_instanceDic.ContainsKey(clrType.FullName))
             {
-                m_instanceDic.Remove(fullName);
+                object mvcObject = m_instanceDic[clrType.FullName];
+                m_instanceDic.Remove(clrType.FullName);
+                CLRSharpManager.instance.Invoke(clrType, "dispose", mvcObject);
                 return true;
             }
             return false;
-        }
-
-        /// <summary>
-        /// 获取MVCObject实例，如果实例不存在将会创建
-        /// 注意：IView的实现者将不会主动创建实例，若实例不存在将返回null;
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>IMVCObject实例</returns>
-        public IMVCObject getInstance(Type type)
-        {
-            if (type.IsInterface)
-            {
-                return null;
-            }
-            string fullName = type.FullName;
-            if (!typeof(IMVCObject).IsAssignableFrom(type))
-            {
-                throw new Exception(fullName + "并未实现" + typeof(IMVCObject).FullName +
-                    "接口，无法通过MVCCharge.instance.getInstance方法存储和获取其实例");
-            }
-            if (!m_instanceDic.ContainsKey(fullName))
-            {
-                if (typeof(IView).IsAssignableFrom(type))
-                {
-                    return null;
-                }
-                m_instanceDic.Add(fullName, (IMVCObject)Activator.CreateInstance(type));
-            }
-            return m_instanceDic[fullName] as IMVCObject;
-        }
-
-        /// <summary>
-        /// 是否存在实例
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>bool</returns>
-        public bool hasInstance(Type type)
-        {
-            string fullName = type.FullName;
-            return m_instanceDic.ContainsKey(fullName);
-        }
-
-        /// <summary>
-        /// 删除存储的实例
-        /// </summary>
-        /// <param name="type">类型</param>
-        /// <returns>bool</returns>
-        public bool delInstance(Type type)
-        {
-            string fullName = type.FullName;
-            if (m_instanceDic.ContainsKey(fullName))
-            {
-                m_instanceDic.Remove(fullName);
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// 存储实例，为那些并非通过MVCCharge.instance.getInstance()方法创建的实例实现手动存储，
-        /// 主要是为了解决那些在编辑器中拖拽上去的View的继承类无法通过MVCCharge管理的问题
-        /// </summary>
-        /// <param name="instance">实例(不能为null)</param>
-        public void saveInstance(IMVCObject instance)
-        {
-            if(instance == null)
-            {
-                throw new Exception("使用MVCCharge.instance.saveInstance()方法时其参数instance不能为null");
-            }
-            string fullName = instance.GetType().FullName;
-            if (!m_instanceDic.ContainsKey(fullName))
-            {
-                m_instanceDic.Add(fullName, instance);
-            }
-            else if (m_instanceDic[fullName] != instance)
-            {
-                throw new Exception("MVCCharge中已经托管了其他的" + fullName + "实例，无法再托管该实例");
-            }
         }
 
     }
 }
-

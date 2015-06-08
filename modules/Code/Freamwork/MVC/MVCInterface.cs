@@ -1,14 +1,18 @@
-﻿namespace Freamwork
+﻿using CLRSharp;
+using UnityEngine;
+
+namespace Freamwork
 {
     public interface IMVCObject
     {
-        void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command, new();
+        ICLRType getCLRType { get; }
+        void sendCommand(object type, object param);
         void dispose();
     }
 
     public interface ICommand : IMVCObject
     {
-        void execute<TParam>(TParam param);
+        void execute(object param);
     }
 
     public interface IModel : IMVCObject
@@ -18,7 +22,7 @@
 
     public interface IView : IMVCObject
     {
-
+        void init(GameObject gameObject, string[] funNames);
     }
 
 }

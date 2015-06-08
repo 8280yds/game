@@ -4,33 +4,18 @@ using UnityEngine;
 
 namespace Freamwork
 {
-    ///// <summary>
-    ///// 更新侦听的Delegate
-    ///// </summary>
-    //public delegate void ListenerDelegate();
-
     /// <summary>
     /// View是显示物体（特别是UI）的基类，继承它可以实现由MVCCharge托管实例，
     /// 并且可以通过侦听来实现自动更新
     /// </summary>
-    public abstract class View : IView
+    public abstract class View : GMB, IView
     {
-        /// <summary>
-        /// 是否已经执行了释放
-        /// </summary>
-        protected bool disposed = false;
-
-        /// <summary>
-        /// 是否已经执行了销毁
-        /// </summary>
-        protected bool isDestroyed = false;
-
         /// <summary>
         /// 为释放侦听暂存的数据
         /// </summary>
         private Dictionary<string, ListenerDelegate> listenerDic;
 
-        public MVCCharge mvcCharge
+        protected MVCCharge mvcCharge
         {
             get
             {
@@ -39,59 +24,70 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// Awake事件，在此处将实例交给MVCCharge托管
+        /// 初始化
         /// </summary>
-        virtual protected void Awake()
+        /// <param name="gameObject">物体</param>
+        /// <param name="funNames">事件方法的名称，默认已经包含"Update","LateUpdate","OnEnable","OnDisable"</param>
+        public override void init(GameObject gameObject, string[] funNames = null)
         {
-            mvcCharge.saveInstance(this);
+            string[] baseFunNames = new string[] { "Update", "LateUpdate", "OnEnable", "OnDisable" };
+            if (funNames != null && funNames.Length > 0)
+            {
+                funNames.CopyTo(baseFunNames, 0);
+            }
+            base.init(gameObject, baseFunNames);
         }
 
         /// <summary>
         /// Update事件
         /// </summary>
-        virtual protected void Update()
+        override protected void Update()
         {
             mvcCharge.doLater = true;
+            base.Update();
         }
 
         /// <summary>
         /// LateUpdate事件，在此处会具体执行更新的方法
         /// 一般重写时主要带上base.LateUpdate()
         /// </summary>
-        virtual protected void LateUpdate()
+        override protected void LateUpdate()
         {
             mvcCharge.doListenerDelegate();
+            base.LateUpdate();
         }
 
         /// <summary>
         /// OnEnable事件，一般在此处添加所有更新的侦听
         /// </summary>
-        virtual protected void OnEnable()
+        override protected void OnEnable()
         {
             addListeners();
+            base.OnEnable();
         }
 
         /// <summary>
         /// OnDisable事件，一般在此处移除所有更新的侦听
         /// 默认会自动移除，一般重写时要注意带上base.OnDisable()，否则不会自动移除侦听
         /// </summary>
-        virtual protected void OnDisable()
+        override protected void OnDisable()
         {
+            base.OnDisable();
             removeListeners();
         }
 
         /// <summary>
         /// 发送命令
         /// </summary>
-        /// <typeparam name="TCommand">命令类型</typeparam>
-        /// <param name="param">需要传递的数据</param>
-        public void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command, new()
+        /// <param name="type">L#类型，必须是ICLRType的实现者</param>
+        /// <param name="param">命令携带的参数</param>
+        public void sendCommand(object type, object param)
         {
             if (disposed)
             {
-                throw new Exception(this.GetType().FullName + "对象已经销毁，sendCommand失败");
+                throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
             }
-            mvcCharge.sendCommand<TCommand, TParam>(param);
+            mvcCharge.sendCommand(type, param);
         }
 
         /// <summary>
@@ -141,31 +137,12 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 销毁，会调用dispose方法，销毁View实例
-        /// </summary>
-        virtual protected void OnDestroy()
-        {
-            isDestroyed = true;
-            dispose();
-        }
-
-        /// <summary>
         /// 释放，调用此方法会彻底销毁View的实例
         /// </summary>
-        virtual public void dispose()
+        override public void dispose()
         {
-            if (!isDestroyed)
-            {
-                //Destroy(this);
-            }
-            if (disposed)
-            {
-                Debug.Log(this.GetType().FullName + "对象重复释放！");
-                return;
-            }
-            disposed = true;
-
-            mvcCharge.delInstance(this.GetType());
+            base.dispose();
+            mvcCharge.delInstance(getCLRType);
         }
 
     }

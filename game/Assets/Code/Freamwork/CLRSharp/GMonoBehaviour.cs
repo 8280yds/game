@@ -69,7 +69,8 @@ namespace Freamwork
             funDic = new Dictionary<string, IMethod>();
             for (int i = 0, len = s_funNames.Length; i < len; i++)
             {
-                funDic.Add(s_funNames[i], null);
+                //funDic.Add(s_funNames[i], null);
+                funDic[s_funNames[i]] = null;
             }
 
             //传送实例

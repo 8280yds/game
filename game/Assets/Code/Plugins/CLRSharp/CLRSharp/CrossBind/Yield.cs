@@ -53,7 +53,7 @@ namespace CLRSharp
             CLRSharp_Instance inst;
             public Base_IEnumerator(CLRSharp_Instance inst)
             { 
-                //var context = ThreadContext.activeContext;
+                var context = ThreadContext.activeContext;
                 this.inst = inst;
                 var ms = this.inst.type.GetMethodNames();
                 foreach(string name in ms)
@@ -94,8 +94,8 @@ namespace CLRSharp
             {
                 var context = ThreadContext.activeContext;
 
-                //??var obj = _Reset.Invoke(context, inst, null);
-                _Reset.Invoke(context, inst, null);
+                var obj = _Reset.Invoke(context, inst, null);
+
             }
         }
     }

@@ -177,7 +177,7 @@ namespace Freamwork
         private void startModules()
         {
             CLRSharpManager clrmana = CLRSharpManager.instance;
-            ICLRType clrType = clrmana.getCLRType("TestMB");
+            ICLRType clrType = clrmana.getCLRType("Freamwork.ModulesStart");
             clrmana.Invoke(clrType, "start");
         }
 

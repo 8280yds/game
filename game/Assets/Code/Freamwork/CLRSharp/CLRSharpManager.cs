@@ -1,13 +1,14 @@
 ﻿using CLRSharp;
 using Mono.Cecil.Pdb;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
 namespace Freamwork
 {
     /// <summary>
-    /// CLRSharp功能管理类
+    /// L#功能管理类
     /// </summary>
     sealed public class CLRSharpManager
     {
@@ -61,7 +62,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// CLRSharp执行环境
+        /// L#执行环境
         /// </summary>
         public CLRSharp_Environment env
         {
@@ -77,7 +78,7 @@ namespace Freamwork
         {
             if (isInit)
             {
-                throw new Exception("试图重复初始化，如果确信要这么做请在clear()后调用此方法");
+                throw new Exception("CLRSharpManager试图重复初始化，如果确信要这么做请在clear()后调用此方法");
             }
 
             env = new CLRSharp_Environment(new Logger());
@@ -112,7 +113,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 获取CLR类型，和反射代码中的Type.GetType相对应
+        /// 获取L#类型，和反射代码中的Type.GetType相对应
         /// </summary>
         /// <param name="fullName">全名，包括命名空间</param>
         /// <returns></returns>
@@ -176,6 +177,69 @@ namespace Freamwork
                 }
             }
             return fun;
+        }
+
+        /// <summary>
+        /// 根据实例获取L#类型
+        /// <param>注意：一般仅在L#中调用</param>
+        /// </summary>
+        /// <param name="inst">实例</param>
+        /// <returns>L#类型</returns>
+        public ICLRType getCLRTypeByInst(object inst)
+        {
+            CLRSharp_Instance clrInst = inst as CLRSharp_Instance;
+            if (clrInst != null)
+            {
+                return clrInst.type;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 判断A类是否是继承B类
+        /// </summary>
+        /// <param name="A"></param>
+        /// <param name="B"></param>
+        /// <returns></returns>
+        private bool isExtend(Type_Common_CLRSharp typeA, Type_Common_CLRSharp typeB)
+        {
+            if (typeA == null || typeB == null)
+            {
+                return false;
+            }
+            if (typeA == typeB)
+            {
+                return true;
+            }
+            return isExtend(typeA.BaseType as Type_Common_CLRSharp, typeB);
+        }
+
+        /// <summary>
+        /// 获取所有接口
+        /// </summary>
+        /// <param name="type">L#类</param>
+        /// <returns></returns>
+        public List<ICLRType> getInterfaces(Type_Common_CLRSharp clrType)
+        {
+            List<ICLRType> interfaces = new List<ICLRType>();
+            getInterfaces(clrType, ref interfaces);
+            return interfaces;
+        }
+
+        private void getInterfaces(Type_Common_CLRSharp clrType, ref List<ICLRType> interfaces)
+        {
+            if (clrType == null)
+            {
+                return;
+            }
+            if(clrType._Interfaces != null)
+            {
+                interfaces.AddRange(clrType._Interfaces);
+            }
+            if (clrType.BaseType != null)
+            {
+                getInterfaces(clrType.BaseType as Type_Common_CLRSharp, ref interfaces);
+            }
         }
 
         /// <summary>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CLRSharp;
+using System;
 using UnityEngine;
 
 namespace Freamwork
@@ -15,18 +16,10 @@ namespace Freamwork
 
         public MVCObject()
         {
-            init();
-        }
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        virtual protected void init()
-        {
 
         }
 
-        public MVCCharge mvcCharge
+        protected MVCCharge mvcCharge
         {
             get
             {
@@ -34,18 +27,26 @@ namespace Freamwork
             }
         }
 
+        public ICLRType getCLRType
+        {
+            get
+            {
+                return CLRSharpManager.instance.getCLRTypeByInst(this);
+            }
+        }
+
         /// <summary>
         /// 发送命令
         /// </summary>
-        /// <typeparam name="TCommand">命令类型</typeparam>
-        /// <param name="param">需要传递的数据</param>
-        public void sendCommand<TCommand, TParam>(TParam param) where TCommand : Command, new()
+        /// <param name="type">L#类型，必须是ICLRType的实现者</param>
+        /// <param name="param">命令携带的参数</param>
+        public void sendCommand(object type, object param)
         {
             if (disposed)
             {
-                throw new Exception(this.GetType().FullName + "对象已经销毁，sendCommand失败");
+                throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
             }
-            mvcCharge.sendCommand<TCommand, TParam>(param);
+            mvcCharge.sendCommand(type, param);
         }
 
         /// <summary>
@@ -55,11 +56,11 @@ namespace Freamwork
         {
             if (disposed)
             {
-                Debug.Log(this.GetType().FullName + "对象重复释放！");
+                Debug.Log(getCLRType.FullName + "对象重复释放！");
                 return;
             }
             disposed = true;
-            mvcCharge.delInstance(this.GetType());
+            mvcCharge.delInstance(getCLRType);
         }
     }
 }

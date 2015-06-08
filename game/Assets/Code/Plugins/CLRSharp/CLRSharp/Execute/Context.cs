@@ -201,18 +201,18 @@ namespace CLRSharp
         public ICLRType GetType(object token)
         {
             token.GetHashCode();
-            //??Mono.Cecil.ModuleDefinition module = null;
+            Mono.Cecil.ModuleDefinition module = null;
             string typename = null;
             if (token is Mono.Cecil.TypeDefinition)
             {
                 Mono.Cecil.TypeDefinition _def = (token as Mono.Cecil.TypeDefinition);
-                //??module = _def.Module;
+                module = _def.Module;
                 typename = _def.FullName;
             }
             else if (token is Mono.Cecil.TypeReference)
             {
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
-                //??module = _ref.Module;
+                module = _ref.Module;
                 typename = _ref.FullName;
             }
             else
@@ -230,7 +230,7 @@ namespace CLRSharp
             {
                 return __method;
             }
-            //??Mono.Cecil.ModuleDefinition module = null;
+            Mono.Cecil.ModuleDefinition module = null;
             string methodname = null;
             string typename = null;
             MethodParamList genlist = null;
@@ -238,7 +238,7 @@ namespace CLRSharp
             if (token is Mono.Cecil.MethodReference)
             {
                 Mono.Cecil.MethodReference _ref = (token as Mono.Cecil.MethodReference);
-                //??module = _ref.Module;
+                module = _ref.Module;
                 methodname = _ref.Name;
                 typename = _ref.DeclaringType.FullName;
                 list = new MethodParamList(environment, _ref);
@@ -252,7 +252,7 @@ namespace CLRSharp
             else if (token is Mono.Cecil.MethodDefinition)
             {
                 Mono.Cecil.MethodDefinition _def = token as Mono.Cecil.MethodDefinition;
-                //??module = _def.Module;
+                module = _def.Module;
                 methodname = _def.Name;
                 typename = _def.DeclaringType.FullName;
                 list = new MethodParamList(environment, _def);
@@ -291,18 +291,18 @@ namespace CLRSharp
             {
                 return __method;
             }
-            //??Mono.Cecil.ModuleDefinition module = null;
+            Mono.Cecil.ModuleDefinition module = null;
             string typename = null;
             if (token is Mono.Cecil.TypeDefinition)
             {
                 Mono.Cecil.TypeDefinition _def = (token as Mono.Cecil.TypeDefinition);
-                //??module = _def.Module;
+                module = _def.Module;
                 typename = _def.FullName;
             }
             else if (token is Mono.Cecil.TypeReference)
             {
                 Mono.Cecil.TypeReference _ref = (token as Mono.Cecil.TypeReference);
-                //??module = _ref.Module;
+                module = _ref.Module;
                 typename = _ref.FullName;
             }
             else

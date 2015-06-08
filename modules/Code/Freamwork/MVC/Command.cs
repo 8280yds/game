@@ -10,8 +10,8 @@ namespace Freamwork
         /// <summary>
         /// 执行命令
         /// </summary>
-        /// <param name="param">携带的数据</param>
-        abstract public void execute<TParam>(TParam param);
+        /// <param name="param">传递过来的参数</param>
+        abstract public void execute(object param);
 
         /// <summary>
         /// 释放
@@ -20,7 +20,7 @@ namespace Freamwork
         {
             if (disposed)
             {
-                Debug.Log(this.GetType().FullName + "对象重复释放！");
+                Debug.Log(getCLRType.FullName + "对象重复释放！");
                 return;
             }
             disposed = true;

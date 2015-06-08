@@ -1,317 +1,363 @@
-﻿using Freamwork;
+﻿using CLRSharp;
 using System;
 using UnityEngine;
 
-public class GMB
+namespace Freamwork
 {
-    public GMB(GameObject gameObject, string[] funNames)
-    {
-        if (gameObject == null)
-        {
-            throw new Exception("初始化时gameObject参数不能为null");
-        }
-        this.gameObject = gameObject;
-        GMonoBehaviour.setProvisionalData(this, funNames);
-        gameObject.AddComponent<GMonoBehaviour>();
-    }
-
-    public GameObject gameObject
-    {
-        get;
-        private set;
-    }
-
-    public GMonoBehaviour gmb
-    {
-        get;
-        private set;
-    }
-
-    private void setGMB(object gmb)
-    {
-        this.gmb = gmb as GMonoBehaviour;
-    }
-
     /// <summary>
-    /// 释放
+    /// L#中的动作类，与C#中GMonoBehaviour搭档共同实现各种功能
     /// </summary>
-    virtual public void dispose()
+    public abstract class GMB
     {
-        if (gmb != null && !gmb.isDestorying)
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="gameObject">物体</param>
+        /// <param name="funNames">事件方法的名称</param>
+        virtual public void init(GameObject gameObject, string[] funNames = null)
         {
-            GameObject.Destroy(gmb);
-            return;
+            if (inited)
+            {
+                throw new Exception("试图重复初始化" + CLRSharpManager.instance.getCLRTypeByInst(this).FullName);
+            }
+            inited = true;
+            this.gameObject = gameObject;
+            GMonoBehaviour.setProvisionalData(this, funNames);
+            gameObject.AddComponent<GMonoBehaviour>();
         }
-        if (disposed)
+
+        public ICLRType getCLRType
         {
-            Debug.Log(GetType().FullName + "对象重复释放！");
-            return;
+            get
+            {
+                return CLRSharpManager.instance.getCLRTypeByInst(this);
+            }
         }
-        disposed = true;
 
-        gameObject = null;
-        gmb = null;
-    }
-    protected bool disposed = false;
+        /// <summary>
+        /// 是否已经初始化过了
+        /// </summary>
+        public bool inited
+        {
+            get
+            {
+                return m_inited;
+            }
+            private set
+            {
+                m_inited = value;
+            }
+        }
+        private bool m_inited = false;
 
-    //===============================事件=============================
-    virtual protected void Awake()
-    {
-        
-    }
+        /// <summary>
+        /// 物体实例
+        /// </summary>
+        public GameObject gameObject
+        {
+            get;
+            private set;
+        }
 
-    virtual protected void FixedUpdate()
-    {
-        
-    }
+        /// <summary>
+        /// C#的GMonoBehaviour脚本实例
+        /// </summary>
+        public GMonoBehaviour gmb
+        {
+            get;
+            private set;
+        }
 
-    virtual protected void LateUpdate()
-    {
-        
-    }
+        /// <summary>
+        /// 设置实例，仅在GMonoBehaviour中调用
+        /// </summary>
+        /// <param name="gmb"></param>
+        private void setGMB(object gmb)
+        {
+            this.gmb = gmb as GMonoBehaviour;
+        }
 
-    virtual protected void OnAnimatorIK(int layerIndex)
-    {
-        
-    }
+        /// <summary>
+        /// 释放
+        /// </summary>
+        virtual public void dispose()
+        {
+            if (gmb != null && !gmb.isDestorying)
+            {
+                GameObject.Destroy(gmb);
+                return;
+            }
+            if (disposed)
+            {
+                Debug.Log(getCLRType.FullName + "对象重复释放！");
+                return;
+            }
+            disposed = true;
+            inited = false;
+            gameObject = null;
+            gmb = null;
+        }
+        protected bool disposed = false;
 
-    virtual protected void OnAnimatorMove()
-    {
-        
-    }
+        //===============================事件=============================
+        virtual protected void Awake()
+        {
 
-    virtual protected void OnApplicationFocus(bool focusStatus)
-    {
-        
-    }
+        }
 
-    virtual protected void OnApplicationPause(bool pauseStatus)
-    {
-        
-    }
+        virtual protected void FixedUpdate()
+        {
 
-    virtual protected void OnApplicationQuit()
-    {
-        
-    }
+        }
 
-    virtual protected void OnAudioFilterRead(float[] data, int channels)
-    {
-        
-    }
+        virtual protected void LateUpdate()
+        {
 
-    virtual protected void OnBecameInvisible()
-    {
-        
-    }
+        }
 
-    virtual protected void OnBecameVisible()
-    {
-        
-    }
+        virtual protected void OnAnimatorIK(int layerIndex)
+        {
 
-    virtual protected void OnCollisionEnter(Collision collision)
-    {
-        
-    }
+        }
 
-    virtual protected void OnCollisionEnter2D(Collision2D coll)
-    {
-        
-    }
+        virtual protected void OnAnimatorMove()
+        {
 
-    virtual protected void OnCollisionExit(Collision collisionInfo)
-    {
-        
-    }
+        }
 
-    virtual protected void OnCollisionExit2D(Collision2D coll)
-    {
-        
-    }
+        virtual protected void OnApplicationFocus(bool focusStatus)
+        {
 
-    virtual protected void OnCollisionStay(Collision collisionInfo)
-    {
-        
-    }
+        }
 
-    virtual protected void OnCollisionStay2D(Collision2D coll)
-    {
-        
-    }
+        virtual protected void OnApplicationPause(bool pauseStatus)
+        {
 
-    virtual protected void OnConnectedToServer()
-    {
-        
-    }
+        }
 
-    virtual protected void OnControllerColliderHit(ControllerColliderHit hit)
-    {
-        
-    }
+        virtual protected void OnApplicationQuit()
+        {
 
-    virtual protected void OnDestroy()
-    {
-        
-    }
+        }
 
-    virtual protected void OnDisable()
-    {
-        
-    }
+        virtual protected void OnAudioFilterRead(float[] data, int channels)
+        {
 
-    virtual protected void OnDisconnectedFromServer(NetworkDisconnection info)
-    {
-        
-    }
+        }
 
-    virtual protected void OnEnable()
-    {
-        
-    }
+        virtual protected void OnBecameInvisible()
+        {
 
-    virtual protected void OnFailedToConnect(NetworkConnectionError error)
-    {
-        
-    }
+        }
 
-    virtual protected void OnFailedToConnectToMasterServer(NetworkConnectionError info)
-    {
-        
-    }
+        virtual protected void OnBecameVisible()
+        {
 
-    virtual protected void OnJointBreak(float breakForce)
-    {
-        
-    }
+        }
 
-    virtual protected void OnLevelWasLoaded(int level)
-    {
-        
-    }
+        virtual protected void OnCollisionEnter(Collision collision)
+        {
 
-    virtual protected void OnMasterServerEvent(MasterServerEvent msEvent)
-    {
-        
-    }
+        }
 
-    virtual protected void OnNetworkInstantiate(NetworkMessageInfo info)
-    {
-        
-    }
+        virtual protected void OnCollisionEnter2D(Collision2D coll)
+        {
 
-    virtual protected void OnParticleCollision(GameObject other)
-    {
-        
-    }
+        }
 
-    virtual protected void OnPlayerConnected(NetworkPlayer player)
-    {
-        
-    }
+        virtual protected void OnCollisionExit(Collision collisionInfo)
+        {
 
-    virtual protected void OnPlayerDisconnected(NetworkPlayer player)
-    {
-        
-    }
+        }
 
-    virtual protected void OnPostRender()
-    {
-        
-    }
+        virtual protected void OnCollisionExit2D(Collision2D coll)
+        {
 
-    virtual protected void OnPreCull()
-    {
-        
-    }
+        }
 
-    virtual protected void OnPreRender()
-    {
-        
-    }
+        virtual protected void OnCollisionStay(Collision collisionInfo)
+        {
 
-    virtual protected void OnRenderImage(RenderTexture src, RenderTexture dest)
-    {
-        
-    }
+        }
 
-    virtual protected void OnRenderObject()
-    {
-        
-    }
+        virtual protected void OnCollisionStay2D(Collision2D coll)
+        {
 
-    virtual protected void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
-    {
-        
-    }
+        }
 
-    virtual protected void OnServerInitialized()
-    {
-        
-    }
+        virtual protected void OnConnectedToServer()
+        {
 
-    virtual protected void OnTransformChildrenChanged()
-    {
-        
-    }
+        }
 
-    virtual protected void OnTransformParentChanged()
-    {
-        
-    }
+        virtual protected void OnControllerColliderHit(ControllerColliderHit hit)
+        {
 
-    virtual protected void OnTriggerEnter(Collider other)
-    {
-        
-    }
+        }
 
-    virtual protected void OnTriggerEnter2D(Collider2D other)
-    {
-        
-    }
+        virtual protected void OnDestroy()
+        {
+            
+        }
 
-    virtual protected void OnTriggerExit(Collider other)
-    {
-        
-    }
+        virtual protected void OnDisable()
+        {
 
-    virtual protected void OnTriggerExit2D(Collider2D other)
-    {
-        
-    }
+        }
 
-    virtual protected void OnTriggerStay(Collider other)
-    {
-        
-    }
+        virtual protected void OnDisconnectedFromServer(NetworkDisconnection info)
+        {
 
-    virtual protected void OnTriggerStay2D(Collider2D other)
-    {
-        
-    }
+        }
 
-    virtual protected void OnValidate()
-    {
-        
-    }
+        virtual protected void OnEnable()
+        {
 
-    virtual protected void OnWillRenderObject()
-    {
-        
-    }
+        }
 
-    virtual protected void Reset()
-    {
-        
-    }
+        virtual protected void OnFailedToConnect(NetworkConnectionError error)
+        {
 
-    virtual protected void Start()
-    {
-        
-    }
+        }
 
-    virtual protected void Update()
-    {
-        
+        virtual protected void OnFailedToConnectToMasterServer(NetworkConnectionError info)
+        {
+
+        }
+
+        virtual protected void OnJointBreak(float breakForce)
+        {
+
+        }
+
+        virtual protected void OnLevelWasLoaded(int level)
+        {
+
+        }
+
+        virtual protected void OnMasterServerEvent(MasterServerEvent msEvent)
+        {
+
+        }
+
+        virtual protected void OnNetworkInstantiate(NetworkMessageInfo info)
+        {
+
+        }
+
+        virtual protected void OnParticleCollision(GameObject other)
+        {
+
+        }
+
+        virtual protected void OnPlayerConnected(NetworkPlayer player)
+        {
+
+        }
+
+        virtual protected void OnPlayerDisconnected(NetworkPlayer player)
+        {
+
+        }
+
+        virtual protected void OnPostRender()
+        {
+
+        }
+
+        virtual protected void OnPreCull()
+        {
+
+        }
+
+        virtual protected void OnPreRender()
+        {
+
+        }
+
+        virtual protected void OnRenderImage(RenderTexture src, RenderTexture dest)
+        {
+
+        }
+
+        virtual protected void OnRenderObject()
+        {
+
+        }
+
+        virtual protected void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
+        {
+
+        }
+
+        virtual protected void OnServerInitialized()
+        {
+
+        }
+
+        virtual protected void OnTransformChildrenChanged()
+        {
+
+        }
+
+        virtual protected void OnTransformParentChanged()
+        {
+
+        }
+
+        virtual protected void OnTriggerEnter(Collider other)
+        {
+
+        }
+
+        virtual protected void OnTriggerEnter2D(Collider2D other)
+        {
+
+        }
+
+        virtual protected void OnTriggerExit(Collider other)
+        {
+
+        }
+
+        virtual protected void OnTriggerExit2D(Collider2D other)
+        {
+
+        }
+
+        virtual protected void OnTriggerStay(Collider other)
+        {
+
+        }
+
+        virtual protected void OnTriggerStay2D(Collider2D other)
+        {
+
+        }
+
+        virtual protected void OnValidate()
+        {
+
+        }
+
+        virtual protected void OnWillRenderObject()
+        {
+
+        }
+
+        virtual protected void Reset()
+        {
+
+        }
+
+        virtual protected void Start()
+        {
+
+        }
+
+        virtual protected void Update()
+        {
+
+        }
     }
 }

@@ -362,7 +362,7 @@ namespace CLRSharp
                         }
                         else if (_paramsdef[i].ParameterType.IsEnum)//特殊处理枚举
                         {
-                            //??var ms = _paramsdef[i].ParameterType.GetMethods();
+                            var ms = _paramsdef[i].ParameterType.GetMethods();
                             _outp[i] = Enum.ToObject(_paramsdef[i].ParameterType, _params[i]);
                         }
                         else
