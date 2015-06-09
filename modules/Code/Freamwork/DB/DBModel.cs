@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using CLRSharp;
+using System;
+using System.Collections.Generic;
 using System.Xml;
 
 namespace Freamwork
@@ -6,15 +8,14 @@ namespace Freamwork
     /// <summary>
     /// 配置表DBModel的基类
     /// </summary>
-    /// <typeparam name="TDBVO">数据VO</typeparam>
-    public abstract class DBModel<TDBVO> : Model where TDBVO : DBVO, new()
+    public abstract class DBModel : Model
     {
-        protected bool m_order;
-        private int m_count;
-
         private XmlNode xmlNode;
-        private Dictionary<int, TDBVO> m_dataDic;
+        private Dictionary<int, object> m_dataDic;
         private int[] m_ids;
+
+        private IMethod m_method_xmlToVo;
+        private IMethod m_method_creatVo;
 
         public DBModel()
         {
@@ -24,14 +25,21 @@ namespace Freamwork
         /// <summary>
         /// 初始化数据
         /// </summary>
+        /// <param name="voCLRType">vo的L#类型</param>
         /// <param name="name">数据表名称，不带后缀</param>
         /// <param name="order">数据是否有顺序性</param>
-        virtual protected void initDBModel(string name = "", bool order = false)
+        virtual protected void initDBModel(ICLRType voCLRType = null, string sheet = "", bool order = false)
         {
-            m_order = order;
-            xmlNode = DBXMLManager.instance().extractXmlNode(name);
-            m_count = xmlNode.ChildNodes.Count;
-            m_dataDic = new Dictionary<int, TDBVO>();
+            object dbvoCLRType = typeof(DBVO);
+            if (!CLRSharpManager.instance.isExtend(voCLRType as Type_Common_CLRSharp, dbvoCLRType as Type_Common_CLRSharp))
+            {
+                throw new Exception(this.GetType().FullName + "初始化时VO的类型并非是DBVO的子类");
+            }
+            this.voCLRType = voCLRType;
+            this.order = order;
+            xmlNode = DBXMLManager.instance().extractXmlNode(sheet);
+            count = xmlNode.ChildNodes.Count;
+            m_dataDic = new Dictionary<int, object>();
             if (order)
             {
                 m_ids = new int[count];
@@ -39,14 +47,52 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// vo的xmlToVo方法
+        /// </summary>
+        public IMethod method_xmlToVo
+        {
+            get
+            {
+                if (m_method_xmlToVo == null)
+                {
+                    m_method_xmlToVo = CLRSharpManager.instance.GetMethod(voCLRType,
+                        "xmlToVo", CLRSharpManager.instance.getParamTypeList(typeof(XmlNode)));
+                }
+                return m_method_xmlToVo;
+            }
+        }
+
+        /// <summary>
+        /// vo的构造方法
+        /// </summary>
+        public IMethod method_creatVo
+        {
+            get
+            {
+                if (m_method_creatVo == null)
+                {
+                    m_method_creatVo = CLRSharpManager.instance.GetMethod(voCLRType, CLRSharpConstant.METHOD_CTOR);
+                }
+                return m_method_creatVo;
+            }
+        }
+
+        /// <summary>
+        /// vo的L#类型
+        /// </summary>
+        public ICLRType voCLRType
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// 数据是否有顺序
         /// </summary>
         protected bool order
         {
-            get
-            {
-                return m_order;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -54,10 +100,8 @@ namespace Freamwork
         /// </summary>
         protected int count
         {
-            get
-            {
-                return m_count;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -74,11 +118,11 @@ namespace Freamwork
         /// <summary>
         /// 存储所有数据vo的dictionary(返回的是浅克隆的列表)
         /// </summary>
-        protected Dictionary<int, TDBVO> dataDic
+        protected Dictionary<int, object> dataDic
         {
             get
             {
-                return new Dictionary<int, TDBVO>(m_dataDic);
+                return new Dictionary<int, object>(m_dataDic);
             }
         }
 
@@ -105,7 +149,7 @@ namespace Freamwork
         {
             if (!analysised)
             {
-                TDBVO vo;
+                object vo;
                 XmlNode node;
 
                 if (order)
@@ -114,12 +158,16 @@ namespace Freamwork
                     {
                         if (m_ids[i] == 0)
                         {
-                            vo = new TDBVO();
+                            //创建实例，调用构造函数
+                            vo = method_creatVo.Invoke(CLRSharpManager.instance.context, null, null);
+
+                            //调用xmlToVo方法
                             node = xmlNode.FirstChild;
-                            vo.xmlToVo(node);
+                            method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
+
                             xmlNode.RemoveChild(node);
-                            m_ids[i] = vo.id;
-                            m_dataDic.Add(vo.id, vo);
+                            m_ids[i] = int.Parse(((XmlElement)node).GetAttribute("id"));
+                            m_dataDic.Add(m_ids[i], vo);
 
                             if (!xmlNode.HasChildNodes)
                             {
@@ -132,11 +180,15 @@ namespace Freamwork
                 {
                     while (xmlNode.HasChildNodes)
                     {
-                        vo = new TDBVO();
                         node = xmlNode.FirstChild;
-                        vo.xmlToVo(node);
+
+                        //创建实例，调用构造函数
+                        vo = method_creatVo.Invoke(CLRSharpManager.instance.context, null, null);
+                        //调用xmlToVo方法
+                        method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
+
+                        m_dataDic.Add(int.Parse(((XmlElement)node).GetAttribute("id")), vo);
                         xmlNode.RemoveChild(node);
-                        m_dataDic.Add(vo.id, vo);
                     }
                 }
             }
@@ -147,8 +199,8 @@ namespace Freamwork
         /// 根据id获取一条数据，不会解析全表，只会取想要的数据
         /// </summary>
         /// <param name="id">表的索引id</param>
-        /// <returns>TDBVO</returns>
-        public TDBVO getVoById(int id)
+        /// <returns></returns>
+        public object getVoById(int id)
         {
             if (m_dataDic.ContainsKey(id))
             {
@@ -166,12 +218,14 @@ namespace Freamwork
                 return null;
             }
 
-            TDBVO vo = new TDBVO();
-            vo.xmlToVo(node);
-            m_dataDic.Add(vo.id, vo);
+            object vo = method_creatVo.Invoke(CLRSharpManager.instance.context, null, null);
+            method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
+
+            int _id = int.Parse(((XmlElement)node).GetAttribute("id"));
+            m_dataDic.Add(_id, vo);
             if (order)
             {
-                m_ids[findIndex(node)] = vo.id;
+                m_ids[findIndex(node)] = _id;
             }
             xmlNode.RemoveChild(node);
             return vo;

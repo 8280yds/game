@@ -151,7 +151,7 @@ namespace Freamwork
         /// <returns>实例</returns>
         public object creatCLRInstance(ICLRType clrType, MethodParamList paramTypes = null, object[] param = null)
         {
-            return Invoke(clrType, ".ctor", null, paramTypes, param);
+            return Invoke(clrType, CLRSharpConstant.METHOD_CTOR, null, paramTypes, param);
         }
 
         /// <summary>
@@ -201,7 +201,7 @@ namespace Freamwork
         /// <param name="A"></param>
         /// <param name="B"></param>
         /// <returns></returns>
-        private bool isExtend(Type_Common_CLRSharp typeA, Type_Common_CLRSharp typeB)
+        public bool isExtend(Type_Common_CLRSharp typeA, Type_Common_CLRSharp typeB)
         {
             if (typeA == null || typeB == null)
             {
