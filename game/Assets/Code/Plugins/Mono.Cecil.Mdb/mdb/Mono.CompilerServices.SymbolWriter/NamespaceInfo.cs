@@ -4,8 +4,8 @@ namespace Mono.CompilerServices.SymbolWriter
 {
 	internal class NamespaceInfo
 	{
-		public string Name;
-		public int NamespaceID;
+        //??public string Name;
+        //??public int NamespaceID;
 		public ArrayList UsingClauses = new ArrayList();
 	}
 }

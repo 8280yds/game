@@ -9,7 +9,7 @@ namespace Mono.CompilerServices.SymbolWriter
 		private int DataOffset;
 		private MonoSymbolFile file;
 		private string file_name;
-		private byte[] guid;
+        //??private byte[] guid;
 		private byte[] hash;
 		private bool creating;
 		private bool auto_generated;
@@ -43,7 +43,7 @@ namespace Mono.CompilerServices.SymbolWriter
 		}
 		public SourceFileEntry(MonoSymbolFile file, string file_name, byte[] guid, byte[] checksum) : this(file, file_name)
 		{
-			this.guid = guid;
+            //??this.guid = guid;
 			this.hash = checksum;
 		}
         //internal void WriteData(MyBinaryWriter bw)
@@ -83,7 +83,7 @@ namespace Mono.CompilerServices.SymbolWriter
 			int old_pos = (int)reader.BaseStream.Position;
 			reader.BaseStream.Position = (long)this.DataOffset;
 			this.file_name = reader.ReadString();
-			this.guid = reader.ReadBytes(16);
+            //??this.guid = reader.ReadBytes(16);
 			this.hash = reader.ReadBytes(16);
 			this.auto_generated = (reader.ReadByte() == 1);
 			reader.BaseStream.Position = (long)old_pos;
