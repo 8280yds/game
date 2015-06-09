@@ -215,13 +215,15 @@ namespace Freamwork
         /// <summary>
         /// 发送命令
         /// </summary>
-        /// <param name="type">L#类型，必须是ICLRType的实现者</param>
+        /// <param name="type">L#类型</param>
         /// <param name="param">命令携带的参数</param>
-        public void sendCommand(object type, object param)
+        public void sendCommand(ICLRType clrType, object param)
         {
-            ICLRType clrType = type as ICLRType;
-            ICommand command = CLRSharpManager.instance.creatCLRInstance(clrType) as ICommand;
-            command.execute(param);
+            CLRSharpManager mana =  CLRSharpManager.instance;
+            object command = mana.creatCLRInstance(clrType);
+            MethodParamList paramTypes = mana.getParamTypeList(typeof(object));
+            object[] paramList = new object[] { param };
+            mana.Invoke(clrType, "execute", command, paramTypes, paramList);
         }
 
         //********************************* 单例管理 *************************************

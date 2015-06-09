@@ -16,7 +16,8 @@ namespace Freamwork
             TestMB2 testMB2 = MVCCharge.instance.getInstance(typeof(TestMB2) as ICLRType) as TestMB2;
             testMB2.init(sphere);
 
-            MVCCharge.instance.clear();
+            TestView testView = MVCCharge.instance.getInstance(typeof(TestView) as ICLRType) as TestView;
+            testView.init(GameObject.Find("Panel"));
         }
 
         //public static void start()

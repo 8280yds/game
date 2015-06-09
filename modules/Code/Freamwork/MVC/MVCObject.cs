@@ -40,13 +40,13 @@ namespace Freamwork
         /// </summary>
         /// <param name="type">L#类型，必须是ICLRType的实现者</param>
         /// <param name="param">命令携带的参数</param>
-        public void sendCommand(object type, object param)
+        public void sendCommand(ICLRType clrType, object param)
         {
             if (disposed)
             {
                 throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
             }
-            mvcCharge.sendCommand(type, param);
+            mvcCharge.sendCommand(clrType, param);
         }
 
         /// <summary>

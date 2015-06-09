@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CLRSharp;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -30,12 +31,16 @@ namespace Freamwork
         /// <param name="funNames">事件方法的名称，默认已经包含"Update","LateUpdate","OnEnable","OnDisable"</param>
         public override void init(GameObject gameObject, string[] funNames = null)
         {
-            string[] baseFunNames = new string[] { "Update", "LateUpdate", "OnEnable", "OnDisable" };
+            List<string> baseFunNames = new List<string>();
+            baseFunNames.Add("Update");
+            baseFunNames.Add("LateUpdate");
+            baseFunNames.Add("OnEnable");
+            baseFunNames.Add("OnDisable");
             if (funNames != null && funNames.Length > 0)
             {
-                funNames.CopyTo(baseFunNames, 0);
+                baseFunNames.AddRange(funNames);
             }
-            base.init(gameObject, baseFunNames);
+            base.init(gameObject, baseFunNames.ToArray());
         }
 
         /// <summary>
@@ -81,13 +86,13 @@ namespace Freamwork
         /// </summary>
         /// <param name="type">L#类型，必须是ICLRType的实现者</param>
         /// <param name="param">命令携带的参数</param>
-        public void sendCommand(object type, object param)
+        public void sendCommand(ICLRType clrType, object param)
         {
             if (disposed)
             {
                 throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
             }
-            mvcCharge.sendCommand(type, param);
+            mvcCharge.sendCommand(clrType, param);
         }
 
         /// <summary>
