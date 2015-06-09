@@ -9,6 +9,7 @@ public class TestView : View
     private Button btn2;
     private Text txt;
     private TestModel model;
+    private AaaSssDdDBModel dbModel;
 
     public override void init(GameObject gameObject, string[] funNames = null)
     {
@@ -21,7 +22,9 @@ public class TestView : View
         btn = GameObject.Find("Button").GetComponentInChildren<Button>();
         btn2 = GameObject.Find("Button2").GetComponentInChildren<Button>();
         txt = GameObject.Find("TestText").GetComponent<Text>();
-        model = MVCCharge.instance.getInstance(typeof(TestModel) as ICLRType) as TestModel;
+        model = mvcCharge.getInstance(typeof(TestModel) as ICLRType) as TestModel;
+
+        dbModel = mvcCharge.getInstance(typeof(AaaSssDdDBModel) as ICLRType) as AaaSssDdDBModel;
 
         btn.onClick.AddListener(onClick);
         btn2.onClick.AddListener(onClick2);
@@ -51,6 +54,12 @@ public class TestView : View
     private void countChange()
     {
         txt.text = "当前鼠标点击次数为：" + model.count;
+
+        AaaSssDdDBVO vo = dbModel.getvoByAge(model.count);
+        if (vo != null)
+        {
+            Debug.Log(vo.name);
+        }
     }
     
 }

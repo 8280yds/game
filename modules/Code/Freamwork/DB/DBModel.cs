@@ -11,9 +11,6 @@ namespace Freamwork
     public abstract class DBModel : Model
     {
         private XmlNode xmlNode;
-        private Dictionary<int, object> m_dataDic;
-        private int[] m_ids;
-
         private IMethod m_method_xmlToVo;
         private IMethod m_method_creatVo;
 
@@ -39,17 +36,17 @@ namespace Freamwork
             this.order = order;
             xmlNode = DBXMLManager.instance().extractXmlNode(sheet);
             count = xmlNode.ChildNodes.Count;
-            m_dataDic = new Dictionary<int, object>();
+            dataDic = new Dictionary<int, object>();
             if (order)
             {
-                m_ids = new int[count];
+                ids = new int[count];
             }
         }
 
         /// <summary>
         /// vo的xmlToVo方法
         /// </summary>
-        public IMethod method_xmlToVo
+        private IMethod method_xmlToVo
         {
             get
             {
@@ -65,7 +62,7 @@ namespace Freamwork
         /// <summary>
         /// vo的构造方法
         /// </summary>
-        public IMethod method_creatVo
+        private IMethod method_creatVo
         {
             get
             {
@@ -111,7 +108,7 @@ namespace Freamwork
         {
             get
             {
-                return m_dataDic.Count == count;
+                return dataDic.Count == count;
             }
         }
 
@@ -120,10 +117,8 @@ namespace Freamwork
         /// </summary>
         protected Dictionary<int, object> dataDic
         {
-            get
-            {
-                return new Dictionary<int, object>(m_dataDic);
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -133,12 +128,8 @@ namespace Freamwork
         /// </summary>
         protected int[] ids
         {
-            get
-            {
-                int[] arr = new int[count];
-                m_ids.CopyTo(arr, 0);
-                return arr;
-            }
+            get;
+            private set;
         }
 
         /// <summary>
@@ -154,9 +145,9 @@ namespace Freamwork
 
                 if (order)
                 {
-                    for (int i = 0, len = m_ids.Length; i < len; i++)
+                    for (int i = 0, len = ids.Length; i < len; i++)
                     {
-                        if (m_ids[i] == 0)
+                        if (ids[i] == 0)
                         {
                             //创建实例，调用构造函数
                             vo = method_creatVo.Invoke(CLRSharpManager.instance.context, null, null);
@@ -166,8 +157,8 @@ namespace Freamwork
                             method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
 
                             xmlNode.RemoveChild(node);
-                            m_ids[i] = int.Parse(((XmlElement)node).GetAttribute("id"));
-                            m_dataDic.Add(m_ids[i], vo);
+                            ids[i] = int.Parse(((XmlElement)node).GetAttribute("id"));
+                            dataDic.Add(ids[i], vo);
 
                             if (!xmlNode.HasChildNodes)
                             {
@@ -187,12 +178,14 @@ namespace Freamwork
                         //调用xmlToVo方法
                         method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
 
-                        m_dataDic.Add(int.Parse(((XmlElement)node).GetAttribute("id")), vo);
+                        dataDic.Add(int.Parse(((XmlElement)node).GetAttribute("id")), vo);
                         xmlNode.RemoveChild(node);
                     }
                 }
             }
             xmlNode = null;
+            m_method_xmlToVo = null;
+            m_method_creatVo = null;
         }
 
         /// <summary>
@@ -202,9 +195,9 @@ namespace Freamwork
         /// <returns></returns>
         public object getVoById(int id)
         {
-            if (m_dataDic.ContainsKey(id))
+            if (dataDic.ContainsKey(id))
             {
-                return m_dataDic[id];
+                return dataDic[id];
             }
 
             if (analysised)
@@ -222,10 +215,10 @@ namespace Freamwork
             method_xmlToVo.Invoke(CLRSharpManager.instance.context, vo, new object[] { node });
 
             int _id = int.Parse(((XmlElement)node).GetAttribute("id"));
-            m_dataDic.Add(_id, vo);
+            dataDic.Add(_id, vo);
             if (order)
             {
-                m_ids[findIndex(node)] = _id;
+                ids[findIndex(node)] = _id;
             }
             xmlNode.RemoveChild(node);
             return vo;
@@ -240,7 +233,7 @@ namespace Freamwork
                 {
                     for (int j = 0, t = 0; j < count; j++)
                     {
-                        if (m_ids[j] == 0)
+                        if (ids[j] == 0)
                         {
                             if (t == i)
                             {
@@ -261,8 +254,10 @@ namespace Freamwork
         override public void clearAll()
         {
             xmlNode = null;
-            m_dataDic = null;
-            m_ids = null;
+            dataDic = null;
+            ids = null;
+            m_method_xmlToVo = null;
+            m_method_creatVo = null;
         }
 
     }
