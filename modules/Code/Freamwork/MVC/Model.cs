@@ -32,9 +32,7 @@ namespace Freamwork
                 Debug.Log(getCLRType.FullName + "对象重复释放！");
                 return;
             }
-            disposed = true;
             clearAll();
-
             base.dispose();
         }
 

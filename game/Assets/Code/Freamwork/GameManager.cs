@@ -176,6 +176,7 @@ namespace Freamwork
         /// </summary>
         private void startModules()
         {
+            Debug.Log("==================正式开启L#模块===================");
             CLRSharpManager clrmana = CLRSharpManager.instance;
             ICLRType clrType = clrmana.getCLRType("Freamwork.ModulesStart");
             clrmana.Invoke(clrType, "start");

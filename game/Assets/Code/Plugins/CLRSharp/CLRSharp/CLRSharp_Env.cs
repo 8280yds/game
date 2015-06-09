@@ -22,7 +22,7 @@ namespace CLRSharp
         public CLRSharp_Environment(ICLRSharp_Logger logger)
         {
             this.logger = logger;
-            logger.Log_Warning("CLR# Ver:" + version + " Inited.");
+            logger.Log("####CLR# Ver:" + version + " Inited.####");
 
             this.RegCrossBind(new CrossBind_IEnumerable());
             this.RegCrossBind(new CrossBind_IEnumerator());

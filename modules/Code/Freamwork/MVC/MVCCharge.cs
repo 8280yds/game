@@ -267,9 +267,12 @@ namespace Freamwork
         {
             if (m_instanceDic.ContainsKey(clrType.FullName))
             {
-                object mvcObject = m_instanceDic[clrType.FullName];
+                CLRSharp_Instance mvcObject = m_instanceDic[clrType.FullName] as CLRSharp_Instance;
                 m_instanceDic.Remove(clrType.FullName);
-                CLRSharpManager.instance.Invoke(clrType, "dispose", mvcObject);
+                if (!(bool)(mvcObject.Fields["disposed"]))
+                {
+                    CLRSharpManager.instance.Invoke(clrType, "dispose", mvcObject);
+                }
                 return true;
             }
             return false;
