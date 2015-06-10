@@ -1,7 +1,6 @@
 ﻿using CLRSharp;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace Freamwork
 {
@@ -22,25 +21,6 @@ namespace Freamwork
             {
                 return MVCCharge.instance;
             }
-        }
-
-        /// <summary>
-        /// 初始化
-        /// </summary>
-        /// <param name="gameObject">物体</param>
-        /// <param name="funNames">事件方法的名称，默认已经包含"Update","LateUpdate","OnEnable","OnDisable"</param>
-        public override void init(GameObject gameObject, string[] funNames = null)
-        {
-            List<string> baseFunNames = new List<string>();
-            baseFunNames.Add("Update");
-            baseFunNames.Add("LateUpdate");
-            baseFunNames.Add("OnEnable");
-            baseFunNames.Add("OnDisable");
-            if (funNames != null && funNames.Length > 0)
-            {
-                baseFunNames.AddRange(funNames);
-            }
-            base.init(gameObject, baseFunNames.ToArray());
         }
 
         /// <summary>

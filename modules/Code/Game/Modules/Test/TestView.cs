@@ -11,11 +11,6 @@ public class TestView : View
     private TestModel model;
     private AaaSssDdDBModel dbModel;
 
-    public override void init(GameObject gameObject, string[] funNames = null)
-    {
-        base.init(gameObject, new string[] { "Awake", "Update" });
-    }
-
     protected override void Awake()
     {
         base.Awake();

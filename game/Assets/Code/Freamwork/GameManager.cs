@@ -55,16 +55,17 @@ namespace Freamwork
         {
             started = false;
 
+            //ModulesStart.clear();
+            CLRSharpManager clrmana = CLRSharpManager.instance;
+            ICLRType clrType = clrmana.getCLRType("Freamwork.ModulesStart");
+            clrmana.Invoke(clrType, "clear");
+
+            GMBManager.instance.clear();
+            CLRSharpManager.instance.clear();
             EnterFrame.instance.clear();
             ManifestManager.instance.clear();
             LoadManager.instance.clear();
             BundleLoadManager.instance.clear();
-
-            //调用MVCCharge.instance.clear();
-            CLRSharpManager clrmana = CLRSharpManager.instance;
-            ICLRType clrType = clrmana.getCLRType("Freamwork.MVCCharge");
-            object inst = clrmana.Invoke(clrType, "instance");
-            clrmana.Invoke(clrType, "clear", inst);
         }
 
         //=====================================================================
@@ -176,7 +177,7 @@ namespace Freamwork
         /// </summary>
         private void startModules()
         {
-            Debug.Log("==================正式开启L#模块===================");
+            Debug.Log("==================正式启动L#模块===================");
             CLRSharpManager clrmana = CLRSharpManager.instance;
             ICLRType clrType = clrmana.getCLRType("Freamwork.ModulesStart");
             clrmana.Invoke(clrType, "start");

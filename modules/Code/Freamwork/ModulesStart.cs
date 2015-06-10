@@ -7,6 +7,9 @@ namespace Freamwork
 {
     public class ModulesStart
     {
+        /// <summary>
+        /// L#模块总启动
+        /// </summary>
         public static void start()
         {
             //测试GMB
@@ -27,6 +30,14 @@ namespace Freamwork
             EnterFrame.instance.addEnterFrame(doEnterframe);
         }
 
+        /// <summary>
+        /// 清除单例等，主要是用于项目重启时的清理
+        /// </summary>
+        public static void clear()
+        {
+            MVCCharge.instance.clear();
+        }
+
         private static void doEnterframe()
         {
             count++;
@@ -38,31 +49,5 @@ namespace Freamwork
         }
         private static int count = 0;
         private static Text txt;
-
-        //public static void start()
-        //{
-        //    object type = typeof(Test);
-        //    ICLRType clrType = type as ICLRType;
-        //    Test test = CLRSharpManager.instance.creatCLRInstance(clrType) as Test;
-        //    Debug.Log(test.getValue("dd"));
-        //}
-
     }
-    public class Test
-    {
-        public Dictionary<string, object> dic = new Dictionary<string, object>();
-        public Test()
-        {
-            dic.Add("aa", "AA");
-            dic.Add("bb", "BB");
-            dic.Add("cc", "CC");
-            dic.Add("dd", "DD");
-        }
-
-        public object getValue(string key)
-        {
-            return dic[key];
-        }
-    }
-
 }

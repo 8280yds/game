@@ -22,7 +22,7 @@ namespace Freamwork
 
     public interface IView : IMVCObject
     {
-        void init(GameObject gameObject, string[] funNames);
+        void init(GameObject gameObject);
     }
 
 }

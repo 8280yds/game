@@ -3,17 +3,6 @@ using UnityEngine;
 
 public class TestMB : GMB
 {
-    public TestMB()
-        : base()
-    {
-
-    }
-
-    override public void init(GameObject gameObject, string[] funNames = null)
-    {
-        base.init(gameObject, new string[] { "Awake", "Update" });
-    }
-
     protected override void Update()
     {
         base.Update();

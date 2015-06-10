@@ -19,5 +19,10 @@ namespace Freamwork
         {
             Debug.LogWarning(str);
         }
+
+        public static void debug(params object[] objs)
+        {
+            Debug.Log(objs);
+        }
     }
 }

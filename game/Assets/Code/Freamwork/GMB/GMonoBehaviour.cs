@@ -15,29 +15,17 @@ namespace Freamwork
         /// 初始化时设置临时变量，勿要调用！！！
         /// </summary>
         /// <param name="clrInst"></param>
-        /// <param name="funNames"></param>
-        public static void setProvisionalData(object clrInst, string[] funNames)
+        public static void setProvisionalData(object clrInst)
         {
             s_clrInst = clrInst as CLRSharp_Instance;
-            s_funNames = funNames;
         }
         private static CLRSharp_Instance s_clrInst;
-        private static string[] s_funNames;
 
         //================================================================
         /// <summary>
         /// 方法列表
         /// </summary>
-        private Dictionary<string, IMethod> funDic;
-
-        /// <summary>
-        /// 对应的L#类
-        /// </summary>
-        public ICLRType clrType
-        {
-            get;
-            private set;
-        }
+        private Dictionary<GMBEventMethod, IMethod> funDic;
 
         /// <summary>
         /// 对应的L#类的实例
@@ -63,370 +51,358 @@ namespace Freamwork
         public void init()
         {
             isDestorying = false;
-            this.clrInst = s_clrInst;
-            this.clrType = CLRSharpManager.instance.getCLRType(clrInst.type.FullName);
-
-            funDic = new Dictionary<string, IMethod>();
-            for (int i = 0, len = s_funNames.Length; i < len; i++)
-            {
-                //funDic.Add(s_funNames[i], null);
-                funDic[s_funNames[i]] = null;
-            }
+            clrInst = s_clrInst;
+            funDic = new Dictionary<GMBEventMethod, IMethod>();
 
             //传送实例
             MethodParamList TypeList = CLRSharpManager.instance.getParamTypeList(typeof(object));
             object[] paramList = new object[] { this };
-            CLRSharpManager.instance.Invoke(clrType, "setGMB", clrInst, TypeList, paramList);
+            CLRSharpManager.instance.Invoke(clrInst.type, "setGMB", clrInst, TypeList, paramList);
         }
 
         /// <summary>
         /// 执行L#对应的方法
         /// </summary>
-        /// <param name="funName">方法名称</param>
+        /// <param name="funName">方法</param>
         /// <param name="paramTypes">参数类型列表</param>
         /// <param name="param">参数列表</param>
-        private void doFun(string funName, MethodParamList paramTypes = null, object[] param = null)
+        protected void doFun(GMBEventMethod method, MethodParamList paramTypes = null, object[] param = null)
         {
             if (funDic == null)
             {
                 init();
             }
-            if (!funDic.ContainsKey(funName))
+            if (!funDic.ContainsKey(method))
             {
-                return;
+                funDic.Add(method, GMBManager.instance.getGMBEventMethod(clrInst.type, method, paramTypes));
             }
-            if (funDic[funName] == null)
+            if (funDic[method] != null)
             {
-                if (paramTypes == null)
-                {
-                    paramTypes = MethodParamList.constEmpty();
-                }
-                funDic[funName] = CLRSharpManager.instance.GetMethod(clrType, funName, paramTypes);
+                funDic[method].Invoke(CLRSharpManager.instance.context, clrInst, param);
             }
-            funDic[funName].Invoke(CLRSharpManager.instance.context, clrInst, param);
         }
 
         //===============================事件=============================
         virtual protected void Awake()
         {
-            doFun("Awake");
+            doFun(GMBEventMethod.Awake);
         }
 
         virtual protected void FixedUpdate()
         {
-            doFun("FixedUpdate");
+            doFun(GMBEventMethod.FixedUpdate);
         }
 
         virtual protected void LateUpdate()
         {
-            doFun("LateUpdate");
+            doFun(GMBEventMethod.LateUpdate);
         }
 
         virtual protected void OnAnimatorIK(int layerIndex)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(int));
             object[] paramList = new object[]{layerIndex};
-            doFun("OnAnimatorIK", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnAnimatorIK, paramTypeList, paramList);
         }
 
         virtual protected void OnAnimatorMove()
         {
-            doFun("OnAnimatorMove");
+            doFun(GMBEventMethod.OnAnimatorMove);
         }
 
         virtual protected void OnApplicationFocus(bool focusStatus)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(bool));
             object[] paramList = new object[] { focusStatus };
-            doFun("OnApplicationFocus", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnApplicationFocus, paramTypeList, paramList);
         }
 
         virtual protected void OnApplicationPause(bool pauseStatus)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(bool));
             object[] paramList = new object[] { pauseStatus };
-            doFun("OnApplicationPause", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnApplicationPause, paramTypeList, paramList);
         }
 
         virtual protected void OnApplicationQuit()
         {
-            doFun("OnApplicationQuit");
+            doFun(GMBEventMethod.OnApplicationQuit);
         }
 
         virtual protected void OnAudioFilterRead(float[] data, int channels)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(float[]), typeof(int));
             object[] paramList = new object[] { data, channels };
-            doFun("OnAudioFilterRead", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnAudioFilterRead, paramTypeList, paramList);
         }
 
         virtual protected void OnBecameInvisible()
         {
-            doFun("OnBecameInvisible");
+            doFun(GMBEventMethod.OnBecameInvisible);
         }
 
         virtual protected void OnBecameVisible()
         {
-            doFun("OnBecameVisible");
+            doFun(GMBEventMethod.OnBecameVisible);
         }
 
         virtual protected void OnCollisionEnter(Collision collision)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision));
             object[] paramList = new object[] { collision };
-            doFun("OnCollisionEnter", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionEnter, paramTypeList, paramList);
         }
 
         virtual protected void OnCollisionEnter2D(Collision2D coll)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision2D));
             object[] paramList = new object[] { coll };
-            doFun("OnCollisionEnter2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionEnter2D, paramTypeList, paramList);
         }
 
         virtual protected void OnCollisionExit(Collision collisionInfo)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision));
             object[] paramList = new object[] { collisionInfo };
-            doFun("OnCollisionExit", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionExit, paramTypeList, paramList);
         }
 
         virtual protected void OnCollisionExit2D(Collision2D coll)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision2D));
             object[] paramList = new object[] { coll };
-            doFun("OnCollisionExit2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionExit2D, paramTypeList, paramList);
         }
 
         virtual protected void OnCollisionStay(Collision collisionInfo)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision));
             object[] paramList = new object[] { collisionInfo };
-            doFun("OnCollisionStay", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionStay, paramTypeList, paramList);
         }
 
         virtual protected void OnCollisionStay2D(Collision2D coll)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collision2D));
             object[] paramList = new object[] { coll };
-            doFun("OnCollisionStay2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnCollisionStay2D, paramTypeList, paramList);
         }
 
         virtual protected void OnConnectedToServer()
         {
-            doFun("OnConnectedToServer");
+            doFun(GMBEventMethod.OnConnectedToServer);
         }
 
         virtual protected void OnControllerColliderHit(ControllerColliderHit hit)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(ControllerColliderHit));
             object[] paramList = new object[] { hit };
-            doFun("OnControllerColliderHit", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnControllerColliderHit, paramTypeList, paramList);
         }
 
         virtual protected void OnDestroy()
         {
             isDestorying = true;
-            doFun("OnDestroy");
+            doFun(GMBEventMethod.OnDestroy);
             
             //销毁
-            CLRSharpManager.instance.Invoke(clrType, "dispose", clrInst);
+            CLRSharpManager.instance.Invoke(clrInst.type, "dispose", clrInst);
         }
 
         virtual protected void OnDisable()
         {
-            doFun("OnDisable");
+            doFun(GMBEventMethod.OnDisable);
         }
 
         virtual protected void OnDisconnectedFromServer(NetworkDisconnection info)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkDisconnection));
             object[] paramList = new object[] { info };
-            doFun("OnDisconnectedFromServer", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnDisconnectedFromServer, paramTypeList, paramList);
         }
 
         virtual protected void OnEnable()
         {
-            doFun("OnEnable");
+            doFun(GMBEventMethod.OnEnable);
         }
 
         virtual protected void OnFailedToConnect(NetworkConnectionError error)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkConnectionError));
             object[] paramList = new object[] { error };
-            doFun("OnFailedToConnect", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnFailedToConnect, paramTypeList, paramList);
         }
 
         virtual protected void OnFailedToConnectToMasterServer(NetworkConnectionError info)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkConnectionError));
             object[] paramList = new object[] { info };
-            doFun("OnFailedToConnectToMasterServer", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnFailedToConnectToMasterServer, paramTypeList, paramList);
         }
 
         virtual protected void OnJointBreak(float breakForce)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(float));
             object[] paramList = new object[] { breakForce };
-            doFun("OnJointBreak", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnJointBreak, paramTypeList, paramList);
         }
 
         virtual protected void OnLevelWasLoaded(int level)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(int));
             object[] paramList = new object[] { level };
-            doFun("OnLevelWasLoaded", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnLevelWasLoaded, paramTypeList, paramList);
         }
 
         virtual protected void OnMasterServerEvent(MasterServerEvent msEvent)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(MasterServerEvent));
             object[] paramList = new object[] { msEvent };
-            doFun("OnMasterServerEvent", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnMasterServerEvent, paramTypeList, paramList);
         }
 
         virtual protected void OnNetworkInstantiate(NetworkMessageInfo info)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkMessageInfo));
             object[] paramList = new object[] { info };
-            doFun("OnNetworkInstantiate", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnNetworkInstantiate, paramTypeList, paramList);
         }
 
         virtual protected void OnParticleCollision(GameObject other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(GameObject));
             object[] paramList = new object[] { other };
-            doFun("OnParticleCollision", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnParticleCollision, paramTypeList, paramList);
         }
 
         virtual protected void OnPlayerConnected(NetworkPlayer player)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkPlayer));
             object[] paramList = new object[] { player };
-            doFun("OnPlayerConnected", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnPlayerConnected, paramTypeList, paramList);
         }
 
         virtual protected void OnPlayerDisconnected(NetworkPlayer player)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(NetworkPlayer));
             object[] paramList = new object[] { player };
-            doFun("OnPlayerDisconnected", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnPlayerDisconnected, paramTypeList, paramList);
         }
 
         virtual protected void OnPostRender()
         {
-            doFun("OnPostRender");
+            doFun(GMBEventMethod.OnPostRender);
         }
 
         virtual protected void OnPreCull()
         {
-            doFun("OnPreCull");
+            doFun(GMBEventMethod.OnPreCull);
         }
 
         virtual protected void OnPreRender()
         {
-            doFun("OnPreRender");
+            doFun(GMBEventMethod.OnPreRender);
         }
 
         virtual protected void OnRenderImage(RenderTexture src, RenderTexture dest)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(RenderTexture), typeof(RenderTexture));
             object[] paramList = new object[] { src, dest };
-            doFun("OnRenderImage", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnRenderImage, paramTypeList, paramList);
         }
 
         virtual protected void OnRenderObject()
         {
-            doFun("OnRenderObject");
+            doFun(GMBEventMethod.OnRenderObject);
         }
 
         virtual protected void OnSerializeNetworkView(BitStream stream, NetworkMessageInfo info)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BitStream), typeof(NetworkMessageInfo));
             object[] paramList = new object[] { stream, info };
-            doFun("OnSerializeNetworkView", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnSerializeNetworkView, paramTypeList, paramList);
         }
 
         virtual protected void OnServerInitialized()
         {
-            doFun("OnServerInitialized");
+            doFun(GMBEventMethod.OnServerInitialized);
         }
 
         virtual protected void OnTransformChildrenChanged()
         {
-            doFun("OnTransformChildrenChanged");
+            doFun(GMBEventMethod.OnTransformChildrenChanged);
         }
 
         virtual protected void OnTransformParentChanged()
         {
-            doFun("OnTransformParentChanged");
+            doFun(GMBEventMethod.OnTransformParentChanged);
         }
 
         virtual protected void OnTriggerEnter(Collider other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerEnter", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerEnter, paramTypeList, paramList);
         }
 
         virtual protected void OnTriggerEnter2D(Collider2D other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider2D));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerEnter2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerEnter2D, paramTypeList, paramList);
         }
 
         virtual protected void OnTriggerExit(Collider other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerExit", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerExit, paramTypeList, paramList);
         }
 
         virtual protected void OnTriggerExit2D(Collider2D other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider2D));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerExit2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerExit2D, paramTypeList, paramList);
         }
 
         virtual protected void OnTriggerStay(Collider other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerStay", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerStay, paramTypeList, paramList);
         }
 
         virtual protected void OnTriggerStay2D(Collider2D other)
         {
             MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(Collider2D));
             object[] paramList = new object[] { other };
-            doFun("OnTriggerStay2D", paramTypeList, paramList);
+            doFun(GMBEventMethod.OnTriggerStay2D, paramTypeList, paramList);
         }
 
         virtual protected void OnValidate()
         {
-            doFun("OnValidate");
+            doFun(GMBEventMethod.OnValidate);
         }
 
         virtual protected void OnWillRenderObject()
         {
-            doFun("OnWillRenderObject");
+            doFun(GMBEventMethod.OnWillRenderObject);
         }
 
         virtual protected void Reset()
         {
-            doFun("Reset");
+            doFun(GMBEventMethod.Reset);
         }
 
         virtual protected void Start()
         {
-            doFun("Start");
+            doFun(GMBEventMethod.Start);
         }
 
         virtual protected void Update()
         {
-            doFun("Update");
+            doFun(GMBEventMethod.Update);
         }
     }
 }

@@ -12,17 +12,16 @@ namespace Freamwork
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="gameObject">物体</param>
-        /// <param name="funNames">事件方法的名称</param>
-        virtual public void init(GameObject gameObject, string[] funNames = null)
+        /// <param name="gameObject">要绑定的物体</param>
+        virtual public void init(GameObject gameObject)
         {
             if (inited)
             {
-                throw new Exception("试图重复初始化" + CLRSharpManager.instance.getCLRTypeByInst(this).FullName);
+                throw new Exception(getCLRType.FullName + "试图重复初始化");
             }
             inited = true;
             this.gameObject = gameObject;
-            GMonoBehaviour.setProvisionalData(this, funNames);
+            GMonoBehaviour.setProvisionalData(this);
             gameObject.AddComponent<GMonoBehaviour>();
         }
 
