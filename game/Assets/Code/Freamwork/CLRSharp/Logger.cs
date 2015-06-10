@@ -19,37 +19,5 @@ namespace Freamwork
         {
             Debug.LogWarning(str);
         }
-
-        //======================静态方法======================
-        public static void log(string message)
-        {
-            Debug.Log(message);
-        }
-
-        public static void log(string message, Object context)
-        {
-            Debug.Log(message, context);
-        }
-
-        public static void logWarning(string message)
-        {
-            Debug.LogWarning(message);
-        }
-
-        public static void logWarning(string message, Object context)
-        {
-            Debug.LogWarning(message, context);
-        }
-
-        public static void logError(string message)
-        {
-            Debug.LogError(message);
-        }
-
-        public static void logError(string message, Object context)
-        {
-            Debug.LogError(message, context);
-        }
-
     }
 }

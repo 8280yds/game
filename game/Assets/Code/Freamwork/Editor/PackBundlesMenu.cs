@@ -126,10 +126,6 @@ public class PackBundlesMenu : ScriptableObject
     {
         string direName = StringUtil.getLastStr(bundlesDirePath);
         string manifestPath = bundlesDirePath + "/" + direName + ".manifest";
-        if (!File.Exists(manifestPath))
-        {
-            return "";
-        }
 
         Dictionary<string, ManifestVO> voDic = new Dictionary<string, ManifestVO>();
         //手动添加db
@@ -141,44 +137,47 @@ public class PackBundlesMenu : ScriptableObject
         manifestVO.name = "modules";
         voDic.Add(manifestVO.name, manifestVO);
 
-        StreamReader fs = new StreamReader(manifestPath);
         string line;
-
-        //获取总信息
-        while ((line = fs.ReadLine()) != null)
+        StreamReader fs;
+        if (File.Exists(manifestPath))
         {
-            line = line.Replace("\n", "");
-            int index = line.IndexOf("Name:");
-            if (index >= 0)
+            fs = new StreamReader(manifestPath);
+            //获取总信息
+            while ((line = fs.ReadLine()) != null)
             {
-                ManifestVO vo = new ManifestVO();
-                vo.name = line.Substring(index + 6);
-
-                fs.ReadLine();
-
-                while ((line = fs.ReadLine()) != null)
+                line = line.Replace("\n", "");
+                int index = line.IndexOf("Name:");
+                if (index >= 0)
                 {
-                    index = line.IndexOf("Dependency_");
-                    if (index < 0)
-                    {
-                        break;
-                    }
+                    ManifestVO vo = new ManifestVO();
+                    vo.name = line.Substring(index + 6);
 
-                    line = line.Replace("\n", "");
-                    index = line.IndexOf(":");
-                    if (string.IsNullOrEmpty(vo.deps))
+                    fs.ReadLine();
+
+                    while ((line = fs.ReadLine()) != null)
                     {
-                        vo.deps = line.Substring(index + 2);
+                        index = line.IndexOf("Dependency_");
+                        if (index < 0)
+                        {
+                            break;
+                        }
+
+                        line = line.Replace("\n", "");
+                        index = line.IndexOf(":");
+                        if (string.IsNullOrEmpty(vo.deps))
+                        {
+                            vo.deps = line.Substring(index + 2);
+                        }
+                        else
+                        {
+                            vo.deps = "," + line.Substring(index + 2);
+                        }
                     }
-                    else
-                    {
-                        vo.deps = "," + line.Substring(index + 2);
-                    }
+                    voDic.Add(vo.name, vo);
                 }
-                voDic.Add(vo.name, vo);
             }
+            fs.Close();
         }
-        fs.Close();
 
         //读取CRC和assets信息
         foreach (string fileName in voDic.Keys)
