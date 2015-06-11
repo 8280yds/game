@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Freamwork
 {
+    /// <summary>
+    /// MonoBehaviour的事件方法
+    /// </summary>
     public enum GMBEventMethod
     {
         Awake,
@@ -64,6 +67,18 @@ namespace Freamwork
         OnPointerClick,
         OnPointerEnter,
         OnPointerExit,
+        OnBeginDrag,
+        OnInitializePotentialDrag,
+        OnDrag,
+        OnEndDrag,
+        OnDrop,
+        OnScroll,
+        OnUpdateSelected,
+        OnSelect,
+        OnDeselect,
+        OnMove,
+        OnSubmit,
+        OnCancel,
     }
 
     sealed public class GMBManager

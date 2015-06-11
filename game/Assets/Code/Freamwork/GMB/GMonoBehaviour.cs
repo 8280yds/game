@@ -1,6 +1,7 @@
 ﻿using CLRSharp;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Freamwork
 {
@@ -9,7 +10,11 @@ namespace Freamwork
     /// </summary>
     public delegate void ListenerDelegate();
 
-    public class GMonoBehaviour : MonoBehaviour
+    public class GMonoBehaviour : MonoBehaviour,
+        IPointerDownHandler,IPointerUpHandler, IPointerClickHandler, IPointerEnterHandler,IPointerExitHandler,
+        IBeginDragHandler, IInitializePotentialDragHandler, IDragHandler, IEndDragHandler, IDropHandler,
+        IScrollHandler, IUpdateSelectedHandler, ISelectHandler, IDeselectHandler, IMoveHandler, 
+        ISubmitHandler, ICancelHandler
     {
         /// <summary>
         /// 初始化时设置临时变量，勿要调用！！！
@@ -82,7 +87,7 @@ namespace Freamwork
             }
         }
 
-        //===============================事件=============================
+        //========================MonoBehaviour事件=======================
         virtual protected void Awake()
         {
             doFun(GMBEventMethod.Awake);
@@ -404,5 +409,126 @@ namespace Freamwork
         {
             doFun(GMBEventMethod.Update);
         }
+
+        //========================UGUI事件=======================
+        virtual public void OnPointerDown(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnPointerDown, paramTypeList, paramList);
+        }
+
+        virtual public void OnPointerUp(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnPointerUp, paramTypeList, paramList);
+        }
+
+        virtual public void OnPointerClick(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnPointerClick, paramTypeList, paramList);
+        }
+
+        virtual public void OnPointerEnter(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnPointerEnter, paramTypeList, paramList);
+        }
+
+        virtual public void OnPointerExit(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnPointerExit, paramTypeList, paramList);
+        }
+
+        virtual public void OnBeginDrag(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnBeginDrag, paramTypeList, paramList);
+        }
+
+        virtual public void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnInitializePotentialDrag, paramTypeList, paramList);
+        }
+
+        virtual public void OnDrag(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnDrag, paramTypeList, paramList);
+        }
+
+        virtual public void OnEndDrag(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnEndDrag, paramTypeList, paramList);
+        }
+
+        virtual public void OnDrop(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnDrop, paramTypeList, paramList);
+        }
+
+        virtual public void OnScroll(PointerEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(PointerEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnScroll, paramTypeList, paramList);
+        }
+
+        virtual public void OnUpdateSelected(BaseEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BaseEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnUpdateSelected, paramTypeList, paramList);
+        }
+
+        virtual public void OnSelect(BaseEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BaseEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnSelect, paramTypeList, paramList);
+        }
+
+        virtual public void OnDeselect(BaseEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BaseEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnDeselect, paramTypeList, paramList);
+        }
+
+        virtual public void OnMove(AxisEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(AxisEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnMove, paramTypeList, paramList);
+        }
+
+        virtual public void OnSubmit(BaseEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BaseEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnSubmit, paramTypeList, paramList);
+        }
+
+        virtual public void OnCancel(BaseEventData eventData)
+        {
+            MethodParamList paramTypeList = CLRSharpManager.instance.getParamTypeList(typeof(BaseEventData));
+            object[] paramList = new object[] { eventData };
+            doFun(GMBEventMethod.OnCancel, paramTypeList, paramList);
+        }
+
     }
 }

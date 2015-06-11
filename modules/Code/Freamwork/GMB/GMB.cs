@@ -1,6 +1,7 @@
 ﻿using CLRSharp;
 using System;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace Freamwork
 {
@@ -98,7 +99,7 @@ namespace Freamwork
         }
         protected bool disposed = false;
 
-        //===============================事件=============================
+        //========================MonoBehaviour事件=======================
         virtual protected void Awake()
         {
 
@@ -358,5 +359,92 @@ namespace Freamwork
         {
 
         }
+
+        //========================UGUI事件=======================
+        virtual protected void OnPointerDown(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnPointerUp(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnPointerClick(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnPointerEnter(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnPointerExit(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnBeginDrag(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnInitializePotentialDrag(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnDrag(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnEndDrag(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnDrop(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnScroll(PointerEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnUpdateSelected(BaseEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnSelect(BaseEventData eventData)
+        {
+
+        }
+
+        virtual protected void OnDeselect(BaseEventData eventData)
+        {
+            
+        }
+
+        virtual protected void OnMove(AxisEventData eventData)
+        {
+            
+        }
+
+        virtual protected void OnSubmit(BaseEventData eventData)
+        {
+            
+        }
+
+        virtual protected void OnCancel(BaseEventData eventData)
+        {
+            
+        }
+
     }
 }
