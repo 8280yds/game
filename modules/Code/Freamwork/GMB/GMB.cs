@@ -43,7 +43,7 @@ namespace Freamwork
             {
                 return m_inited;
             }
-            private set
+            protected set
             {
                 m_inited = value;
             }
@@ -56,7 +56,7 @@ namespace Freamwork
         public GameObject gameObject
         {
             get;
-            private set;
+            protected set;
         }
 
         /// <summary>

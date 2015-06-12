@@ -3,7 +3,7 @@ using Freamwork;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestView : View
+public class TestView : Window
 {
     private Button btn;
     private Button btn2;
@@ -11,23 +11,24 @@ public class TestView : View
     private TestModel model;
     private AaaSssDdDBModel dbModel;
 
-    protected override void Awake()
+    public override void show(string assetName = "test")
     {
-        base.Awake();
-        btn = GameObject.Find("Button").GetComponentInChildren<Button>();
-        btn2 = GameObject.Find("Button2").GetComponentInChildren<Button>();
-        txt = GameObject.Find("TestText").GetComponent<Text>();
-        model = mvcCharge.getInstance(typeof(TestModel) as ICLRType) as TestModel;
+        base.show(assetName);
+    }
 
+    protected override void onShow()
+    {
+        base.onShow();
+
+        btn = gmb.transform.FindChild("Button").GetComponentInChildren<Button>();
+        btn2 = gmb.transform.FindChild("Button2").GetComponentInChildren<Button>();
+        txt = gmb.transform.FindChild("TestText").GetComponent<Text>();
+
+        model = mvcCharge.getInstance(typeof(TestModel) as ICLRType) as TestModel;
         dbModel = mvcCharge.getInstance(typeof(AaaSssDdDBModel) as ICLRType) as AaaSssDdDBModel;
 
         btn.onClick.AddListener(onClick);
         btn2.onClick.AddListener(onClick2);
-    }
-
-    protected override void Update()
-    {
-        base.Update();
     }
 
     private void onClick()
