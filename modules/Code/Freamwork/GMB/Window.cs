@@ -53,6 +53,7 @@ namespace Freamwork
         private void unZipEnd(LoadData data)
         {
             GameObject go = GameObject.Instantiate(data.assets[0]) as GameObject;
+            go.name = getCLRType.FullName;
             init(go);
         }
 
@@ -90,7 +91,7 @@ namespace Freamwork
         /// </summary>
         virtual public void close()
         {
-            dispose();
+            GameObject.Destroy(gameObject);
         }
 
     }

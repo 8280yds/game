@@ -7,6 +7,7 @@ public class TestView : Window
 {
     private Button btn;
     private Button btn2;
+    private Button btn3;
     private Text txt;
     private TestModel model;
     private AaaSssDdDBModel dbModel;
@@ -22,6 +23,7 @@ public class TestView : Window
 
         btn = gmb.transform.FindChild("Button").GetComponentInChildren<Button>();
         btn2 = gmb.transform.FindChild("Button2").GetComponentInChildren<Button>();
+        btn3 = gmb.transform.FindChild("Button3").GetComponentInChildren<Button>();
         txt = gmb.transform.FindChild("TestText").GetComponent<Text>();
 
         model = mvcCharge.getInstance(typeof(TestModel) as ICLRType) as TestModel;
@@ -29,6 +31,7 @@ public class TestView : Window
 
         btn.onClick.AddListener(onClick);
         btn2.onClick.AddListener(onClick2);
+        btn3.onClick.AddListener(onClick3);
     }
 
     private void onClick()
@@ -39,6 +42,11 @@ public class TestView : Window
     private void onClick2()
     {
         sendCommand(typeof(TestCommand) as ICLRType, 0);
+    }
+
+    private void onClick3()
+    {
+        close();
     }
 
     protected override void addListeners()
