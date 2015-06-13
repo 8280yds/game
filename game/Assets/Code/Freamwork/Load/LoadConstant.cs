@@ -54,7 +54,7 @@
         /// <summary>
         /// cdn地址
         /// </summary>
-        public const string CDN = "file:///C:/Users/Administrator/Desktop/game/game/Resources/Bundles/";
+        public const string CDN = "http://192.168.1.105/Bundles/";
 
         /// <summary>
         /// 最大同时加载的数量
@@ -79,11 +79,11 @@
         /// <summary>
         /// 加载信息文件的名称
         /// </summary>
-        public const string MANIFEST_FILE = "manifest";
+        public const string MANIFEST_FILE = "manifest.assets";
 
         /// <summary>
         /// db数据文件的名称
         /// </summary>
-        public const string DB_FILE = "db";
+        public const string DB_FILE = "db.assets";
     }
 }

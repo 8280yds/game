@@ -21,6 +21,11 @@ public class PackBundlesMenu : ScriptableObject
     /// </summary>
     private const string dllPath = "../modules/bin/Debug";
 
+    /// <summary>
+    /// cdn的绝对位置
+    /// </summary>
+    private const string cdnPath = "C:/inetpub/wwwroot/Bundles";
+
     [MenuItem("Game/Pack Bundles/Pack(Not Clear)", false, 2)]
     static void Pack()
     {
@@ -35,6 +40,21 @@ public class PackBundlesMenu : ScriptableObject
             Directory.Delete(bundlesDirePath, true);
         }
         PackBundles();
+    }
+
+    //[MenuItem("Game/Pack Bundles/Copy TO CDN", false, 2)]
+    static void CopyToCDN()
+    {
+        if (!Directory.Exists(cdnPath))
+        {
+            EditorUtility.DisplayDialog("出错啦", "CDN目录未找到！", "确定");
+            return;
+        }
+        DirectoryInfo folder = new DirectoryInfo(bundlesDirePath);
+        foreach (FileInfo file in folder.GetFiles("*.assets"))
+        {
+            File.Copy(file.FullName, cdnPath + "/" + file.Name, true);
+        }
     }
 
     /// <summary>
@@ -79,16 +99,16 @@ public class PackBundlesMenu : ScriptableObject
         //单独打包db.xml和modules.dll
         AssetDatabase.Refresh();
         AssetBundleBuild[] buildMap = new AssetBundleBuild[2];
-        buildMap[0].assetBundleName = "db";
+        buildMap[0].assetBundleName = "db.assets";
         buildMap[0].assetNames = new string[] { "Assets/db.xml" };
-        buildMap[1].assetBundleName = "modules";
+        buildMap[1].assetBundleName = "modules.assets";
         buildMap[1].assetNames = new string[] { "Assets/modules.bytes" };
         BuildPipeline.BuildAssetBundles(bundlesDirePath + "/.Temporary", buildMap, 
             BuildAssetBundleOptions.None, BuildTarget.Android);
-        File.Copy(bundlesDirePath + "/.Temporary/db", bundlesDirePath + "/db", true);
-        File.Copy(bundlesDirePath + "/.Temporary/db.manifest", bundlesDirePath + "/db.manifest", true);
-        File.Copy(bundlesDirePath + "/.Temporary/modules", bundlesDirePath + "/modules", true);
-        File.Copy(bundlesDirePath + "/.Temporary/modules.manifest", bundlesDirePath + "/modules.manifest", true);
+        File.Copy(bundlesDirePath + "/.Temporary/db.assets", bundlesDirePath + "/db.assets", true);
+        File.Copy(bundlesDirePath + "/.Temporary/db.assets.manifest", bundlesDirePath + "/db.assets.manifest", true);
+        File.Copy(bundlesDirePath + "/.Temporary/modules.assets", bundlesDirePath + "/modules.assets", true);
+        File.Copy(bundlesDirePath + "/.Temporary/modules.assets.manifest", bundlesDirePath + "/modules.assets.manifest", true);
         File.Delete("Assets/db.xml");
         File.Delete("Assets/modules.bytes");
 
@@ -104,17 +124,18 @@ public class PackBundlesMenu : ScriptableObject
         File.Copy(bundlesDirePath + "/manifest.xml", "Assets/manifest.xml", true);
         AssetDatabase.Refresh();
         buildMap = new AssetBundleBuild[1];
-        buildMap[0].assetBundleName = "manifest";
+        buildMap[0].assetBundleName = "manifest.assets";
         buildMap[0].assetNames = new string[] { "Assets/manifest.xml" };
         BuildPipeline.BuildAssetBundles(bundlesDirePath + "/.Temporary", buildMap, 
             BuildAssetBundleOptions.None, BuildTarget.Android);
-        File.Copy(bundlesDirePath + "/.Temporary/manifest", bundlesDirePath + "/manifest", true);
-        File.Copy(bundlesDirePath + "/.Temporary/manifest.manifest", bundlesDirePath + "/manifest.manifest", true);
+        File.Copy(bundlesDirePath + "/.Temporary/manifest.assets", bundlesDirePath + "/manifest.assets", true);
+        File.Copy(bundlesDirePath + "/.Temporary/manifest.assets.manifest", bundlesDirePath + "/manifest.assets.manifest", true);
         File.Delete("Assets/manifest.xml");
 
         //打包完成
         Directory.Delete(bundlesDirePath + "/.Temporary", true);
         AssetDatabase.Refresh();
+        CopyToCDN();    //拷贝到CDN目录
         EditorUtility.DisplayDialog("提示", "资源打包完毕", "确定");
     }
 
@@ -130,11 +151,11 @@ public class PackBundlesMenu : ScriptableObject
         Dictionary<string, ManifestVO> voDic = new Dictionary<string, ManifestVO>();
         //手动添加db
         ManifestVO manifestVO = new ManifestVO();
-        manifestVO.name = "db";
+        manifestVO.name = "db.assets";
         voDic.Add(manifestVO.name, manifestVO);
         //手动添加modules
         manifestVO = new ManifestVO();
-        manifestVO.name = "modules";
+        manifestVO.name = "modules.assets";
         voDic.Add(manifestVO.name, manifestVO);
 
         string line;

@@ -26,7 +26,7 @@ namespace Freamwork
         /// <summary>
         /// 显示面板
         /// </summary>
-        /// <param name="assetName">面板对应的资源名称</param>
+        /// <param name="assetName">面板对应的资源全名</param>
         virtual public void show(string assetName = "")
         {
             if (string.IsNullOrEmpty(assetName))

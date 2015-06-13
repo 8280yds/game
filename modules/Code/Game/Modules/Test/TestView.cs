@@ -12,7 +12,7 @@ public class TestView : Window
     private TestModel model;
     private AaaSssDdDBModel dbModel;
 
-    public override void show(string assetName = "test")
+    public override void show(string assetName = "test.assets")
     {
         base.show(assetName);
     }

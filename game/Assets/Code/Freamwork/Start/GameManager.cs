@@ -117,7 +117,7 @@ namespace Freamwork
             if (BundleLoadManager.instance.getLoadingFullNames().Count == 0 && 
                 data.fullName != LoadConstant.MANIFEST_FILE)
             {
-                LoadManager.instance.addLoad(GameConstant.MODULES, LoadPriority.zero, LoadType.local,
+                LoadManager.instance.addLoad(GameConstant.MODULES + GameConstant.SUFFIX, LoadPriority.zero, LoadType.local,
                     null, null, null, null, unZipStart, unZipProgress, unZipEnd);
             }
         }
@@ -149,7 +149,7 @@ namespace Freamwork
                         loadStart, loadProgress, loadEnd, loadFail);
                 }
             }
-            else if (data.fullName == GameConstant.MODULES)
+            else if (data.fullName == GameConstant.MODULES + GameConstant.SUFFIX)
             {
                 //加载并解压dll文件包结束
                 CLRSharpManager.instance.init(data.assets[0] as TextAsset);

@@ -13,5 +13,9 @@
         /// 热更新dll资源包名称
         /// </summary>
         public const string MODULES = "modules";
+        /// <summary>
+        /// 资源文件后缀
+        /// </summary>
+        public const string SUFFIX = ".assets";
     }
 }
