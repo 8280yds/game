@@ -11,12 +11,12 @@ namespace Freamwork
         public static void start()
         {
             //测试GMB
-            //var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            //TestMB testMB = new TestMB();
-            //testMB.init(cube);
-            //var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //TestMB2 testMB2 = MVCCharge.instance.getInstance(typeof(TestMB2) as ICLRType) as TestMB2;
-            //testMB2.init(sphere);
+            var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            TestMB testMB = new TestMB();
+            testMB.init(cube);
+            var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            TestMB2 testMB2 = MVCCharge.instance.getInstance(typeof(TestMB2) as ICLRType) as TestMB2;
+            testMB2.init(sphere);
 
             //测试view
             TestView testView = MVCCharge.instance.getInstance(typeof(TestView) as ICLRType) as TestView;

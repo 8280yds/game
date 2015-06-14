@@ -16,7 +16,7 @@ namespace Freamwork
         WindowLayer,     //窗口层
         TipsLayer,       //Tip层
         PopUpLayer,      //冒泡文字层
-        ModelLayer,           //模态层
+        ModelLayer,      //模态层
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ namespace Freamwork
         private void init()
         {
             //添加canvas
-            GameObject go = new GameObject("UICanvas");
+            GameObject go = new GameObject("UI");
             GameObject.DontDestroyOnLoad(go);
             go.layer = LayerMask.NameToLayer("UI");
             canvas = go.AddComponent<Canvas>();
@@ -67,9 +67,18 @@ namespace Freamwork
 
             go.AddComponent<GraphicRaycaster>();
 
+            //添加UI摄像机
+            //go = new GameObject("_UICamera");
+            //go.transform.SetParent(canvas.transform, false);
+            //uiCamera = go.AddComponent<Camera>();
+            //uiCamera.clearFlags = CameraClearFlags.Depth;
+            //uiCamera.cullingMask = 1 << canvas.gameObject.layer;
+            //uiCamera.depth = 10000;
+            //uiCamera.renderingPath = RenderingPath.VertexLit;
+            
             //添加EventSystem
-            go = new GameObject("EventSystem");
-            GameObject.DontDestroyOnLoad(go);
+            go = new GameObject("_EventSystem");
+            go.transform.SetParent(canvas.transform, false);
             eventSystem = go.AddComponent<EventSystem>();
             go.AddComponent<TouchInputModule>();
             if (Application.isEditor)
@@ -96,18 +105,26 @@ namespace Freamwork
             if (canvas != null)
             {
                 GameObject.Destroy(canvas.gameObject);
-                canvas = null;
             }
-            if (eventSystem != null)
-            {
-                GameObject.Destroy(eventSystem.gameObject);
-                eventSystem = null;
-            }
+            canvas = null;
+            //uiCamera = null;
+            eventSystem = null;
+            layerNameList = null;
+            layerList = null;
         }
 
         //============================================================
+        ///// <summary>
+        ///// UI摄像机
+        ///// </summary>
+        //public Camera uiCamera
+        //{
+        //    get;
+        //    private set;
+        //}
+
         /// <summary>
-        /// 画布
+        /// UI画布
         /// </summary>
         public Canvas canvas
         {
@@ -135,7 +152,7 @@ namespace Freamwork
             panelGameObject.layer = LayerMask.NameToLayer("UI");
 
             RectTransform rectTransform = panelGameObject.AddComponent<RectTransform>();
-            rectTransform.SetParent(canvas.transform);
+            rectTransform.SetParent(canvas.transform, false);
             rectTransform.sizeDelta = new Vector2(160f, 30f);
             rectTransform = panelGameObject.GetComponent<RectTransform>();
             rectTransform.anchorMin = Vector2.zero;
