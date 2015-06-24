@@ -13,7 +13,8 @@ public class TestService : Service
 
     private void receiveMessage(Package package)
     {
-        Debug.Log("收到数据" + package);
+        
+
     }
 
     public void sendMessage()

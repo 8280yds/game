@@ -54,35 +54,26 @@ namespace Freamwork
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             IPAddress ipAdress = IPAddress.Parse(SocketConstant.IPAddress);
             IPEndPoint ipEndPoint = new IPEndPoint(ipAdress, SocketConstant.IPEndPoint);
+
             //创建异步连接，在成功后执行connectCallback方法
-            IAsyncResult result = socket.BeginConnect(ipEndPoint, new AsyncCallback(connectCallback), socket);
-            //判断连接超时
+            IAsyncResult result = socket.BeginConnect(ipEndPoint, null, socket);
             if (!result.AsyncWaitHandle.WaitOne(5000, true))
             {
-                closed();
-                Debug.LogError("服务器连接超时……");
+                close();
+                Debug.LogWarning("服务器连接超时……");
             }
             else
             {
-                //socket连接成功，开启线程接受服务端数据。
+                Debug.Log("服务器连接成功……");
+                EnterFrame.instance.addEnterFrame(onEnterFrame);
+
                 listenDic = new Dictionary<int, SocketListenerVO>();
                 bytesList = new List<byte[]>();
-
-                EnterFrame.instance.addEnterFrame(onEnterFrame);
 
                 Thread thread = new Thread(receiveSorket);
                 thread.IsBackground = true;
                 thread.Start();
             }
-        }
-
-        /// <summary>
-        /// 连接成功
-        /// </summary>
-        /// <param name="asyncConnect"></param>
-        private void connectCallback(IAsyncResult asyncConnect)
-        {
-            Debug.Log("服务器连接成功……");
         }
 
         /// <summary>
@@ -92,45 +83,38 @@ namespace Freamwork
         {
             while (true)
             {
-                if (!socket.Connected)
+                if (socket == null || !socket.Connected)
                 {
-                    //与服务器断开连接跳出循环
-                    Debug.LogError("服务器已断开……");
-                    socket.Close();
-                    EnterFrame.instance.addEnterFrame(onEnterFrame);
                     break;
                 }
 
                 try
                 {
-                    byte[] bytes = new byte[4096];
+                    byte[] bytes = new byte[1024];
 
                     //Receive方法会一直等待，直到服务端返回数据
-                    int i = socket.Receive(bytes);
-                    if (i <= 0)
+                    int len = socket.Receive(bytes);
+                    if (len <= 0)
                     {
                         socket.Close();
-                        EnterFrame.instance.addEnterFrame(onEnterFrame);
                         break;
                     }
 
-                    //此处根据实际需要判断
-                    if (bytes.Length <= 2)
+                    if (bytes.Length <= 10)
                     {
-                        Debug.LogError("Socket数据包长度小于或等于包头长度……");
+                        Debug.LogWarning("Socket数据包长度小于或等于包头长度……");
                     }
                     else
                     {
-                        byte[] bytes2 = new byte[i];
-                        Array.Copy(bytes, bytes2, i);
+                        byte[] bytes2 = new byte[len];
+                        Array.Copy(bytes, 0, bytes2, 0, len);
                         bytesList.Add(bytes2);
                     }
                 }
                 catch (Exception e)
                 {
-                    Debug.LogError("Socket出错：" + e);
                     socket.Close();
-                    EnterFrame.instance.addEnterFrame(onEnterFrame);
+                    Debug.LogError("Socket出错：" + e);
                     break;
                 }
             }
@@ -138,6 +122,10 @@ namespace Freamwork
 
         private void onEnterFrame()
         {
+            if (socket == null || !socket.Connected)
+            {
+                close();
+            }
             while(bytesList.Count > 0)
             {
                 ByteBuffer buff = new ByteBuffer(bytesList[0]);
@@ -158,9 +146,9 @@ namespace Freamwork
         /// <param name="data">协议数据</param>
         public void request(int protocol, object data)
         {
-            if (!socket.Connected)
+            if (socket == null || !socket.Connected)
             {
-                socket.Close();
+                close();
                 return;
             }
 
@@ -169,15 +157,12 @@ namespace Freamwork
                 ByteBuffer buff = packet(protocol, data);
 
                 //向服务端异步发送这个字节数组
-                //IAsyncResult asyncSend = socket.BeginSend(buff.buffer, 0, buff.length, SocketFlags.None, 
-                //    new AsyncCallback(sendCallback), socket);
                 IAsyncResult asyncSend = socket.BeginSend(buff.buffer, 0, buff.length, SocketFlags.None, null, socket);
-                //监测超时
                 bool success = asyncSend.AsyncWaitHandle.WaitOne(5000, true);
                 if (!success)
                 {
-                    socket.Close();
-                    Debug.LogError("发送请求超时……");
+                    close();
+                    Debug.LogWarning("发送" + protocol + "协议超时……");
                 }
             }
             catch (Exception e)
@@ -185,23 +170,22 @@ namespace Freamwork
                 Debug.LogError("Socket出错：" + e);
             }
         }
-        //private void sendCallback(IAsyncResult asyncSend)
-        //{
-        //    Debug.Log("发送请求成功……");
-        //}
 
         /// <summary>
         /// 关闭Socket
         /// </summary>
-        public void closed()
+        public void close()
         {
-            if (socket != null && socket.Connected)
+            if (socket != null)
             {
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
+                if (socket.Connected)
+                {
+                    socket.Shutdown(SocketShutdown.Both);
+                    socket.Close();
+                }
+                socket = null;
             }
-            socket = null;
-            EnterFrame.instance.addEnterFrame(onEnterFrame);
+            EnterFrame.instance.removeEnterFrame(onEnterFrame);
         }
 
         /// <summary>
@@ -262,22 +246,27 @@ namespace Freamwork
         /// <returns></returns>
         private Package unpack(ByteBuffer buff)
         {
-            //try
-            //{
-                Package package = new Package();
-                package.timeStamp = buff.removeInt();
-                package.protocol = buff.removeInt();
-                package.len = buff.removeUshort();
-                package.data = PackageUtil.byteBufferToClrObject(ref buff, listenDic[package.protocol].clrType);
+            Package package = new Package();
+            package.timeStamp = buff.removeInt();
+            package.protocol = buff.removeInt();
+            package.len = buff.removeUshort();
 
+            if (buff.length < package.len)
+            {
+                throw new Exception("协议" + package.protocol + 
+                    "包体字节长度不对，应是" + package.len + "，但当前是" + buff.length);
+            }
+
+            if (listenDic.ContainsKey(package.protocol))
+            {
+                package.data = PackageUtil.byteBufferToClrObject(ref buff, listenDic[package.protocol].clrType);
                 Debug.Log("[接收] " + package.toString());
-                return package;
-            //}
-            //catch (Exception e)
-            //{
-            //    Debug.LogError("协议解析出错:" + e);
-            //}
-            //return null;
+            }
+            else
+            {
+                Debug.Log("[接收，未处理] " + package.toString());
+            }
+            return package;
         }
 
     }
