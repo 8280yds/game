@@ -40,8 +40,8 @@ public class TestView : Window
     {
         model.count++;
 
-        TestService service = MVCCharge.instance.getInstance(typeof(TestService) as ICLRType) as TestService;
-        service.sendMessage();
+        //TestService service = MVCCharge.instance.getInstance(typeof(TestService) as ICLRType) as TestService;
+        //service.sendMessage();
     }
 
     private void onClick2()

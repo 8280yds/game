@@ -60,6 +60,17 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// transform
+        /// </summary>
+        public Transform transform
+        {
+            get
+            {
+                return gmb.transform;
+            }
+        }
+
+        /// <summary>
         /// C#的GMonoBehaviour脚本实例
         /// </summary>
         public GMonoBehaviour gmb
