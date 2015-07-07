@@ -25,7 +25,7 @@ namespace Freamwork
             //加载cell资源
             LoadManager.instance.addLoad("cell.assets", LoadPriority.two, LoadType.local,
                 null, null, null, null, null, null, unZipEnd);
-            LoadManager.instance.addLoad("hand.assets", LoadPriority.two, LoadType.local,
+            LoadManager.instance.addLoad("node.assets", LoadPriority.two, LoadType.local,
                 null, null, null, null, null, null, unZipEnd);
         }
 
@@ -36,12 +36,12 @@ namespace Freamwork
             {
                 CellWarManager.instance.cellPrefab = go;
             }
-            else if (go.name == "hand")
+            else if (go.name == "node")
             {
-                CellWarManager.instance.handPrefab = go;
+                CellWarManager.instance.nodePrefab = go;
             }
 
-            if (CellWarManager.instance.cellPrefab != null && CellWarManager.instance.handPrefab != null)
+            if (CellWarManager.instance.cellPrefab != null && CellWarManager.instance.nodePrefab != null)
             {
                 CellWarView cellWarView = MVCCharge.instance.getInstance(typeof(CellWarView) as ICLRType) as CellWarView;
                 cellWarView.show();

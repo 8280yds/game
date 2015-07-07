@@ -9,4 +9,5 @@
 	<item id="7" name="关羽" sex="男"/>
 	<item id="8" name="曹操" sex="男"/>
 	<item id="9" name="吕布" sex="男"/>
+	<item id="None" name="None" sex="None"/>
 </fff>

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CLRSharp
 {
@@ -481,38 +480,45 @@ namespace CLRSharp
                 context = ThreadContext.activeContext;
             if (context == null)
                 throw new Exception("这个线程上没有CLRSharp:ThreadContext");
-            if (bVisual && method_CLRSharp.IsVirtual)
+            try
             {
-                CLRSharp_Instance inst = _this as CLRSharp_Instance;
-                if (inst.type != this.DeclaringType)
+                if (bVisual && method_CLRSharp.IsVirtual)
                 {
-                    IMethod impl = inst.type.GetVMethod(this);// .GetMethod(this.Name, this.ParamList);
-                    if (impl != this)
+                    CLRSharp_Instance inst = _this as CLRSharp_Instance;
+                    if (inst.type != this.DeclaringType)
                     {
-                        return impl.Invoke(context, _this, _params);
+                        IMethod impl = inst.type.GetVMethod(this);// .GetMethod(this.Name, this.ParamList);
+                        if (impl != this)
+                        {
+                            return impl.Invoke(context, _this, _params);
+                        }
                     }
                 }
-            }
-            if (method_CLRSharp.Name == ".ctor")
-            {
-                CLRSharp_Instance inst = _this as CLRSharp_Instance;
-                if (inst == null)
-                    inst = new CLRSharp_Instance(_DeclaringType);
-
-                //if (_DeclaringType.BaseType is ICLRType_System)
-                context.ExecuteFunc(this, inst, _params);
-                return inst;
-            }
-            var obj = context.ExecuteFunc(this, _this, _params);
-            if (obj is CLRSharp_Instance && ReturnType is ICLRType_System)
-            {
-                var bind = context.environment.GetCrossBind((ReturnType as ICLRType_System).TypeForSystem);
-                if (bind != null)
+                if (method_CLRSharp.Name == ".ctor")
                 {
-                    obj = bind.CreateBind(obj as CLRSharp_Instance);
+                    CLRSharp_Instance inst = _this as CLRSharp_Instance;
+                    if (inst == null)
+                        inst = new CLRSharp_Instance(_DeclaringType);
+
+                    //if (_DeclaringType.BaseType is ICLRType_System)
+                    context.ExecuteFunc(this, inst, _params);
+                    return inst;
                 }
+                var obj = context.ExecuteFunc(this, _this, _params);
+                if (obj is CLRSharp_Instance && ReturnType is ICLRType_System)
+                {
+                    var bind = context.environment.GetCrossBind((ReturnType as ICLRType_System).TypeForSystem);
+                    if (bind != null)
+                    {
+                        obj = bind.CreateBind(obj as CLRSharp_Instance);
+                    }
+                }
+                return obj;
             }
-            return obj;
+            catch (Exception err)
+            {
+                throw new Exception(err.Message + "\n" + method_CLRSharp.ToString());
+            }
         }
         public object Invoke(ThreadContext context, object _this, object[] _params)
         {

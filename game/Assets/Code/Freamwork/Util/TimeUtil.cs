@@ -15,6 +15,20 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// 获取当前时间戳
+        /// </summary>  
+        /// <param name="bflag">为真时获取10位时间戳,为假时获取13位时间戳.</param>  
+        /// <returns></returns>  
+        public static long getTimeStamp(bool bflag)
+        {
+            TimeSpan ts = DateTime.UtcNow - new DateTime(1970, 1, 1);
+            if (bflag)
+                return Convert.ToInt64(ts.TotalSeconds);
+            else
+                return Convert.ToInt64(ts.TotalMilliseconds);
+        }  
+
+        /// <summary>
         /// 时间戳转为DateTime
         /// </summary>
         /// <param name="timeStamp">时间戳（秒）</param>

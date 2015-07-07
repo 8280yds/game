@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Hand : GMB
+public class TentacleNode : GMB
 {
     public Color color
     {
@@ -31,9 +31,13 @@ public class Hand : GMB
     }
     private Image m_image;
 
-    public Hand(Color color)
+    public TentacleNode(Color color)
     {
         m_color = color;
+    }
+
+    public TentacleNode()
+    {
     }
 
     public override void init(UnityEngine.GameObject gameObject)

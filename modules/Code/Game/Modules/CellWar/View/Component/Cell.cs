@@ -77,6 +77,7 @@ public class Cell : GMB
         set
         {
             m_camp = value;
+            txt.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
         }
     }
     private Camp m_camp;
@@ -111,26 +112,18 @@ public class Cell : GMB
     }
     private CellWarView m_view;
 
-    //==============================================================================
-    /// <summary>
-    /// 细胞基类
-    /// </summary>
-    /// <param name="camp">阵营</param>
-    /// <param name="hp">生命值</param>
-    public Cell(Camp camp, int hp)
+    public int index
     {
-        m_camp = camp;
-        m_hp = hp;
+        get
+        {
+            return m_index;
+        }
+        set
+        {
+            m_index = value;
+        }
     }
-
-    public override void init(UnityEngine.GameObject gameObject)
-    {
-        base.init(gameObject);
-
-        //更新状态
-        camp = m_camp;
-        hp = m_hp;
-    }
+    private int m_index = -1;
 
     //===================================事件==========================================
     protected override void OnPointerDown(PointerEventData eventData)
@@ -148,6 +141,19 @@ public class Cell : GMB
     {
         base.OnPointerUp(eventData);
 
+        //进行攻击或支援
+        if (SelectedCell != null && DestCell != null)
+        {
+            CellWarModel model = MVCCharge.instance.getInstance(typeof(CellWarModel) as ICLRType) as CellWarModel;
+            ActionData actionData = new ActionData();
+            actionData.time = model.getCurrentTime();
+            actionData.cellAIndex = (byte)SelectedCell.index;
+            actionData.cellBIndex = (byte)DestCell.index;
+            actionData.type = 0;    //0:连接 1:切断
+            model.actionData = actionData;
+        }
+
+        //清除
         if (SelectedCell != null)
         {
             SelectedCell.selectImage.gameObject.SetActive(false);
@@ -158,7 +164,7 @@ public class Cell : GMB
             DestCell.selectImage.gameObject.SetActive(false);
             DestCell = null;
         }
-        view.removeMouseHands();
+        view.hideMouseTentacle();
     }
 
     protected override void OnDrag(PointerEventData eventData)
@@ -168,25 +174,8 @@ public class Cell : GMB
         if (DestCell == null && SelectedCell != null)
         {
             //显示细胞和鼠标之间的触手
-            Vector3 p = SelectedCell.transform.position;
-            Vector2 sour = new Vector2(p.x, p.y);
-            Vector2 dest = eventData.position;
-            float d = Vector2.Distance(sour, dest);
-            if (d <= CellConstant.CELL_R + CellConstant.HAND_D)
-            {
-                view.removeMouseHands();
-                return;
-            }
-            float sourX = sour.x - CellConstant.CELL_R * (sour.x - dest.x) / d;
-            float sourY = sour.y - CellConstant.CELL_R * (sour.y - dest.y) / d;
-            view.updateMouseHands(new Vector2(sourX, sourY), dest);
+            view.updateMouseTentacle(SelectedCell, eventData.position);
         }
-    }
-
-    protected override void OnDrop(PointerEventData eventData)
-    {
-        base.OnDrop(eventData);
-        //进行攻击
     }
 
     protected override void OnPointerEnter(PointerEventData eventData)
@@ -195,7 +184,7 @@ public class Cell : GMB
 
         if (SelectedCell == this)
         {
-            view.removeMouseHands();
+            view.hideMouseTentacle();
         }
         else if (SelectedCell != null)
         {
@@ -203,17 +192,7 @@ public class Cell : GMB
             DestCell = this;
 
             //显示两细胞间的触手
-            Vector3 p = SelectedCell.transform.position;
-            Vector2 sour = new Vector2(p.x, p.y);
-            p = DestCell.transform.position;
-            Vector2 dest = new Vector2(p.x, p.y);
-
-            float d = Vector2.Distance(sour, dest);
-            float sourX = sour.x - CellConstant.CELL_R * (sour.x - dest.x) / d;
-            float sourY = sour.y - CellConstant.CELL_R * (sour.y - dest.y) / d;
-            float destX = dest.x + CellConstant.CELL_R * (sour.x - dest.x) / d;
-            float destY = dest.y + CellConstant.CELL_R * (sour.y - dest.y) / d;
-            view.updateMouseHands(new Vector2(sourX, sourY), new Vector2(destX, destY));
+            view.updateMouseTentacle(SelectedCell, DestCell);
         }
     }
 
@@ -237,5 +216,4 @@ public class Cell : GMB
             selectImage.transform.eulerAngles += new Vector3(0, 0, 1f);
         }
     }
-
 }
