@@ -48,7 +48,7 @@ sealed public class CellWarManager
     /// <summary>
     /// 添加触手单元
     /// </summary>
-    public TentacleNode addNode(Vector3 position, Vector3 rotation, Color color, Transform parent)
+    public TentacleNode addNode(Vector2 position, Vector3 rotation, Color color, Transform parent)
     {
         TentacleNode node;
         if (nodePool.Count > 0)
@@ -63,13 +63,13 @@ sealed public class CellWarManager
             node = new TentacleNode(color);
             node.init(go);
         }
-        Transform tf = node.transform;
+        RectTransform tf = node.transform as RectTransform;
 
         if (tf.parent != parent)
         {
             tf.SetParent(parent, false);
         }
-        tf.position = position;
+        tf.anchoredPosition = position;
         tf.eulerAngles = rotation;
         tf.gameObject.SetActive(true);
         return node;
@@ -88,13 +88,15 @@ sealed public class CellWarManager
     /// <summary>
     /// 添加细胞
     /// </summary>
-    public Cell addCell(Vector3 position, Transform parent)
+    public Cell addCell(Vector2 position, Transform parent)
     {
         GameObject cellGO = GameObject.Instantiate<GameObject>(cellPrefab);
         Cell cell = new Cell();
         cell.init(cellGO);
-        cell.transform.SetParent(parent, false);
-        cell.transform.localPosition = position;
+
+        RectTransform rectTF = cell.transform as RectTransform;
+        rectTF.SetParent(parent, false);
+        rectTF.anchoredPosition = position;
         return cell;
     }
 

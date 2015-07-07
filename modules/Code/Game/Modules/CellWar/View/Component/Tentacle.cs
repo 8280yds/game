@@ -21,13 +21,14 @@ public class Tentacle : GMB
     }
     private CellWarView m_view;
 
+    private Vector3 nodeRetation;
     //==================================================================
     public void setNodes(Cell sourCell, Cell destCell)
     {
-        Vector3 p = sourCell.transform.position;
-        Vector2 sour = new Vector2(p.x, p.y);
-        p = destCell.transform.position;
-        Vector2 dest = new Vector2(p.x, p.y);
+        RectTransform rectTF = sourCell.transform as RectTransform;
+        Vector2 sour = rectTF.anchoredPosition;
+        rectTF = destCell.transform as RectTransform;
+        Vector2 dest = rectTF.anchoredPosition;
 
         float d = Vector2.Distance(sour, dest);
         float sourX = sour.x - CellConstant.CELL_R * (sour.x - dest.x) / d;
@@ -40,8 +41,8 @@ public class Tentacle : GMB
 
     public void setNodes(Cell sourCell, Vector2 dest)
     {
-        Vector3 p = sourCell.transform.position;
-        Vector2 sour = new Vector2(p.x, p.y);
+        RectTransform rectTF = sourCell.transform as RectTransform;
+        Vector2 sour = rectTF.anchoredPosition;
         float d = Vector2.Distance(sour, dest);
         if (d <= CellConstant.CELL_R + CellConstant.NODE_D)
         {
@@ -59,7 +60,7 @@ public class Tentacle : GMB
 
         //计算触手旋转角度
         float angle = VectorUtil.Vector2Angle(dest - sour, Vector2.right);
-        Vector3 rotation = new Vector3(0, 0, angle);
+        nodeRetation = new Vector3(0, 0, angle);
 
         //计算触手单元数量
         float d = Vector2.Distance(sour, dest);
@@ -68,16 +69,16 @@ public class Tentacle : GMB
         //步长
         float dx2 = CellConstant.NODE_D * (sour.x - dest.x) / d;
         float dy2 = CellConstant.NODE_D * (sour.y - dest.y) / d;
-        Vector3 dv = new Vector3(-dx2, -dy2, 0);
+        Vector2 dv = new Vector2(-dx2, -dy2);
 
         //多余的距离分摊到触手两端，并且移动半个步长(因为原点在中心)
         float f = 0.5f + (d - len * CellConstant.NODE_D) / CellConstant.NODE_D / 2;
-        Vector3 position = new Vector3(sour.x + f * dv.x, sour.y + f * dv.y, 0);
+        Vector2 position = new Vector2(sour.x + f * dv.x, sour.y + f * dv.y);
 
         CellWarManager mana = CellWarManager.instance;
         for (int i = 0; i < len; i++)
         {
-            m_nodes.Add(mana.addNode(position + dv * i, rotation, Color.yellow, transform));
+            m_nodes.Add(mana.addNode(position + dv * i, nodeRetation, Color.yellow, transform));
         }
     }
 
@@ -127,11 +128,13 @@ public class Tentacle : GMB
             if (i < lenA)
             {
                 node.color = data.nodeListA[i] ? Color.yellow : colorA;
+                node.transform.eulerAngles = nodeRetation;
                 node.gameObject.SetActive(true);
             }
             else if(i >= len - lenB)
             {
                 node.color = data.nodeListB[len-i-1] ? Color.yellow : colorB;
+                node.transform.eulerAngles = nodeRetation + new Vector3(0, 0, 180);
                 node.gameObject.SetActive(true);
             }
             else

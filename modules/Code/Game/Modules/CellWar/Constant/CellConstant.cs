@@ -51,17 +51,17 @@ public class CellConstant
     /// <summary>
     /// 进攻时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_ATTACK = 50;
+    public const int MOVE_ATTACK = 60;
 
     /// <summary>
     /// 撤退时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_RETREAT = 30;
+    public const int MOVE_RETREAT = 20;
 
     /// <summary>
     /// 比拼时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_PK = 30;
+    public const int MOVE_PK = 20;
 
     /// <summary>
     /// 占领细胞后核内DNA数量

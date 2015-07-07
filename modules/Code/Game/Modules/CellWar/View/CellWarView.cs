@@ -80,38 +80,29 @@ public class CellWarView : Window
     /// <param name="id"></param>
     private void initScene(int id)
     {
+        Cell.SelectedCell = null;
+        Cell.DestCell = null;
+        clearAllTentacle();
+        clearAllCell();
+        mouseTentacle = CellWarManager.instance.addTentacle(tentacleLayer);
+
+        //数据初始化
         CellWarSceneDBModel sceneDBModel = mvcCharge.getInstance(typeof(CellWarSceneDBModel) as ICLRType) as CellWarSceneDBModel;
         CellWarSceneDBVO sceneDBVO = sceneDBModel.getVOById(id);
         model.initScene(sceneDBVO);
 
-        Cell.SelectedCell = null;
-        Cell.DestCell = null;
-        clearAllTentacle();
-        mouseTentacle = CellWarManager.instance.addTentacle(tentacleLayer);
-
+        //布置细胞
         ViewStatus viewStatus = model.lastUpdateViewStatus;
-        int len = viewStatus.cellDataList.Count - cellList.Count;
-        for (int i = 0; i < Mathf.Abs(len); i++ )
-        {
-            if (len > 0)
-            {
-                cellList.Add(CellWarManager.instance.addCell(Vector3.zero, cellsLayer));
-            }
-            else
-            {
-                CellWarManager.instance.removeCell(cellList[0]);
-                cellList.RemoveAt(0);
-            }
-        }
-
         Cell cell;
-        foreach (CellData cellData in viewStatus.cellDataList)
+        CellData cellData;
+        for (int i = 0, len = viewStatus.cellDataList.Count; i < len; i++ )
         {
-            cell = cellList[cellData.index];
+            cellData = viewStatus.cellDataList[i];
+            cell = CellWarManager.instance.addCell(cellData.position, cellsLayer);
             cell.index = cellData.index;
             cell.camp = cellData.camp;
             cell.hp = cellData.hp;
-            cell.transform.localPosition = new Vector3(cellData.position.x, cellData.position.y, 0);
+            cellList.Add(cell);
         }
     }
 
@@ -121,17 +112,10 @@ public class CellWarView : Window
         addListener(CellWarUpdate.UPDATE_VIEW_STATUS, updateViewStatus);
     }
 
-    /// <summary>
-    /// 界面更新
-    /// </summary>
     protected override void Update()
     {
         base.Update();
-
-        if (model.actionData == null)
-        {
-            model.getCurrentViewStatus();
-        }
+        model.getCurrentViewStatus();
     }
 
     /// <summary>
@@ -156,6 +140,7 @@ public class CellWarView : Window
             {
                 if (tentacleDic.ContainsKey(key))
                 {
+                    CellWarManager.instance.removeTentacle(tentacleDic[key]);
                     tentacleDic.Remove(key);
                 }
             }
@@ -163,7 +148,7 @@ public class CellWarView : Window
             {
                 if (!tentacleDic.ContainsKey(key))
                 {
-                    tentacleDic.Add(key, getTentacle(cellList[data.indexA], cellList[data.indexB]));
+                    getTentacle(cellList[data.indexA], cellList[data.indexB]);
                 }
                 tentacleDic[key].updateByData(data);
             }
@@ -207,7 +192,7 @@ public class CellWarView : Window
     /// <param name="cell1"></param>
     /// <param name="cell2"></param>
     /// <returns></returns>
-    public Tentacle getTentacle(Cell cellA, Cell cellB)
+    private Tentacle getTentacle(Cell cellA, Cell cellB)
     {
         if (cellA.index > cellB.index)
         {
@@ -241,6 +226,18 @@ public class CellWarView : Window
         {
             CellWarManager.instance.removeTentacle(mouseTentacle);
         }
+    }
+
+    /// <summary>
+    /// 清除所有细胞
+    /// </summary>
+    private void clearAllCell()
+    {
+        foreach (Cell cell in cellList)
+        {
+            CellWarManager.instance.removeCell(cell);
+        }
+        cellList.Clear();
     }
 
     /// <summary>

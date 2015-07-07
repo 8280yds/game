@@ -36,10 +36,6 @@ public class TentacleNode : GMB
         m_color = color;
     }
 
-    public TentacleNode()
-    {
-    }
-
     public override void init(UnityEngine.GameObject gameObject)
     {
         base.init(gameObject);

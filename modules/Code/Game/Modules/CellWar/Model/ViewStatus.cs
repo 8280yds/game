@@ -96,10 +96,17 @@ public class ViewStatus
     /// <returns></returns>
     private int getTentacleNodeNum(int indexA, int indexB)
     {
-        Vector2 positionA = cellDataList[indexA].position;
-        Vector2 positionB = cellDataList[indexB].position;
-        float d = Vector2.Distance(positionA, positionB);
-        return (int)((d - 2 * CellConstant.CELL_R) / CellConstant.NODE_D);
+        Vector2 sour = cellDataList[indexA].position;
+        Vector2 dest = cellDataList[indexB].position;
+
+        float d = Vector2.Distance(sour, dest);
+        float sourX = sour.x - CellConstant.CELL_R * (sour.x - dest.x) / d;
+        float sourY = sour.y - CellConstant.CELL_R * (sour.y - dest.y) / d;
+        float destX = dest.x + CellConstant.CELL_R * (sour.x - dest.x) / d;
+        float destY = dest.y + CellConstant.CELL_R * (sour.y - dest.y) / d;
+
+        d = Vector2.Distance(new Vector2(sourX, sourY), new Vector2(destX, destY));
+        return (int)(d / CellConstant.NODE_D);
     }
 
     /// <summary>
