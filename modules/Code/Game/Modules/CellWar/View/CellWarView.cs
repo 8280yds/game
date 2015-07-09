@@ -71,7 +71,7 @@ public class CellWarView : Window
         cellList = new List<Cell>();
         tentacleDic = new Dictionary<string, Tentacle>();
 
-        initScene(1);
+        initScene(4);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public class CellWarView : Window
         Cell.DestCell = null;
         clearAllTentacle();
         clearAllCell();
-        mouseTentacle = CellWarManager.instance.addTentacle(tentacleLayer);
+        mouseTentacle = new Tentacle(1000000);
 
         //数据初始化
         CellWarSceneDBModel sceneDBModel = mvcCharge.getInstance(typeof(CellWarSceneDBModel) as ICLRType) as CellWarSceneDBModel;
@@ -133,24 +133,20 @@ public class CellWarView : Window
         }
 
         TentacleData data;
+        Tentacle ten;
         foreach (string key in viewStatus.tentacleDataDic.Keys)
         {
             data = viewStatus.tentacleDataDic[key];
-            if (data.nodeListA.Count == 0 && data.nodeListB.Count == 0)
+
+            if (data.nodeListA.Count > 0 || data.nodeListB.Count > 0)
             {
-                if (tentacleDic.ContainsKey(key))
-                {
-                    CellWarManager.instance.removeTentacle(tentacleDic[key]);
-                    tentacleDic.Remove(key);
-                }
+                ten = getTentacle(cellList[data.indexA], cellList[data.indexB]);
+                ten.updateByData(data);
             }
-            else
+            else if (tentacleDic.ContainsKey(key))
             {
-                if (!tentacleDic.ContainsKey(key))
-                {
-                    getTentacle(cellList[data.indexA], cellList[data.indexB]);
-                }
-                tentacleDic[key].updateByData(data);
+                tentacleDic[key].clear();
+                tentacleDic.Remove(key);
             }
         }
     }
@@ -183,7 +179,7 @@ public class CellWarView : Window
     /// <param name="dest"></param>
     public void hideMouseTentacle()
     {
-        mouseTentacle.clearNodes();
+        mouseTentacle.clear();
     }
 
     /// <summary>
@@ -207,7 +203,7 @@ public class CellWarView : Window
             return tentacleDic[key];
         }
 
-        Tentacle tentacle = CellWarManager.instance.addTentacle(tentacleLayer);
+        Tentacle tentacle = new Tentacle();
         tentacle.setNodes(cellA, cellB);
         tentacleDic.Add(key, tentacle);
         return tentacle;
@@ -220,11 +216,11 @@ public class CellWarView : Window
     {
         foreach (Tentacle tentacle in tentacleDic.Values)
         {
-            CellWarManager.instance.removeTentacle(tentacle);
+            tentacle.clear();
         }
         if (mouseTentacle != null)
         {
-            CellWarManager.instance.removeTentacle(mouseTentacle);
+            mouseTentacle.clear();
         }
     }
 
@@ -247,5 +243,29 @@ public class CellWarView : Window
     public Color getColorByCellIndex(int index)
     {
         return CellConstant.CAMP_COLOR_ARR[(int)cellList[index].camp];
+    }
+
+    /// <summary>
+    /// 进行攻击
+    /// </summary>
+    public void attack(Cell cellA, Cell cellB)
+    {
+        ViewStatus viewStatus = model.lastUpdateViewStatus;
+        if (viewStatus.hasTentacleData(cellA.index, cellB.index))
+        {
+            TentacleData tentacleData = viewStatus.getTentacleData(cellA.index, cellB.index);
+            if ((cellA.index < cellB.index && tentacleData.isAttackA) ||
+                (cellA.index > cellB.index && tentacleData.isAttackB) ||
+                tentacleData.cutStatus != CutStatus.NONE)
+            {
+                return;
+            }
+        }
+        ActionData actionData = new ActionData();
+        actionData.time = model.getCurrentTime();
+        actionData.cellAIndex = (byte)cellA.index;
+        actionData.cellBIndex = (byte)cellB.index;
+        actionData.type = 0;    //0:连接 1:切断
+        model.actionData = actionData;
     }
 }

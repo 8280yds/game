@@ -12,8 +12,11 @@ public class TentacleNode : GMB
         }
         set
         {
-            m_color = value;
-            image.color = m_color;
+            if (m_color != value)
+            {
+                m_color = value;
+                image.color = m_color;
+            }
         }
     }
     private Color m_color;
@@ -31,16 +34,9 @@ public class TentacleNode : GMB
     }
     private Image m_image;
 
-    public TentacleNode(Color color)
-    {
-        m_color = color;
-    }
-
-    public override void init(UnityEngine.GameObject gameObject)
+    public override void init(GameObject gameObject)
     {
         base.init(gameObject);
-
-        //更新状态
-        color = m_color;
+        m_color = image.color;
     }
 }

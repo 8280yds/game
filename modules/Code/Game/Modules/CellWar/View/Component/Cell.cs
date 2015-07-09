@@ -144,13 +144,7 @@ public class Cell : GMB
         //进行攻击或支援
         if (SelectedCell != null && DestCell != null)
         {
-            CellWarModel model = MVCCharge.instance.getInstance(typeof(CellWarModel) as ICLRType) as CellWarModel;
-            ActionData actionData = new ActionData();
-            actionData.time = model.getCurrentTime();
-            actionData.cellAIndex = (byte)SelectedCell.index;
-            actionData.cellBIndex = (byte)DestCell.index;
-            actionData.type = 0;    //0:连接 1:切断
-            model.actionData = actionData;
+            view.attack(SelectedCell, DestCell);
         }
 
         //清除

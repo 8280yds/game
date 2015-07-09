@@ -53,10 +53,11 @@ public class CellWarModel : Model
         }
 
         lastUpdateViewStatus.doNext(getCurrentTime());
+
         actionData = null;
         dispatch(CellWarUpdate.UPDATE_VIEW_STATUS);
 
-        //??在此处可以贩毒案胜利
+        //??在此处可以判断胜利
     }
 
     /// <summary>
@@ -79,7 +80,7 @@ public class CellWarModel : Model
 
         beginTime = TimeUtil.getTimeStamp(false);
         lastUpdateViewStatus = new ViewStatus(sceneDBVO);
-        lastActionViewStatus = lastUpdateViewStatus.clone();
+        lastActionViewStatus = new ViewStatus(sceneDBVO);
     }
 
     /// <summary>

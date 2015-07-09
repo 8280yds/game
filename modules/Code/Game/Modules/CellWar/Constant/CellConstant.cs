@@ -10,6 +10,13 @@ public enum Camp
     CYAN,
 }
 
+public enum CellStatus
+{
+    NONE,
+    ADD_HP,
+    OUT_HP,
+}
+
 public enum CutStatus
 {
     NONE,           //无动作
@@ -46,25 +53,30 @@ public class CellConstant
     /// <summary>
     /// 触手单元间距
     /// </summary>
-    public const int NODE_D = 8;
+    public const int NODE_D = 12;
 
     /// <summary>
     /// 进攻时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_ATTACK = 60;
+    public const int MOVE_ATTACK = 200;
 
     /// <summary>
     /// 撤退时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_RETREAT = 20;
+    public const int MOVE_RETREAT = 100;
 
     /// <summary>
     /// 比拼时移动一格需要的时间ms
     /// </summary>
-    public const int MOVE_PK = 20;
+    public const int MOVE_PK = 100;
 
     /// <summary>
     /// 占领细胞后核内DNA数量
     /// </summary>
     public const int INIT_HP = 10;
+
+    /// <summary>
+    /// 传输时间调整系数
+    /// </summary>
+    public const float ATTACK_COEFF = 0.8f;
 }

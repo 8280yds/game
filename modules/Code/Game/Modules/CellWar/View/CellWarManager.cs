@@ -48,19 +48,18 @@ sealed public class CellWarManager
     /// <summary>
     /// 添加触手单元
     /// </summary>
-    public TentacleNode addNode(Vector2 position, Vector3 rotation, Color color, Transform parent)
+    public TentacleNode addNode(Vector2 position, Vector3 rotation, Transform parent)
     {
         TentacleNode node;
         if (nodePool.Count > 0)
         {
             node = nodePool[0];
-            node.color = color;
             nodePool.RemoveAt(0);
         }
         else
         {
             GameObject go = GameObject.Instantiate<GameObject>(nodePrefab);
-            node = new TentacleNode(color);
+            node = new TentacleNode();
             node.init(go);
         }
         RectTransform tf = node.transform as RectTransform;
@@ -106,30 +105,5 @@ sealed public class CellWarManager
     public void removeCell(Cell cell)
     {
         cell.dispose();
-    }
-
-    /// <summary>
-    /// 添加触手
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <returns></returns>
-    public Tentacle addTentacle(Transform parent)
-    {
-        GameObject go = new GameObject("Tentacle");
-        RectTransform tf = go.AddComponent<RectTransform>();
-        Tentacle tentacle = new Tentacle();
-        tentacle.init(go);
-        tf.SetParent(parent, false);
-        return tentacle;
-    }
-
-    /// <summary>
-    /// 移除触手
-    /// </summary>
-    /// <param name="tentacle"></param>
-    public void removeTentacle(Tentacle tentacle)
-    {
-        tentacle.clear();
-        tentacle.dispose();
     }
 }

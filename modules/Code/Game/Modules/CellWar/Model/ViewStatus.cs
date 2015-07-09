@@ -8,7 +8,7 @@ public class ViewStatus
     /// <summary>
     /// 场景VO
     /// </summary>
-    public readonly CellWarSceneDBVO vo;
+    private CellWarSceneDBVO vo;
 
     /// <summary>
     /// 状态所处的时间点
@@ -24,6 +24,11 @@ public class ViewStatus
     /// 触手信息列表
     /// </summary>
     public Dictionary<string, TentacleData> tentacleDataDic = new Dictionary<string,TentacleData>();
+
+    public ViewStatus()
+    {
+
+    }
 
     public ViewStatus(CellWarSceneDBVO vo, int time = 0)
     {
@@ -41,7 +46,8 @@ public class ViewStatus
         {
             cellData = new CellData();
             cellData.index = i;
-            cellData.time = time;
+            cellData.addTime = time;
+            cellData.outTime = time;
             cellData.hp = int.Parse(hpArr[i]);
             cellData.camp = (Camp)int.Parse(campArr[i]);
             cellData.position = new Vector2(int.Parse(xArr[i]), int.Parse(yArr[i]));
@@ -51,7 +57,8 @@ public class ViewStatus
 
     public ViewStatus clone()
     {
-        ViewStatus data = new ViewStatus(vo);
+        ViewStatus data = new ViewStatus();
+        data.vo = vo;
         data.time = time;
         for (int i = 0, len = cellDataList.Count; i < len; i++ )
         {
@@ -70,22 +77,41 @@ public class ViewStatus
     /// <param name="indexA"></param>
     /// <param name="indexB"></param>
     /// <returns></returns>
-    private TentacleData getTentacleData(int indexA, int indexB)
+    public TentacleData getTentacleData(int indexA, int indexB)
     {
-        string key = indexA < indexB ? indexA + ":" + indexB : indexB + ":" + indexA;
+        if (indexA > indexB)
+        {
+            int t = indexA;
+            indexA = indexB;
+            indexB = t;
+        }
+        string key = indexA + ":" + indexB;
+
         if (tentacleDataDic.ContainsKey(key))
         {
             return tentacleDataDic[key];
         }
         else
         {
-            TentacleData tentacleData = new TentacleData();
+            TentacleData tentacleData = new TentacleData(this);
             tentacleData.indexA = indexA;
             tentacleData.indexB = indexB;
             tentacleData.count = getTentacleNodeNum(indexA, indexB);
             tentacleDataDic.Add(key, tentacleData);
             return tentacleData;
         }
+    }
+
+    /// <summary>
+    /// 是否存在触手信息
+    /// </summary>
+    /// <param name="indexA"></param>
+    /// <param name="indexB"></param>
+    /// <returns></returns>
+    public bool hasTentacleData(int indexA, int indexB)
+    {
+        string key = indexA < indexB ? indexA + ":" + indexB : indexB + ":" + indexA;
+        return tentacleDataDic.ContainsKey(key);
     }
 
     /// <summary>
@@ -229,8 +255,19 @@ public class ViewStatus
 
             if (cellTime == minTime)
             {
-                outCellData.time = minTime;
-                outCellData.hp++;  //细胞DNA增加
+                switch (outCellStatus)
+                {
+                    case CellStatus.ADD_HP:  //细胞DNA增加
+                        outCellData.addTime = minTime;
+                        outCellData.hp++;
+                        break;
+                    case CellStatus.OUT_HP:  //细胞DNA输出
+                        outCellData.outTime = minTime;
+                        outHp(outCellData);
+                        break;
+                    default:
+                        break;
+                }
             }
             else
             {
@@ -287,6 +324,39 @@ public class ViewStatus
                 }
             }
             time = minTime;
+        }
+    }
+
+    /// <summary>
+    /// 开始输出
+    /// </summary>
+    /// <param name="data"></param>
+    private void outHp(CellData data)
+    {
+        TentacleData tentacleData;
+        string key;
+        foreach(int index in data.tentacleList)
+        {
+            if (data.index < index)
+            {
+                key = data.index + ":" + index;
+                tentacleData = tentacleDataDic[key];
+                if (tentacleData.nodeListA.Count > 0 && !tentacleData.nodeListA[0])
+                {
+                    tentacleData.nodeListA[0] = true;
+                    data.hp--;
+                }
+            }
+            else
+            {
+                key = index + ":" + data.index;
+                tentacleData = tentacleDataDic[key];
+                if (tentacleData.nodeListB.Count > 0 && !tentacleData.nodeListB[0])
+                {
+                    tentacleData.nodeListB[0] = true;
+                    data.hp--;
+                }
+            }
         }
     }
 
@@ -352,7 +422,7 @@ public class ViewStatus
     {
         if (cellDataList[data.indexA].hp > 0)
         {
-            data.nodeListA.Add(false);
+            data.nodeListA.Insert(0, false);
             cellDataList[data.indexA].hp--;
             return true;
         }
@@ -371,7 +441,7 @@ public class ViewStatus
     {
         if (cellDataList[data.indexB].hp > 0)
         {
-            data.nodeListB.Add(false);
+            data.nodeListB.Insert(0, false);
             cellDataList[data.indexB].hp--;
             return true;
         }
@@ -471,17 +541,33 @@ public class ViewStatus
     {
         int nextTime = int.MaxValue;
         outCellData = null;
+        outCellStatus = CellStatus.NONE;
+        int tentacleCount;
+        int _time;
+
         foreach (CellData data in cellDataList)
         {
-            if (nextTime > data.time + data.vo.addTime)
+            _time = data.addTime + data.vo.addTime;
+            if (nextTime > _time)
             {
+                outCellStatus = CellStatus.ADD_HP;  //自然增长
                 outCellData = data;
-                nextTime = data.time + data.vo.addTime;
+                nextTime = _time;
+            }
+
+            tentacleCount = data.tentacleList.Count;
+            _time = (int)(data.outTime + data.vo.attackTime * tentacleCount * Mathf.Pow(CellConstant.ATTACK_COEFF, tentacleCount - 1));
+            if (nextTime > _time && data.hp > tentacleCount && tentacleCount > 0)
+            {
+                outCellStatus = CellStatus.OUT_HP;  //往外输出
+                outCellData = data;
+                nextTime = _time;
             }
         }
         return nextTime;
     }
     private CellData outCellData;
+    private CellStatus outCellStatus;
 
     /// <summary>
     /// 获取触手下回动作
@@ -492,13 +578,17 @@ public class ViewStatus
         int nextTime = int.MaxValue;
         outTentacleData = null;
         outTenStatus = TenStatus.NONE;
+        int countA;
+        int countB;
 
         foreach (TentacleData data in tentacleDataDic.Values)
         {
+            countA = data.nodeListA.Count;
+            countB = data.nodeListB.Count;
+
             if (!data.isAttackA)    //A未进攻
             {
-                if (data.nodeListA.Count > 0 &&
-                    nextTime > data.timeA + CellConstant.MOVE_RETREAT)
+                if (countA > 0 && nextTime > data.timeA + CellConstant.MOVE_RETREAT)
                 {
                     outTenStatus = TenStatus.MOVE_RETREAT_A;  //在撤退或切断
                     outTentacleData = data;
@@ -507,30 +597,30 @@ public class ViewStatus
             }
             else                   //A在进攻
             {
-                if (data.nodeListA.Count == data.count &&
+                if (countA == data.count &&
                     nextTime > data.timeA + CellConstant.MOVE_PK)
                 {
                     outTenStatus = TenStatus.MOVE_PK_A;   //单方输出
                     outTentacleData = data;
                     nextTime = data.timeA + CellConstant.MOVE_PK;
                 }
-                else if (data.nodeListA.Count == Mathf.Floor(data.count / 2) && data.isAttackB &&
-                    data.nodeListA.Count + data.nodeListB.Count == data.count &&
+                else if (countA == Mathf.Floor(data.count / 2) && data.isAttackB &&
+                    countA + countB == data.count &&
                     nextTime > data.timeA + CellConstant.MOVE_PK)
                 {
                     outTenStatus = TenStatus.MOVE_PK_A;   //比拼消耗
                     outTentacleData = data;
                     nextTime = data.timeA + CellConstant.MOVE_PK;
                 }
-                else if (data.nodeListA.Count + data.nodeListB.Count != data.count &&
+                else if (countA + countB != data.count &&
                     nextTime > data.timeA + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_ATTACK_A;   //A右移
                     outTentacleData = data;
                     nextTime = data.timeA + CellConstant.MOVE_ATTACK;
                 }
-                else if (data.nodeListA.Count + data.nodeListB.Count == data.count &&
-                    data.nodeListA.Count < Mathf.Floor(data.count / 2) &&
+                else if (countA + countB == data.count &&
+                    countA < Mathf.Floor(data.count / 2) &&
                     nextTime > data.timeA + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_AB_A;   //整体右移
@@ -541,8 +631,7 @@ public class ViewStatus
 
             if (!data.isAttackB)    //B未进攻
             {
-                if (data.nodeListB.Count > 0 && 
-                    nextTime > data.timeB + CellConstant.MOVE_RETREAT)
+                if (countB > 0 && nextTime > data.timeB + CellConstant.MOVE_RETREAT)
                 {
                     outTenStatus = TenStatus.MOVE_RETREAT_B;  //在撤退或切断
                     outTentacleData = data;
@@ -551,30 +640,30 @@ public class ViewStatus
             }
             else                   //B在进攻
             {
-                if (data.nodeListB.Count == data.count &&
+                if (countB == data.count &&
                     nextTime > data.timeB + CellConstant.MOVE_PK)
                 {
                     outTenStatus = TenStatus.MOVE_PK_B;   //单方输出
                     outTentacleData = data;
                     nextTime = data.timeB + CellConstant.MOVE_PK;
                 }
-                else if (data.nodeListB.Count == Mathf.Ceil(data.count / 2) && data.isAttackA &&
-                    data.nodeListA.Count + data.nodeListB.Count == data.count &&
+                else if (countB == Mathf.Ceil(data.count / 2) && data.isAttackA &&
+                    countA + countB == data.count &&
                     nextTime > data.timeB + CellConstant.MOVE_PK)
                 {
                     outTenStatus = TenStatus.MOVE_PK_B;   //比拼消耗
                     outTentacleData = data;
                     nextTime = data.timeB + CellConstant.MOVE_PK;
                 }
-                else if (data.nodeListA.Count + data.nodeListB.Count != data.count &&
+                else if (countA + countB != data.count &&
                     nextTime > data.timeB + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_ATTACK_B;   //B左移
                     outTentacleData = data;
                     nextTime = data.timeB + CellConstant.MOVE_ATTACK;
                 }
-                else if (data.nodeListA.Count + data.nodeListB.Count == data.count &&
-                    data.nodeListB.Count < Mathf.Ceil(data.count / 2) &&
+                else if (countA + countB == data.count &&
+                    countB < Mathf.Ceil(data.count / 2) &&
                     nextTime > data.timeB + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_AB_B;   //整体左移
@@ -607,6 +696,11 @@ public class CellData
     private CellLevelDBModel m_model;
 
     /// <summary>
+    /// 拥有的触手key
+    /// </summary>
+    public List<int> tentacleList = new List<int>();
+
+    /// <summary>
     /// 细胞的索引
     /// </summary>
     public int index;
@@ -614,7 +708,12 @@ public class CellData
     /// <summary>
     /// 上次DNA自然增加的时间点
     /// </summary>
-    public int time;
+    public int addTime;
+
+    /// <summary>
+    /// 上次DNA输出的时间点
+    /// </summary>
+    public int outTime;
 
     /// <summary>
     /// 细胞DNA的数量
@@ -659,8 +758,10 @@ public class CellData
     public CellData clone()
     {
         CellData data = new CellData();
+        data.tentacleList = new List<int>(tentacleList);
         data.index = index;
-        data.time = time;
+        data.addTime = addTime;
+        data.outTime = outTime;
         data.hp = hp;
         data.camp = camp;
         data.position = position;
@@ -693,12 +794,56 @@ public class TentacleData
     /// <summary>
     /// 细胞A是否处于进攻状态
     /// </summary>
-    public bool isAttackA;
+    public bool isAttackA
+    {
+        get
+        {
+            return m_isAttackA;
+        }
+        set
+        {
+            if (m_isAttackA != value)
+            {
+                m_isAttackA = value;
+                if (m_isAttackA)
+                {
+                    viewStatus.cellDataList[indexA].tentacleList.Add(indexB);
+                }
+                else
+                {
+                    viewStatus.cellDataList[indexA].tentacleList.Remove(indexB);
+                }
+            }
+        }
+    }
+    private bool m_isAttackA;
 
     /// <summary>
     /// 细胞B是否处于进攻状态
     /// </summary>
-    public bool isAttackB;
+    public bool isAttackB
+    {
+        get
+        {
+            return m_isAttackB;
+        }
+        set
+        {
+            if (m_isAttackB != value)
+            {
+                m_isAttackB = value;
+                if (m_isAttackB)
+                {
+                    viewStatus.cellDataList[indexB].tentacleList.Add(indexA);
+                }
+                else
+                {
+                    viewStatus.cellDataList[indexB].tentacleList.Remove(indexA);
+                }
+            }
+        }
+    }
+    private bool m_isAttackB;
 
     /// <summary>
     /// 细胞A节点列表，true代表DNA传输点
@@ -720,9 +865,16 @@ public class TentacleData
     /// </summary>
     public int timeB;
 
+    private ViewStatus viewStatus;
+
+    public TentacleData(ViewStatus viewStatus)
+    {
+        this.viewStatus = viewStatus;
+    }
+
     public TentacleData clone()
     {
-        TentacleData data = new TentacleData();
+        TentacleData data = new TentacleData(viewStatus);
         data.count = count;
         data.indexA = indexA;
         data.indexB = indexB;

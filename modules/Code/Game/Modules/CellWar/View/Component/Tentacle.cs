@@ -1,12 +1,20 @@
 ﻿using CLRSharp;
 using Freamwork;
-using System;
-using System.Collections.Generic;
 using UnityEngine;
 
-public class Tentacle : GMB
+public class Tentacle
 {
-    private List<TentacleNode> m_nodes = new List<TentacleNode>();
+    private static int getSiblingIndex()
+    {
+        return m_SiblingIndex++;
+    }
+    private static int m_SiblingIndex = 0;
+
+    //===============================================
+    private TentacleNode[] nodeArr;
+    private Vector2[] nodePositionArr;
+    private Vector3 nodeRetation;
+    private int siblingIndex;
 
     public CellWarView view
     {
@@ -21,8 +29,17 @@ public class Tentacle : GMB
     }
     private CellWarView m_view;
 
-    private Vector3 nodeRetation;
     //==================================================================
+    public Tentacle()
+    {
+        siblingIndex = getSiblingIndex();
+    }
+
+    public Tentacle(int siblingIndex)
+    {
+        this.siblingIndex = siblingIndex;
+    }
+
     public void setNodes(Cell sourCell, Cell destCell)
     {
         RectTransform rectTF = sourCell.transform as RectTransform;
@@ -46,7 +63,7 @@ public class Tentacle : GMB
         float d = Vector2.Distance(sour, dest);
         if (d <= CellConstant.CELL_R + CellConstant.NODE_D)
         {
-            clearNodes();
+            clear();
             return;
         }
         float sourX = sour.x - CellConstant.CELL_R * (sour.x - dest.x) / d;
@@ -56,7 +73,7 @@ public class Tentacle : GMB
 
     public void setNodes(Vector2 sour, Vector2 dest)
     {
-        clearNodes();
+        clear();
 
         //计算触手旋转角度
         float angle = VectorUtil.Vector2Angle(dest - sour, Vector2.right);
@@ -75,35 +92,31 @@ public class Tentacle : GMB
         float f = 0.5f + (d - len * CellConstant.NODE_D) / CellConstant.NODE_D / 2;
         Vector2 position = new Vector2(sour.x + f * dv.x, sour.y + f * dv.y);
 
-        CellWarManager mana = CellWarManager.instance;
+        nodePositionArr = new Vector2[len];
+        nodeArr = new TentacleNode[len];
         for (int i = 0; i < len; i++)
         {
-            m_nodes.Add(mana.addNode(position + dv * i, nodeRetation, Color.yellow, transform));
+            nodePositionArr[i] = position + dv * i;
         }
     }
 
     /// <summary>
     /// 清除全部触手单元
     /// </summary>
-    public void clearNodes()
-    {
-        CellWarManager mana = CellWarManager.instance;
-        foreach (TentacleNode node in m_nodes)
-        {
-            mana.removeNode(node);
-        }
-        m_nodes.Clear();
-    }
-    
     public void clear()
     {
-        CellWarManager mana = CellWarManager.instance;
-        foreach (TentacleNode node in m_nodes)
+        if(nodeArr != null)
         {
-            node.transform.SetParent(null);
-            mana.removeNode(node);
+            CellWarManager mana = CellWarManager.instance;
+            for (int i = 0, len = nodePositionArr.Length; i < len; i++)
+            {
+                if (nodeArr[i] != null)
+                {
+                    mana.removeNode(nodeArr[i]);
+                }
+            }
+            nodeArr = null;
         }
-        m_nodes.Clear();
     }
 
     /// <summary>
@@ -111,33 +124,54 @@ public class Tentacle : GMB
     /// </summary>
     public void updateByData(TentacleData data)
     {
-        if (data.count != m_nodes.Count)
-        {
-            throw new Exception("TentacleData.count与m_nodes.Count不一致");
-        }
-
         TentacleNode node;
         int lenA = data.nodeListA.Count;
         int lenB = data.nodeListB.Count;
         Color colorA = view.getColorByCellIndex(data.indexA);
         Color colorB = view.getColorByCellIndex(data.indexB);
+        CellWarManager mana = CellWarManager.instance;
 
         for (int i = 0, len = data.count; i < len; i++)
         {
-            node = m_nodes[i];
+            node = nodeArr[i];
+            
             if (i < lenA)
             {
-                node.color = data.nodeListA[i] ? Color.yellow : colorA;
-                node.transform.eulerAngles = nodeRetation;
-                node.gameObject.SetActive(true);
+                Color nodeColor = data.nodeListA[i] ? Color.yellow : colorA;
+                if (node == null)
+                {
+                    node = mana.addNode(nodePositionArr[i], nodeRetation, view.tentacleLayer);
+                    node.transform.SetSiblingIndex(siblingIndex);
+                    node.color = nodeColor;
+                    nodeArr[i] = node;
+                }
+                else
+                {
+                    node.color = nodeColor;
+                    node.transform.eulerAngles = nodeRetation;
+                    node.gameObject.SetActive(true);
+                }
             }
             else if(i >= len - lenB)
             {
-                node.color = data.nodeListB[len-i-1] ? Color.yellow : colorB;
-                node.transform.eulerAngles = nodeRetation + new Vector3(0, 0, 180);
-                node.gameObject.SetActive(true);
+                Color nodeColor = data.nodeListB[len - i - 1] ? Color.yellow : colorB;
+                Vector3 eulerAngles = nodeRetation + new Vector3(0, 0, 180);
+
+                if (node == null)
+                {
+                    node = mana.addNode(nodePositionArr[i], eulerAngles, view.tentacleLayer);
+                    node.color = nodeColor;
+                    node.transform.SetSiblingIndex(siblingIndex);
+                    nodeArr[i] = node;
+                }
+                else
+                {
+                    node.color = nodeColor;
+                    node.transform.eulerAngles = eulerAngles;
+                    node.gameObject.SetActive(true);
+                }
             }
-            else
+            else if (node != null)
             {
                 node.gameObject.SetActive(false);
             }
