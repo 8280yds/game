@@ -168,13 +168,7 @@ public class Cell : GMB
         if (DestCell == null && SelectedCell != null)
         {
             //显示细胞和鼠标之间的触手
-            Vector2 pos;
-            Canvas canvas = UIManager.instance.canvas;
-            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
-                canvas.transform as RectTransform, eventData.position, canvas.worldCamera, out pos))
-            {
-                view.updateMouseTentacle(SelectedCell, pos);
-            }
+            view.updateMouseTentacle(SelectedCell, eventData.position);
         }
     }
 

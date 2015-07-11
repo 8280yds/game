@@ -16,6 +16,8 @@ public class Tentacle
     private Vector3 nodeRetation;
     private int siblingIndex;
 
+    private TentacleData data;
+
     public CellWarView view
     {
         get
@@ -33,11 +35,6 @@ public class Tentacle
     public Tentacle()
     {
         siblingIndex = getSiblingIndex();
-    }
-
-    public Tentacle(int siblingIndex)
-    {
-        this.siblingIndex = siblingIndex;
     }
 
     public void setNodes(Cell sourCell, Cell destCell)
@@ -112,11 +109,13 @@ public class Tentacle
             {
                 if (nodeArr[i] != null)
                 {
+                    nodeArr[i].clear();
                     mana.removeNode(nodeArr[i]);
                 }
             }
             nodeArr = null;
         }
+        data = null;
     }
 
     /// <summary>
@@ -124,6 +123,8 @@ public class Tentacle
     /// </summary>
     public void updateByData(TentacleData data)
     {
+        this.data = data;
+
         TentacleNode node;
         int lenA = data.nodeListA.Count;
         int lenB = data.nodeListB.Count;
@@ -131,49 +132,110 @@ public class Tentacle
         Color colorB = view.getColorByCellIndex(data.indexB);
         CellWarManager mana = CellWarManager.instance;
 
+        Color color;
+        Vector3 retation;
+
         for (int i = 0, len = data.count; i < len; i++)
         {
             node = nodeArr[i];
             
             if (i < lenA)
             {
-                Color nodeColor = data.nodeListA[i] ? Color.yellow : colorA;
+                if (data.cutStatus == CutStatus.CUT_B)
+                {
+                    color = data.nodeListA[i] ? Color.yellow : colorB;
+                    retation = nodeRetation + new Vector3(0, 0, 180);
+                }
+                else
+                {
+                    color = data.nodeListA[i] ? Color.yellow : colorA;
+                    retation = nodeRetation;
+                }
+
                 if (node == null)
                 {
-                    node = mana.addNode(nodePositionArr[i], nodeRetation, view.tentacleLayer);
+                    node = mana.addNode(nodePositionArr[i], retation, view.tentacleLayer);
                     node.transform.SetSiblingIndex(siblingIndex);
-                    node.color = nodeColor;
+                    node.color = color;
+                    node.tentacle = this;
                     nodeArr[i] = node;
                 }
                 else
                 {
-                    node.color = nodeColor;
-                    node.transform.eulerAngles = nodeRetation;
+                    node.color = color;
+                    node.transform.eulerAngles = retation;
                     node.gameObject.SetActive(true);
                 }
             }
             else if(i >= len - lenB)
             {
-                Color nodeColor = data.nodeListB[len - i - 1] ? Color.yellow : colorB;
-                Vector3 eulerAngles = nodeRetation + new Vector3(0, 0, 180);
+                if (data.cutStatus == CutStatus.CUT_A)
+                {
+                    color = data.nodeListB[len - i - 1] ? Color.yellow : colorA;
+                    retation = nodeRetation;
+                }
+                else
+                {
+                    color = data.nodeListB[len - i - 1] ? Color.yellow : colorB;
+                    retation = nodeRetation + new Vector3(0, 0, 180);
+                }
 
                 if (node == null)
                 {
-                    node = mana.addNode(nodePositionArr[i], eulerAngles, view.tentacleLayer);
-                    node.color = nodeColor;
+                    node = mana.addNode(nodePositionArr[i], retation, view.tentacleLayer);
                     node.transform.SetSiblingIndex(siblingIndex);
+                    node.color = color;
+                    node.tentacle = this;
                     nodeArr[i] = node;
                 }
                 else
                 {
-                    node.color = nodeColor;
-                    node.transform.eulerAngles = eulerAngles;
+                    node.color = color;
+                    node.transform.eulerAngles = retation;
                     node.gameObject.SetActive(true);
                 }
             }
             else if (node != null)
             {
                 node.gameObject.SetActive(false);
+            }
+            node.index = i;
+        }
+    }
+
+    /// <summary>
+    /// 切断
+    /// </summary>
+    /// <param name="node"></param>
+    public void cut(TentacleNode node)
+    {
+        if(view.isMouseDown && data != null)
+        {
+            int count = data.nodeListA.Count;
+            if (data.isAttackA && node.index < count)
+            {
+                if (count < data.count)
+                {
+                    view.retreat(data.indexA, data.indexB, count);
+                }
+                else
+                {
+                    view.retreat(data.indexA, data.indexB, node.index);
+                }
+                return;
+            }
+
+            count = data.nodeListB.Count;
+            if (data.isAttackB && node.index >= data.count - count)
+            {
+                if (count < data.count)
+                {
+                    view.retreat(data.indexB, data.indexA, count);
+                }
+                else
+                {
+                    view.retreat(data.indexB, data.indexA, data.count - node.index - 1);
+                }
             }
         }
     }

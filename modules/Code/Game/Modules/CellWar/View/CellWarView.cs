@@ -2,11 +2,21 @@
 using Freamwork;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using Vectrosity;
 
 public class CellWarView : Window
 {
     private List<Cell> cellList;
-    private Tentacle mouseTentacle;
+
+    private VectorLine mouseLine;
+    private List<long> mouseLinePointTime;
+
+    public bool isMouseDown
+    {
+        get;
+        private set;
+    }
 
     /// <summary>
     /// 触手列表，key的形式是"3:7"
@@ -71,7 +81,7 @@ public class CellWarView : Window
         cellList = new List<Cell>();
         tentacleDic = new Dictionary<string, Tentacle>();
 
-        initScene(4);
+        initScene(1);
     }
 
     /// <summary>
@@ -84,7 +94,6 @@ public class CellWarView : Window
         Cell.DestCell = null;
         clearAllTentacle();
         clearAllCell();
-        mouseTentacle = new Tentacle(1000000);
 
         //数据初始化
         CellWarSceneDBModel sceneDBModel = mvcCharge.getInstance(typeof(CellWarSceneDBModel) as ICLRType) as CellWarSceneDBModel;
@@ -95,7 +104,7 @@ public class CellWarView : Window
         ViewStatus viewStatus = model.lastUpdateViewStatus;
         Cell cell;
         CellData cellData;
-        for (int i = 0, len = viewStatus.cellDataList.Count; i < len; i++ )
+        for (int i = 0, len = viewStatus.cellDataList.Count; i < len; i++)
         {
             cellData = viewStatus.cellDataList[i];
             cell = CellWarManager.instance.addCell(cellData.position, cellsLayer);
@@ -104,6 +113,11 @@ public class CellWarView : Window
             cell.hp = cellData.hp;
             cellList.Add(cell);
         }
+
+        //初始化鼠标指挥线
+        mouseLine = new VectorLine("MouseLine", new List<Vector2>(), 5f, LineType.Continuous);
+        mouseLine.color = Color.red;
+        mouseLinePointTime = new List<long>();
     }
 
     protected override void addListeners()
@@ -116,6 +130,28 @@ public class CellWarView : Window
     {
         base.Update();
         model.getCurrentViewStatus();
+
+        if (isMouseDown && Cell.SelectedCell == null)
+        {
+            mouseLine.points2.Add(Input.mousePosition);
+            mouseLinePointTime.Add(TimeUtil.getTimeStamp(false));
+        }
+
+        if (mouseLinePointTime != null && mouseLinePointTime.Count > 0)
+        {
+            long time = TimeUtil.getTimeStamp(false);
+            while (time - mouseLinePointTime[0] > 200)
+            {
+                mouseLinePointTime.RemoveAt(0);
+                mouseLine.points2.RemoveAt(0);
+
+                if (mouseLinePointTime.Count == 0)
+                {
+                    return;
+                }
+            }
+            mouseLine.Draw();
+        }
     }
 
     /// <summary>
@@ -159,7 +195,16 @@ public class CellWarView : Window
     /// <param name="destCell"></param>
     public void updateMouseTentacle(Cell sourCell, Cell destCell)
     {
-        mouseTentacle.setNodes(sourCell, destCell);
+        RectTransform rectTF = sourCell.transform as RectTransform;
+        Vector2 sour = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+        rectTF = destCell.transform as RectTransform;
+        Vector2 dest = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+
+        mouseLine.points2.Clear();
+        mouseLinePointTime.Clear();
+        mouseLine.points2.Add(sour);
+        mouseLine.points2.Add(dest);
+        mouseLine.Draw();
     }
 
     /// <summary>
@@ -169,7 +214,14 @@ public class CellWarView : Window
     /// <param name="dest"></param>
     public void updateMouseTentacle(Cell sourCell, Vector2 dest)
     {
-        mouseTentacle.setNodes(sourCell, dest);
+        RectTransform rectTF = sourCell.transform as RectTransform;
+        Vector2 sour = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+
+        mouseLine.points2.Clear();
+        mouseLinePointTime.Clear();
+        mouseLine.points2.Add(sour);
+        mouseLine.points2.Add(dest);
+        mouseLine.Draw();
     }
 
     /// <summary>
@@ -179,7 +231,8 @@ public class CellWarView : Window
     /// <param name="dest"></param>
     public void hideMouseTentacle()
     {
-        mouseTentacle.clear();
+        mouseLine.points2.Clear();
+        mouseLine.Draw();
     }
 
     /// <summary>
@@ -218,10 +271,7 @@ public class CellWarView : Window
         {
             tentacle.clear();
         }
-        if (mouseTentacle != null)
-        {
-            mouseTentacle.clear();
-        }
+        tentacleDic.Clear();
     }
 
     /// <summary>
@@ -246,7 +296,7 @@ public class CellWarView : Window
     }
 
     /// <summary>
-    /// 进行攻击
+    /// 攻击
     /// </summary>
     public void attack(Cell cellA, Cell cellB)
     {
@@ -267,5 +317,38 @@ public class CellWarView : Window
         actionData.cellBIndex = (byte)cellB.index;
         actionData.type = 0;    //0:连接 1:切断
         model.actionData = actionData;
+    }
+
+    /// <summary>
+    /// 切断
+    /// </summary>
+    public void retreat(int indexA, int indexB, int index)
+    {
+        Debug.Log(indexA + "," + indexB + "," + index);
+        ActionData actionData = new ActionData();
+        actionData.time = model.getCurrentTime();
+        actionData.cellAIndex = (byte)indexA;
+        actionData.cellBIndex = (byte)indexB;
+        actionData.type = 1;    //0:连接 1:切断
+        actionData.index = (byte)index;
+        model.actionData = actionData;
+    }
+
+    protected override void OnPointerDown(PointerEventData eventData)
+    {
+        base.OnPointerDown(eventData);
+
+        isMouseDown = true;
+        if (mouseLine != null)
+        {
+            mouseLine.points2.Clear();
+            mouseLinePointTime.Clear();
+        }
+    }
+
+    protected override void OnPointerUp(PointerEventData eventData)
+    {
+        base.OnPointerUp(eventData);
+        isMouseDown = false;
     }
 }

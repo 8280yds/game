@@ -48,7 +48,7 @@ public class CellConstant
     /// <summary>
     /// 细胞半径
     /// </summary>
-    public const int CELL_R = 20;
+    public const int CELL_R = 24;
 
     /// <summary>
     /// 触手单元间距

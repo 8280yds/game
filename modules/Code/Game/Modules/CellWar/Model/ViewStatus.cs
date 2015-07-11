@@ -209,11 +209,17 @@ public class ViewStatus
                 tentacleData.count > actionData.index)              //A单方输出时切断
             {
                 int len = tentacleData.count - actionData.index;
+                if (len <= 0)
+                {
+                    tentacleData.isAttackA = false;
+                    return;
+                }
                 tentacleData.nodeListB = tentacleData.nodeListA.GetRange(actionData.index, len);
                 tentacleData.nodeListB.Reverse();
                 tentacleData.nodeListA.RemoveRange(actionData.index, len);
                 tentacleData.cutStatus = CutStatus.CUT_A;
                 tentacleData.isAttackA = false;
+                tentacleData.timeB = actionData.time;
                 return;
             }
 
@@ -222,11 +228,17 @@ public class ViewStatus
                 tentacleData.count > actionData.index)              //B单方输出时切断
             {
                 int len = tentacleData.count - actionData.index;
+                if (len <= 0)
+                {
+                    tentacleData.isAttackB = false;
+                    return;
+                }
                 tentacleData.nodeListA = tentacleData.nodeListB.GetRange(actionData.index, len);
                 tentacleData.nodeListA.Reverse();
                 tentacleData.nodeListB.RemoveRange(actionData.index, len);
                 tentacleData.cutStatus = CutStatus.CUT_B;
                 tentacleData.isAttackB = false;
+                tentacleData.timeA = actionData.time;
                 return;
             }
         }
