@@ -109,8 +109,6 @@ public class CellWarView : Window
             cellData = viewStatus.cellDataList[i];
             cell = CellWarManager.instance.addCell(cellData.position, cellsLayer);
             cell.index = cellData.index;
-            cell.camp = cellData.camp;
-            cell.hp = cellData.hp;
             cellList.Add(cell);
         }
 
@@ -133,14 +131,33 @@ public class CellWarView : Window
 
         if (isMouseDown && Cell.SelectedCell == null)
         {
-            mouseLine.points2.Add(Input.mousePosition);
-            mouseLinePointTime.Add(TimeUtil.getTimeStamp(false));
+            Vector2 pos;
+            Canvas canvas = UIManager.instance.canvas;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvas.transform as RectTransform, Input.mousePosition, Camera.main, out pos))
+            {
+                int len = mouseLine.points2.Count;
+                if (len > 0 && Vector2.Distance(pos, mouseLine.points2[len - 1]) > 2)
+                {
+                    //判断切割
+                    cut(mouseLine.points2[len - 1], pos);
+                    //绘制轨迹
+                    mouseLine.points2.Add(pos);
+                    mouseLinePointTime.Add(TimeUtil.getTimeStamp(false));
+                }
+                else if (len == 0)
+                {
+                    //绘制轨迹
+                    mouseLine.points2.Add(pos);
+                    mouseLinePointTime.Add(TimeUtil.getTimeStamp(false));
+                }
+            }
         }
 
         if (mouseLinePointTime != null && mouseLinePointTime.Count > 0)
         {
             long time = TimeUtil.getTimeStamp(false);
-            while (time - mouseLinePointTime[0] > 200)
+            while (time - mouseLinePointTime[0] > 50)
             {
                 mouseLinePointTime.RemoveAt(0);
                 mouseLine.points2.RemoveAt(0);
@@ -164,8 +181,7 @@ public class CellWarView : Window
         foreach (CellData cellData in viewStatus.cellDataList)
         {
             cell = cellList[cellData.index];
-            cell.camp = cellData.camp;
-            cell.hp = cellData.hp;
+            cell.UpdateByData(cellData);
         }
 
         TentacleData data;
@@ -196,9 +212,9 @@ public class CellWarView : Window
     public void updateMouseTentacle(Cell sourCell, Cell destCell)
     {
         RectTransform rectTF = sourCell.transform as RectTransform;
-        Vector2 sour = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+        Vector2 sour = rectTF.anchoredPosition;
         rectTF = destCell.transform as RectTransform;
-        Vector2 dest = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+        Vector2 dest = rectTF.anchoredPosition;
 
         mouseLine.points2.Clear();
         mouseLinePointTime.Clear();
@@ -215,7 +231,7 @@ public class CellWarView : Window
     public void updateMouseTentacle(Cell sourCell, Vector2 dest)
     {
         RectTransform rectTF = sourCell.transform as RectTransform;
-        Vector2 sour = RectTransformUtility.WorldToScreenPoint(Camera.main, rectTF.position);
+        Vector2 sour = rectTF.anchoredPosition;
 
         mouseLine.points2.Clear();
         mouseLinePointTime.Clear();
@@ -322,9 +338,8 @@ public class CellWarView : Window
     /// <summary>
     /// 切断
     /// </summary>
-    public void retreat(int indexA, int indexB, int index)
+    private void retreat(int indexA, int indexB, int index)
     {
-        Debug.Log(indexA + "," + indexB + "," + index);
         ActionData actionData = new ActionData();
         actionData.time = model.getCurrentTime();
         actionData.cellAIndex = (byte)indexA;
@@ -351,4 +366,61 @@ public class CellWarView : Window
         base.OnPointerUp(eventData);
         isMouseDown = false;
     }
+
+    /// <summary>
+    /// 通过计算交点，计算出切断位置
+    /// </summary>
+    /// <param name="pos1"></param>
+    /// <param name="pos2"></param>
+    private void cut(Vector2 pos1, Vector2 pos2)
+    {
+        ViewStatus viewStatus = model.lastUpdateViewStatus;
+        Vector3 pos;
+        Vector2 pos3;
+        Vector2 pos4;
+        int cutIndex;
+        CellData cellDataA;
+        CellData cellDataB;
+
+        foreach(TentacleData data in viewStatus.tentacleDataDic.Values)
+        {
+            if (data.cutStatus == CutStatus.NONE)
+            {
+                cellDataA = viewStatus.cellDataList[data.indexA];
+                cellDataB = viewStatus.cellDataList[data.indexB];
+                pos3 = cellDataA.position;
+                pos4 = cellDataB.position;
+
+                if (cellDataA.camp == Camp.GREEN && data.isAttackA)
+                {
+                    pos = VectorUtil.GetIntersection(pos1, pos2, pos3, pos4);
+                    if (pos.z == 1)
+                    {
+                        cutIndex = (int)(data.count * Vector2.Distance(pos3, pos) / Vector2.Distance(pos3, pos4));
+                        if (cutIndex <= data.nodeListA.Count)
+                        {
+                            retreat(data.indexA, data.indexB, cutIndex);
+                        }
+                    }
+                    continue;
+                }
+
+                if (cellDataB.camp == Camp.GREEN && data.isAttackB)
+                {
+                    pos = VectorUtil.GetIntersection(pos1, pos2, pos3, pos4);
+                    if (pos.z == 1)
+                    {
+                        cutIndex = (int)(data.count * Vector2.Distance(pos3, pos) / Vector2.Distance(pos3, pos4));
+                        cutIndex = data.count - cutIndex - 1;
+                        if (cutIndex <= data.nodeListB.Count)
+                        {
+                            retreat(data.indexB, data.indexA, cutIndex);
+                        }
+                    }
+                    continue;
+                }
+            }
+        }
+    }
+
 }

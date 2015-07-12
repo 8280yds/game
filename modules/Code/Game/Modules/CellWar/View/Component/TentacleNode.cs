@@ -1,17 +1,9 @@
 ﻿using Freamwork;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class TentacleNode : GMB
 {
-    /// <summary>
-    /// 所在的触手
-    /// </summary>
-    public Tentacle tentacle;
-
-    public int index;
-
     public Color color
     {
         get
@@ -46,17 +38,5 @@ public class TentacleNode : GMB
     {
         base.init(gameObject);
         m_color = image.color;
-    }
-
-    protected override void OnPointerEnter(PointerEventData eventData)
-    {
-        base.OnPointerEnter(eventData);
-
-        tentacle.cut(this);
-    }
-
-    public void clear()
-    {
-        tentacle = null;
     }
 }

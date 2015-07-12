@@ -676,8 +676,8 @@ public class VectorLine {
 		rectTransform.offsetMin = Vector2.zero;
 		rectTransform.offsetMax = Vector2.zero;
 		rectTransform.anchorMin = Vector2.zero;
-		rectTransform.anchorMax = Vector2.zero;
-		rectTransform.pivot = Vector2.zero;
+		rectTransform.anchorMax = Vector2.one;
+        rectTransform.pivot = new Vector2(0.5f, 0.5f);
 		rectTransform.anchoredPosition = Vector2.zero;
 	}
 
@@ -891,6 +891,17 @@ public class VectorLine {
 	}
 	
 	static void SetCanvas () {
+        //改为设置成UI的鼠标绘制层
+        GameObject uiGo = GameObject.Find("UI");
+        if (uiGo != null)
+        {
+            _canvas = uiGo.GetComponent<Canvas>();
+            if (_canvas != null)
+            {
+                return;
+            }
+        }
+
 		var go = new GameObject("VectorCanvas");
 		go.layer = LayerMask.NameToLayer ("UI");
 		var pos = go.transform.position;

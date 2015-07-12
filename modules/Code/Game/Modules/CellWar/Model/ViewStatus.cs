@@ -817,13 +817,17 @@ public class TentacleData
             if (m_isAttackA != value)
             {
                 m_isAttackA = value;
+                List<int> tentacleList = viewStatus.cellDataList[indexA].tentacleList;
                 if (m_isAttackA)
                 {
-                    viewStatus.cellDataList[indexA].tentacleList.Add(indexB);
+                    if (!tentacleList.Contains(indexB))
+                    {
+                        tentacleList.Add(indexB);
+                    }
                 }
                 else
                 {
-                    viewStatus.cellDataList[indexA].tentacleList.Remove(indexB);
+                    tentacleList.Remove(indexB);
                 }
             }
         }
@@ -844,13 +848,17 @@ public class TentacleData
             if (m_isAttackB != value)
             {
                 m_isAttackB = value;
+                List<int> tentacleList = viewStatus.cellDataList[indexB].tentacleList;
                 if (m_isAttackB)
                 {
-                    viewStatus.cellDataList[indexB].tentacleList.Add(indexA);
+                    if (!tentacleList.Contains(indexA))
+                    {
+                        tentacleList.Add(indexA);
+                    }
                 }
                 else
                 {
-                    viewStatus.cellDataList[indexB].tentacleList.Remove(indexA);
+                    tentacleList.Remove(indexA);
                 }
             }
         }

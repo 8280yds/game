@@ -34,20 +34,36 @@ public class Cell : GMB
     private Image m_image;
 
     /// <summary>
-    /// 细胞文本
+    /// HP文本
     /// </summary>
-    public Text txt
+    public Text hpTxt
     {
         get
         {
-            if (m_txt == null)
+            if (m_hpTxt == null)
             {
-                m_txt = transform.FindChild("Text").GetComponent<Text>();
+                m_hpTxt = transform.FindChild("HPText").GetComponent<Text>();
             }
-            return m_txt;
+            return m_hpTxt;
         }
     }
-    private Text m_txt;
+    private Text m_hpTxt;
+
+    /// <summary>
+    /// Star文本
+    /// </summary>
+    public Text starTxt
+    {
+        get
+        {
+            if (m_starTxt == null)
+            {
+                m_starTxt = transform.FindChild("StarText").GetComponent<Text>();
+            }
+            return m_starTxt;
+        }
+    }
+    private Text m_starTxt;
 
     /// <summary>
     /// 选中图片
@@ -77,7 +93,7 @@ public class Cell : GMB
         set
         {
             m_camp = value;
-            txt.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
+            starTxt.color = hpTxt.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
         }
     }
     private Camp m_camp;
@@ -94,7 +110,7 @@ public class Cell : GMB
         set
         {
             m_hp = value;
-            txt.text = "" + m_hp;
+            hpTxt.text = "" + m_hp;
         }
     }
     private int m_hp;
@@ -124,6 +140,23 @@ public class Cell : GMB
         }
     }
     private int m_index = -1;
+
+    //===================================更新==========================================
+    public void UpdateByData(CellData data)
+    {
+        camp = data.camp;
+        hp = data.hp;
+
+        //显示星级
+        int maxNum = data.vo.tentacle;
+        int tentacleNum = data.tentacleList.Count;
+        string str = "";
+        for (int i = 0; i < maxNum; i++ )
+        {
+            str += i < tentacleNum ? "★" : "☆";
+        }
+        starTxt.text = str;
+    }
 
     //===================================事件==========================================
     protected override void OnPointerDown(PointerEventData eventData)
@@ -168,7 +201,13 @@ public class Cell : GMB
         if (DestCell == null && SelectedCell != null)
         {
             //显示细胞和鼠标之间的触手
-            view.updateMouseTentacle(SelectedCell, eventData.position);
+            Vector2 pos;
+            Canvas canvas = UIManager.instance.canvas;
+            if (RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                canvas.transform as RectTransform, eventData.position, Camera.main, out pos))
+            {
+                view.updateMouseTentacle(SelectedCell, pos);
+            }
         }
     }
 
@@ -207,7 +246,7 @@ public class Cell : GMB
 
         if (selectImage.gameObject.activeInHierarchy)
         {
-            selectImage.transform.eulerAngles += new Vector3(0, 0, 1f);
+            selectImage.transform.eulerAngles += new Vector3(0, 0, 2f);
         }
     }
 }

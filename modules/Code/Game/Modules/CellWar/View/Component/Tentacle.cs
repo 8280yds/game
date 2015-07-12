@@ -109,7 +109,6 @@ public class Tentacle
             {
                 if (nodeArr[i] != null)
                 {
-                    nodeArr[i].clear();
                     mana.removeNode(nodeArr[i]);
                 }
             }
@@ -157,7 +156,6 @@ public class Tentacle
                     node = mana.addNode(nodePositionArr[i], retation, view.tentacleLayer);
                     node.transform.SetSiblingIndex(siblingIndex);
                     node.color = color;
-                    node.tentacle = this;
                     nodeArr[i] = node;
                 }
                 else
@@ -185,7 +183,6 @@ public class Tentacle
                     node = mana.addNode(nodePositionArr[i], retation, view.tentacleLayer);
                     node.transform.SetSiblingIndex(siblingIndex);
                     node.color = color;
-                    node.tentacle = this;
                     nodeArr[i] = node;
                 }
                 else
@@ -198,44 +195,6 @@ public class Tentacle
             else if (node != null)
             {
                 node.gameObject.SetActive(false);
-            }
-            node.index = i;
-        }
-    }
-
-    /// <summary>
-    /// 切断
-    /// </summary>
-    /// <param name="node"></param>
-    public void cut(TentacleNode node)
-    {
-        if(view.isMouseDown && data != null)
-        {
-            int count = data.nodeListA.Count;
-            if (data.isAttackA && node.index < count)
-            {
-                if (count < data.count)
-                {
-                    view.retreat(data.indexA, data.indexB, count);
-                }
-                else
-                {
-                    view.retreat(data.indexA, data.indexB, node.index);
-                }
-                return;
-            }
-
-            count = data.nodeListB.Count;
-            if (data.isAttackB && node.index >= data.count - count)
-            {
-                if (count < data.count)
-                {
-                    view.retreat(data.indexB, data.indexA, count);
-                }
-                else
-                {
-                    view.retreat(data.indexB, data.indexA, data.count - node.index - 1);
-                }
             }
         }
     }
