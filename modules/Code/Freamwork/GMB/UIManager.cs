@@ -42,10 +42,6 @@ namespace Freamwork
 
         private UIManager()
         {
-            if (m_instance != null)
-            {
-                throw new Exception("UIManager是单例，请使用UIManager.instance来获取其实例！");
-            }
             m_instance = this;
             init();
         }

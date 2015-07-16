@@ -141,9 +141,19 @@ public class Cell : GMB
     }
     private int m_index = -1;
 
+    /// <summary>
+    /// 细胞数据
+    /// </summary>
+    public CellData cellData
+    {
+        get;
+        private set;
+    }
+
     //===================================更新==========================================
     public void UpdateByData(CellData data)
     {
+        cellData = data;
         camp = data.camp;
         hp = data.hp;
 
@@ -177,7 +187,14 @@ public class Cell : GMB
         //进行攻击或支援
         if (SelectedCell != null && DestCell != null)
         {
-            view.attack(SelectedCell, DestCell);
+            if (SelectedCell.cellData.vo.tentacle > SelectedCell.cellData.tentacleList.Count)
+            {
+                view.attack(SelectedCell, DestCell);
+            }
+            else
+            {
+                PopUpTextManager.instance.addText("<color=red>触手数量已达上限</color>");
+            }
         }
 
         //清除

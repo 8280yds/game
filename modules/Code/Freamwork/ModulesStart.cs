@@ -10,22 +10,19 @@ namespace Freamwork
         /// </summary>
         public static void start()
         {
-            ////测试GMB
-            //var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            //TestMB testMB = new TestMB();
-            //testMB.init(cube);
-            //var sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            //TestMB2 testMB2 = MVCCharge.instance.getInstance(typeof(TestMB2) as ICLRType) as TestMB2;
-            //testMB2.init(sphere);
+            LoadManager.instance.addLoad("cell_war_scene.assets", LoadPriority.two, LoadType.local,
+                null, null, null, null, null, null, unZipSceneEnd);
+        }
 
-            ////测试view
-            //TestView testView = MVCCharge.instance.getInstance(typeof(TestView) as ICLRType) as TestView;
-            //testView.show();
+        private static void unZipSceneEnd(LoadData data)
+        {
+            Application.LoadLevel("cell_war_scene");
 
-            //加载cell资源
             LoadManager.instance.addLoad("cell.assets", LoadPriority.two, LoadType.local,
                 null, null, null, null, null, null, unZipEnd);
             LoadManager.instance.addLoad("node.assets", LoadPriority.two, LoadType.local,
+                null, null, null, null, null, null, unZipEnd);
+            LoadManager.instance.addLoad("popuptext.assets", LoadPriority.two, LoadType.local,
                 null, null, null, null, null, null, unZipEnd);
         }
 
@@ -40,8 +37,13 @@ namespace Freamwork
             {
                 CellWarManager.instance.nodePrefab = go;
             }
+            else if (go.name == "popuptext")
+            {
+                PopUpTextManager.instance.textGO = go;
+            }
 
-            if (CellWarManager.instance.cellPrefab != null && CellWarManager.instance.nodePrefab != null)
+            if (CellWarManager.instance.cellPrefab != null && CellWarManager.instance.nodePrefab != null && 
+                PopUpTextManager.instance.textGO!= null)
             {
                 CellWarView cellWarView = MVCCharge.instance.getInstance(typeof(CellWarView) as ICLRType) as CellWarView;
                 cellWarView.show();

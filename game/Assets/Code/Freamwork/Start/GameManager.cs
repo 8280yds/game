@@ -104,16 +104,34 @@ namespace Freamwork
 
         private void loadStart(LoadData data)
         {
-            
+            if (data.fullName == LoadConstant.MANIFEST_FILE)
+            {
+                GameStart.setProgressData(0, "加载资源列表：");
+            }
         }
 
         private void loadProgress(LoadData data)
         {
-
+            if (data.fullName == LoadConstant.MANIFEST_FILE)
+            {
+                GameStart.setProgressData((int)data.loadProgressNum * 100, "加载资源列表：");
+            }
         }
 
         private void loadEnd(LoadData data)
         {
+            if (data.fullName != LoadConstant.MANIFEST_FILE)
+            {
+                int totleCount = ManifestManager.instance.getAllFullName.Count;
+                int currentCount = BundleLoadManager.instance.getLoadingFullNames().Count;
+                int progress = 100 * currentCount / totleCount;
+                GameStart.setProgressData(progress, "加载资源：");
+            }
+            else
+            {
+                GameStart.setProgressData(0, "加载资源：");
+            }
+
             if (BundleLoadManager.instance.getLoadingFullNames().Count == 0 && 
                 data.fullName != LoadConstant.MANIFEST_FILE)
             {

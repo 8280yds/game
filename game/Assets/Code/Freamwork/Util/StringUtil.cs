@@ -38,5 +38,21 @@ namespace Freamwork
             return str;
         }
 
+        /// <summary>
+        /// 获取路径中的文件名
+        /// </summary>
+        /// <param name="targetStr"></param>
+        /// <returns></returns>
+        public static string getFileName(string targetStr)
+        {
+            string str = getLastStr(targetStr);
+            int index = str.LastIndexOf(".");
+            if (index >= 0)
+            {
+                str = str.Substring(0, index);
+            }
+            return str;
+        }
+
     }
 }
