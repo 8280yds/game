@@ -1,10 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Freamwork
 {
     public abstract class Window : View
     {
+        /// <summary>
+        /// 资源列表
+        /// </summary>
+        private Dictionary<string, UnityEngine.Object> assetsDic;
+
         /// <summary>
         /// 面板是否在准备显示的过程中
         /// </summary>
@@ -26,14 +32,8 @@ namespace Freamwork
         /// <summary>
         /// 显示面板
         /// </summary>
-        /// <param name="assetName">面板对应的资源全名</param>
-        virtual public void show(string assetName = "")
+        virtual public void show()
         {
-            if (string.IsNullOrEmpty(assetName))
-            {
-                throw new Exception(getCLRType.FullName + "的资源名称不能为空，请在show方法中为assetName设置默认参数");
-            }
-
             if (inited)
             {
                 onShow();
@@ -46,15 +46,27 @@ namespace Freamwork
             }
             readyToShow = true;
 
-            LoadManager.instance.addLoad(assetName, LoadPriority.one, LoadType.local, null, null, null,
-                null, null, null, unZipEnd);
+            LoadManager.instance.addLoad(getCLRType.Name.ToLower() + ".assets", LoadPriority.one, LoadType.local,
+                null, null, null, null, null, null, unZipEnd);
         }
 
         private void unZipEnd(LoadData data)
         {
-            GameObject go = GameObject.Instantiate(data.assets[0]) as GameObject;
-            go.name = getCLRType.FullName;
-            init(go);
+            assetsDic = new Dictionary<string, UnityEngine.Object>();
+            GameObject assetsGO = data.assets[0] as GameObject;
+            Assets assets = assetsGO.GetComponent<Assets>();
+            foreach (UnityEngine.Object obj in assets.assetsList)
+            {
+                assetsDic.Add(obj.name, obj);
+            }
+
+            if (data.fullName == getCLRType.Name.ToLower() + ".assets")
+            {
+                GameObject prefab = getAssetsByName(getCLRType.Name) as GameObject;
+                GameObject go = GameObject.Instantiate<GameObject>(prefab);
+                go.name = getCLRType.FullName;
+                init(go);
+            }
         }
 
         public override void init(GameObject gameObject)
@@ -92,6 +104,28 @@ namespace Freamwork
         virtual public void close()
         {
             GameObject.Destroy(gameObject);
+        }
+
+        /// <summary>
+        /// 根据名称获取资源
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        protected UnityEngine.Object getAssetsByName(string name)
+        {
+            if (assetsDic.ContainsKey(name))
+            {
+                return assetsDic[name];
+            }
+            return null;
+        }
+
+        public override void dispose()
+        {
+            assetsDic.Clear();
+            assetsDic = null;
+
+            base.dispose();
         }
 
     }

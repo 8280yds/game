@@ -69,11 +69,6 @@ public class CellWarView : Window
     private CellWarModel m_model;
 
     //============================================================================
-    public override void show(string assetName = "")
-    {
-        base.show("cellwarview.assets");
-    }
-
     protected override void onShow()
     {
         base.onShow();

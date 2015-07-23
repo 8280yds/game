@@ -52,7 +52,7 @@ namespace Freamwork
         private void init()
         {
             //添加canvas
-            GameObject go = new GameObject("UI");
+            GameObject go = new GameObject("UICanvas");
             GameObject.DontDestroyOnLoad(go);
             go.layer = LayerMask.NameToLayer("UI");
             canvas = go.AddComponent<Canvas>();

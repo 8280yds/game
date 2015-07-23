@@ -58,8 +58,9 @@ namespace Freamwork
             }
             ufoTF.anchoredPosition += ufoMoveVector;
 
-            progressBarTF.sizeDelta = new Vector2(600 * _progress / 100, 30f);
-            progressBarTF.anchoredPosition = new Vector2((progressBarTF.sizeDelta.x - 600) / 2, -200);
+            progressBarTF.sizeDelta = new Vector2(400 * _progress / 100, progressBarTF.sizeDelta.y);
+            progressBarTF.anchoredPosition = new Vector2((progressBarTF.sizeDelta.x - 400) / 2, 
+                progressBarTF.anchoredPosition.y);
             progressText.text = _progressStr + _progress + "%";
         }
         private Vector2 ufoMoveVector = new Vector2(0, 0.5f);

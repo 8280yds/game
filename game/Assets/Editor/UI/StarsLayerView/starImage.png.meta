@@ -1,0 +1,200 @@
+fileFormatVersion: 2
+guid: 136ef13f1ed2217428a3a582bd465b2e
+timeCreated: 1437241130
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: star_0
+    21300002: star_1
+    21300004: star_2
+    21300006: star_3
+    21300008: star_4
+    21300010: star_5
+    21300012: star_6
+    21300014: star_7
+    21300016: star_8
+    21300018: star_9
+    21300020: star_10
+    21300022: star_11
+    21300024: star_12
+    21300026: starImage_0
+    21300028: starImage_1
+    21300030: starImage_2
+    21300032: starImage_3
+    21300034: starImage_4
+    21300036: starImage_5
+    21300038: starImage_6
+    21300040: starImage_7
+    21300042: starImage_8
+    21300044: starImage_9
+    21300046: starImage_10
+    21300048: starImage_11
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: starImage_0
+      rect:
+        serializedVersion: 2
+        x: 1
+        y: 749
+        width: 248
+        height: 249
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_1
+      rect:
+        serializedVersion: 2
+        x: 259
+        y: 780
+        width: 214
+        height: 211
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_2
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 781
+        width: 217
+        height: 210
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_3
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 530
+        width: 213
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_4
+      rect:
+        serializedVersion: 2
+        x: 258
+        y: 529
+        width: 216
+        height: 213
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_5
+      rect:
+        serializedVersion: 2
+        x: 510
+        y: 529
+        width: 212
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_6
+      rect:
+        serializedVersion: 2
+        x: 10
+        y: 275
+        width: 213
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_7
+      rect:
+        serializedVersion: 2
+        x: 249
+        y: 249
+        width: 252
+        height: 251
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_8
+      rect:
+        serializedVersion: 2
+        x: 509
+        y: 280
+        width: 215
+        height: 212
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_9
+      rect:
+        serializedVersion: 2
+        x: 11
+        y: 30
+        width: 211
+        height: 211
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_10
+      rect:
+        serializedVersion: 2
+        x: 261
+        y: 32
+        width: 210
+        height: 209
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: starImage_11
+      rect:
+        serializedVersion: 2
+        x: 500
+        y: 34
+        width: 214
+        height: 215
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: star
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

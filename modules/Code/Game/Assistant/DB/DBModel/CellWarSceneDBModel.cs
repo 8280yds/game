@@ -12,5 +12,4 @@ public class CellWarSceneDBModel : DBModel
     {
         return getVoById(id) as CellWarSceneDBVO;
     }
-
 }
