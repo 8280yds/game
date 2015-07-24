@@ -123,6 +123,7 @@ public class LevelView : Window
         {
             descText.text = "文明等级：" + vo.id;
             ufoImage.sprite = getAssetsByName(vo.ufoImage) as Sprite;
+            ufoImage.SetNativeSize();
 
             LevelDBVO vo2 = dbModel.getVOById(model.enemyLevel - 1);
             leftBtn.gameObject.SetActive(vo2 != null);

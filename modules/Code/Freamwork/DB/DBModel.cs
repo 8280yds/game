@@ -34,7 +34,7 @@ namespace Freamwork
             }
             this.voCLRType = voCLRType;
             this.order = order;
-            xmlNode = DBXMLManager.instance().extractXmlNode(sheet);
+            xmlNode = DBXMLManager.instance.extractXmlNode(sheet);
             count = xmlNode.ChildNodes.Count;
             dataDic = new Dictionary<int, object>();
             if (order)

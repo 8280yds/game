@@ -32,8 +32,6 @@ sealed public class PopUpTextManager
     private List<string> textList;
     private int count;
 
-    public GameObject textGO;
-
     private void init()
     {
         textList = new List<string>();
@@ -73,7 +71,8 @@ sealed public class PopUpTextManager
             }
             else
             {
-                GameObject go = GameObject.Instantiate(textGO);
+                GameObject prefab = AssetsManager.instance.getMainUIPrefab("popuptext") as GameObject;
+                GameObject go = GameObject.Instantiate(prefab);
                 RectTransform rectTF = go.transform as RectTransform;
                 rectTF.SetParent(UIManager.instance.getUILayer(UILayer.PopUpLayer), false);
 

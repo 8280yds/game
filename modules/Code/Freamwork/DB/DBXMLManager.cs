@@ -16,13 +16,16 @@ namespace Freamwork
         /// <summary>
         /// 获取实例
         /// </summary>
-        static public DBXMLManager instance()
+        static public DBXMLManager instance
         {
-            if (m_instance == null)
+            get
             {
-                m_instance = new DBXMLManager();
+                if (m_instance == null)
+                {
+                    m_instance = new DBXMLManager();
+                }
+                return m_instance;
             }
-            return m_instance;
         }
 
         private DBXMLManager()
@@ -44,7 +47,7 @@ namespace Freamwork
         /// 初始化
         /// </summary>
         /// <param name="xmlStr"></param>
-        private void init(string xmlStr)
+        public void init(string xmlStr)
         {
             XmlDocument xmlDocument = new XmlDocument();
             xmlDocument.LoadXml(xmlStr);

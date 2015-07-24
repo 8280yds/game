@@ -106,7 +106,7 @@ namespace Freamwork
         {
             if (data.fullName == LoadConstant.MANIFEST_FILE)
             {
-                GameStart.setProgressData(0, "加载资源列表：");
+                GameStart.setProgressData(0, "加载进程：");
             }
         }
 
@@ -114,7 +114,7 @@ namespace Freamwork
         {
             if (data.fullName == LoadConstant.MANIFEST_FILE)
             {
-                GameStart.setProgressData((int)data.loadProgressNum * 100, "加载资源列表：");
+                GameStart.setProgressData((int)data.loadProgressNum * 10, "加载进程：");
             }
         }
 
@@ -124,17 +124,18 @@ namespace Freamwork
             {
                 int totleCount = ManifestManager.instance.getAllFullName.Count;
                 int currentCount = BundleLoadManager.instance.getLoadingFullNames().Count;
-                int progress = 100 * currentCount / totleCount;
-                GameStart.setProgressData(progress, "加载资源：");
+                int progress = 10 + 80 * currentCount / totleCount;
+                GameStart.setProgressData(progress, "加载进程：");
             }
             else
             {
-                GameStart.setProgressData(0, "加载资源：");
+                GameStart.setProgressData(10, "加载进程：");
             }
 
             if (BundleLoadManager.instance.getLoadingFullNames().Count == 0 && 
                 data.fullName != LoadConstant.MANIFEST_FILE)
             {
+                GameStart.setProgressData(90, "加载进程：");
                 LoadManager.instance.addLoad(GameConstant.MODULES + GameConstant.SUFFIX, LoadPriority.zero, LoadType.local,
                     null, null, null, null, unZipStart, unZipProgress, unZipEnd);
             }
@@ -169,22 +170,9 @@ namespace Freamwork
             }
             else if (data.fullName == GameConstant.MODULES + GameConstant.SUFFIX)
             {
+                GameStart.setProgressData(95, "加载进程：");
                 //加载并解压dll文件包结束
                 CLRSharpManager.instance.init(data.assets[0] as TextAsset);
-                LoadManager.instance.addLoad(LoadConstant.DB_FILE, LoadPriority.zero, LoadType.local,
-                    null, null, null, null, unZipStart, unZipProgress, unZipEnd);
-            }
-            else if (data.fullName == LoadConstant.DB_FILE)
-            {
-                //db加载并解压结束,将字符串交给DBXMLManager管理
-                //调用DBXMLManager.instance.init(data.assets[0] as TextAsset).text);
-                CLRSharpManager clrmana = CLRSharpManager.instance;
-                ICLRType clrType = clrmana.getCLRType("Freamwork.DBXMLManager");
-                object inst = clrmana.Invoke(clrType, "instance");
-                MethodParamList list = clrmana.getParamTypeList(typeof(string));
-                object[] param = new object[] { (data.assets[0] as TextAsset).text };
-                clrmana.Invoke(clrType, "init", inst, list, param);
-
                 //开启模块
                 startModules();
             }
