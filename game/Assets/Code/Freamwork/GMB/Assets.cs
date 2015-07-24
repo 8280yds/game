@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
-[DisallowMultipleComponent]
-public class Assets : MonoBehaviour
+namespace Freamwork
 {
-    public Object[] assetsList;
+    [DisallowMultipleComponent]
+    public class Assets : MonoBehaviour
+    {
+        public List<Object> assetsList = new List<Object>();
+    }
 }
