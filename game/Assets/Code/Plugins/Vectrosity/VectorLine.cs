@@ -403,6 +403,14 @@ public class VectorLine {
 		}
 	}
 	static Dictionary<string, CapInfo> capDictionary;
+
+    public void SetParent(Transform tf, bool worldPositionStays = true)
+    {
+        if (m_vectorObject.transform.parent != tf)
+        {
+            m_vectorObject.transform.SetParent(tf, worldPositionStays);
+        }
+    }
 	
 	void AddColliderIfNeeded () {
 		if (m_vectorObject.GetComponent<Collider2D>() == null) {
@@ -412,71 +420,71 @@ public class VectorLine {
 	}
 	
 	// Vector3 constructors
-    public VectorLine(string lineName, Vector3[] linePoints, float width)
+    public VectorLine(string lineName, Vector3[] linePoints, float width, Transform parent)
     {
         m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, false, false, m_points3.Count);
+        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, false, false, m_points3.Count, parent);
     }
-    public VectorLine(string lineName, List<Vector3> linePoints, float width)
+    public VectorLine(string lineName, List<Vector3> linePoints, float width, Transform parent)
     {
         m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, false, false, m_points3.Count);
-    }
-
-    public VectorLine(string lineName, Vector3[] linePoints, float width, LineType lineType)
-    {
-        m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, lineType, Joins.None, false, false, m_points3.Count);
-    }
-    public VectorLine(string lineName, List<Vector3> linePoints, float width, LineType lineType)
-    {
-        m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, lineType, Joins.None, false, false, m_points3.Count);
+        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, false, false, m_points3.Count, parent);
     }
 
-    public VectorLine(string lineName, Vector3[] linePoints, float width, LineType lineType, Joins joins)
+    public VectorLine(string lineName, Vector3[] linePoints, float width, LineType lineType, Transform parent)
     {
         m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, lineType, joins, false, false, m_points3.Count);
+        SetupLine(lineName, null, width, lineType, Joins.None, false, false, m_points3.Count, parent);
     }
-    public VectorLine(string lineName, List<Vector3> linePoints, float width, LineType lineType, Joins joins)
+    public VectorLine(string lineName, List<Vector3> linePoints, float width, LineType lineType, Transform parent)
     {
         m_points3 = new List<Vector3>(linePoints);
-        SetupLine(lineName, null, width, lineType, joins, false, false, m_points3.Count);
+        SetupLine(lineName, null, width, lineType, Joins.None, false, false, m_points3.Count, parent);
+    }
+
+    public VectorLine(string lineName, Vector3[] linePoints, float width, LineType lineType, Joins joins, Transform parent)
+    {
+        m_points3 = new List<Vector3>(linePoints);
+        SetupLine(lineName, null, width, lineType, joins, false, false, m_points3.Count, parent);
+    }
+    public VectorLine(string lineName, List<Vector3> linePoints, float width, LineType lineType, Joins joins, Transform parent)
+    {
+        m_points3 = new List<Vector3>(linePoints);
+        SetupLine(lineName, null, width, lineType, joins, false, false, m_points3.Count, parent);
     }
 
     // Vector2 constructors
-    public VectorLine(string lineName, Vector2[] linePoints, float width)
+    public VectorLine(string lineName, Vector2[] linePoints, float width, Transform parent)
     {
         m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, true, false, m_points2.Count);
+        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, true, false, m_points2.Count, parent);
     }
-    public VectorLine(string lineName, List<Vector2> linePoints, float width)
+    public VectorLine(string lineName, List<Vector2> linePoints, float width, Transform parent)
     {
         m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, true, false, m_points2.Count);
-    }
-
-    public VectorLine(string lineName, Vector2[] linePoints, float width, LineType lineType)
-    {
-        m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, lineType, Joins.None, true, false, m_points2.Count);
-    }
-    public VectorLine(string lineName, List<Vector2> linePoints, float width, LineType lineType)
-    {
-        m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, lineType, Joins.None, true, false, m_points2.Count);
+        SetupLine(lineName, null, width, LineType.Discrete, Joins.None, true, false, m_points2.Count, parent);
     }
 
-    public VectorLine(string lineName, Vector2[] linePoints, float width, LineType lineType, Joins joins)
+    public VectorLine(string lineName, Vector2[] linePoints, float width, LineType lineType, Transform parent)
     {
         m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, lineType, joins, true, false, m_points2.Count);
+        SetupLine(lineName, null, width, lineType, Joins.None, true, false, m_points2.Count, parent);
     }
-    public VectorLine(string lineName, List<Vector2> linePoints, float width, LineType lineType, Joins joins)
+    public VectorLine(string lineName, List<Vector2> linePoints, float width, LineType lineType, Transform parent)
     {
         m_points2 = new List<Vector2>(linePoints);
-        SetupLine(lineName, null, width, lineType, joins, true, false, m_points2.Count);
+        SetupLine(lineName, null, width, lineType, Joins.None, true, false, m_points2.Count, parent);
+    }
+
+    public VectorLine(string lineName, Vector2[] linePoints, float width, LineType lineType, Joins joins, Transform parent)
+    {
+        m_points2 = new List<Vector2>(linePoints);
+        SetupLine(lineName, null, width, lineType, joins, true, false, m_points2.Count, parent);
+    }
+    public VectorLine(string lineName, List<Vector2> linePoints, float width, LineType lineType, Joins joins, Transform parent)
+    {
+        m_points2 = new List<Vector2>(linePoints);
+        SetupLine(lineName, null, width, lineType, joins, true, false, m_points2.Count, parent);
     }
 
     //=========================================================================================================
@@ -554,7 +562,9 @@ public class VectorLine {
 		SetupLine (lineName, lineMaterial, width, LineType.Continuous, Joins.None, true, true, m_points2.Count);
 	}
 	
-	protected void SetupLine (string lineName, Material useMaterial, float width, LineType lineType, Joins joins, bool use2D, bool usePoints, int count) {	
+	protected void SetupLine (string lineName, Material useMaterial, float width, LineType lineType, Joins joins, 
+        bool use2D, bool usePoints, int count, Transform parent = null) 
+    {
 		m_continuous = (lineType == LineType.Continuous);
 		m_is2D = use2D;
 		m_isPoints = usePoints;
@@ -586,8 +596,12 @@ public class VectorLine {
 		if (_canvas == null) {
 			SetCanvas();
 		}
+        if(parent == null)
+        {
+            parent = _canvas.transform;
+        }
 		m_vectorObject = new GameObject(name);
-		m_vectorObject.transform.SetParent (_canvas.transform, false);
+        SetParent(parent, false);
 		m_on2DCanvas = true;
 		m_canvasRenderer = m_vectorObject.AddComponent<CanvasRenderer>();
 		m_canvasRenderer.SetMaterial (m_material, null);
@@ -892,7 +906,7 @@ public class VectorLine {
 	
 	static void SetCanvas () {
         //改为设置成UI的鼠标绘制层
-        GameObject uiGo = GameObject.Find("UI");
+        GameObject uiGo = GameObject.Find("UICanvas");
         if (uiGo != null)
         {
             _canvas = uiGo.GetComponent<Canvas>();

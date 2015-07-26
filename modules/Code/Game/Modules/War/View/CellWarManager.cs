@@ -24,8 +24,8 @@ sealed public class CellWarManager
 
     private List<TentacleNode> nodePool;
 
-    public GameObject cellPrefab;
-    public GameObject nodePrefab;
+    private GameObject cellPrefab;
+    private GameObject nodePrefab;
 
     private void init()
     {
@@ -45,6 +45,17 @@ sealed public class CellWarManager
     }
 
     //======================================================
+    /// <summary>
+    /// 设置prefab
+    /// </summary>
+    /// <param name="cellPrefab"></param>
+    /// <param name="nodePrefab"></param>
+    public void setPrefab(GameObject cellPrefab, GameObject nodePrefab)
+    {
+        this.cellPrefab = cellPrefab;
+        this.nodePrefab = nodePrefab;
+    }
+
     /// <summary>
     /// 添加触手单元
     /// </summary>

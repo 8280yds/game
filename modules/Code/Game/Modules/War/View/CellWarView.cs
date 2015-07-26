@@ -73,10 +73,10 @@ public class CellWarView : Window
     {
         base.onShow();
 
+        CellWarManager.instance.setPrefab(getAssetsByName("cell") as GameObject, getAssetsByName("node") as GameObject);
         cellList = new List<Cell>();
         tentacleDic = new Dictionary<string, Tentacle>();
-
-        initScene(1);
+        initScene((int)windowParam);
     }
 
     /// <summary>
@@ -108,7 +108,7 @@ public class CellWarView : Window
         }
 
         //初始化鼠标指挥线
-        mouseLine = new VectorLine("MouseLine", new List<Vector2>(), 5f, LineType.Continuous);
+        mouseLine = new VectorLine("MouseLine", new List<Vector2>(), 5f, LineType.Continuous, transform);
         mouseLine.color = Color.red;
         mouseLinePointTime = new List<long>();
     }
@@ -377,7 +377,7 @@ public class CellWarView : Window
         CellData cellDataA;
         CellData cellDataB;
 
-        foreach(TentacleData data in viewStatus.tentacleDataDic.Values)
+        foreach (TentacleData data in viewStatus.tentacleDataDic.Values)
         {
             if (data.cutStatus == CutStatus.NONE)
             {

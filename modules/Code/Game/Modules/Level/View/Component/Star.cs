@@ -47,13 +47,10 @@ public class Star : GMB
     {
         base.OnPointerClick(eventData);
 
-        CellWarSceneDBModel cellWarSceneDBModel = 
-            MVCCharge.instance.getInstance(typeof(CellWarSceneDBModel) as ICLRType) as CellWarSceneDBModel;
-        CellWarSceneDBVO vo = cellWarSceneDBModel.getVOById(warId);
-        if (vo != null)
-        {
-            Debug.Log("进入战场" + vo.id);
-        }
+        CellWarView view = MVCCharge.instance.getInstance(typeof(CellWarView) as ICLRType) as CellWarView;
+        view.show(warId);
+        StarsLayerView starsLayerView = MVCCharge.instance.getInstance(typeof(StarsLayerView) as ICLRType) as StarsLayerView;
+        starsLayerView.close();
     }
     
 }

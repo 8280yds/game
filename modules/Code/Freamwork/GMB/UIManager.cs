@@ -73,8 +73,7 @@ namespace Freamwork
             //uiCamera.renderingPath = RenderingPath.VertexLit;
             
             //添加EventSystem
-            go = new GameObject("_EventSystem");
-            go.transform.SetParent(canvas.transform, false);
+            go = new GameObject("EventSystem");
             eventSystem = go.AddComponent<EventSystem>();
             go.AddComponent<TouchInputModule>();
             if (Application.isEditor)

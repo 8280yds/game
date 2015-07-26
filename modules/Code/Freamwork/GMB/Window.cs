@@ -4,12 +4,20 @@ using UnityEngine;
 
 namespace Freamwork
 {
+    /// <summary>
+    /// 窗口面板基类
+    /// </summary>
     public abstract class Window : View
     {
         /// <summary>
         /// 资源列表
         /// </summary>
         private Dictionary<string, UnityEngine.Object> assetsDic;
+
+        /// <summary>
+        /// 面板参数
+        /// </summary>
+        protected object windowParam;
 
         /// <summary>
         /// 面板是否在准备显示的过程中
@@ -32,8 +40,10 @@ namespace Freamwork
         /// <summary>
         /// 显示面板
         /// </summary>
-        virtual public void show()
+        virtual public void show(object windowParam = null)
         {
+            this.windowParam = windowParam;
+
             if (inited)
             {
                 onShow();
@@ -124,6 +134,7 @@ namespace Freamwork
         {
             assetsDic.Clear();
             assetsDic = null;
+            windowParam = null;
 
             base.dispose();
         }
