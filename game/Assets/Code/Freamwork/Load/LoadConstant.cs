@@ -1,4 +1,6 @@
-﻿namespace Freamwork
+﻿using UnityEngine;
+
+namespace Freamwork
 {
     /// <summary>
     /// <para>加载优先级，可以根据需要添加或删减，数字越小越优先加载</para>
@@ -55,6 +57,17 @@
         /// cdn地址
         /// </summary>
         public const string CDN = "http://192.168.1.105/Bundles/";
+
+        /// <summary>
+        /// 本地加载文件存储地址
+        /// </summary>
+        public static string localFilesPath
+        {
+            get
+            {
+                return Application.persistentDataPath;
+            }
+        }
 
         /// <summary>
         /// 最大同时加载的数量

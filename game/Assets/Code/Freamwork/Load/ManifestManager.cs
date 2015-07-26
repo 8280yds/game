@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Xml;
 using UnityEngine;
+using System.IO;
 
 namespace Freamwork
 {
@@ -29,10 +30,6 @@ namespace Freamwork
 
         private ManifestManager()
         {
-            if (m_instance != null)
-            {
-                throw new Exception("ManifestManager是单例，请使用ManifestManager.instance来获取其实例！");
-            }
             m_instance = this;
         }
 
@@ -74,7 +71,7 @@ namespace Freamwork
         /// <summary>
         /// 初始化
         /// </summary>
-        public void init(LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null,
+        public void init(string url, LoadFunctionDele loadStart = null, LoadFunctionDele loadProgress = null,
             LoadFunctionDele loadEnd = null, LoadFunctionDele loadFail = null, LoadFunctionDele unZipStart = null,
             LoadFunctionDele unZipProgress = null, LoadFunctionDele unZipEnd = null)
         {
@@ -96,7 +93,7 @@ namespace Freamwork
             m_unZipEnd = unZipEnd;
 
             EnterFrame.instance.addEnterFrame(enterframe);
-            www = new WWW(LoadConstant.CDN + LoadConstant.MANIFEST_FILE);
+            www = new WWW(url);
             if (m_loadStart != null)
             {
                 m_loadStart(LoadData.getLoadData(LoadConstant.MANIFEST_FILE));
@@ -114,14 +111,17 @@ namespace Freamwork
                 if (!string.IsNullOrEmpty(www.error))
                 {
                     Debug.LogWarning(LoadConstant.MANIFEST_FILE + "加载失败：" + www.error);
-                    EnterFrame.instance.removeEnterFrame(enterframe);
 
-                    if (m_loadFail != null)
-                    {
-                        m_loadFail(LoadData.getLoadData(LoadConstant.MANIFEST_FILE, www.progress, www.error));
-                    }
-                    www.Dispose();
+                    LoadFunctionDele _loadFail = m_loadFail;
+                    WWW _www = www;
+                    clear();
                     www = null;
+
+                    if (_loadFail != null)
+                    {
+                        _loadFail(LoadData.getLoadData(LoadConstant.MANIFEST_FILE, _www.progress, _www.error));
+                    }
+                    _www.Dispose();
                     return;
                 }
 
@@ -129,6 +129,13 @@ namespace Freamwork
                 if (www.isDone)
                 {
                     Debug.Log(LoadConstant.MANIFEST_FILE + "加载完成");
+
+                    //存入本地
+                    if (www.url.Contains(LoadConstant.CDN))
+                    {
+                        File.WriteAllBytes(LoadConstant.localFilesPath + "/" + LoadConstant.MANIFEST_FILE, www.bytes);
+                    }
+
                     if (m_loadEnd != null)
                     {
                         m_loadEnd(LoadData.getLoadData(LoadConstant.MANIFEST_FILE, 1));
@@ -238,10 +245,21 @@ namespace Freamwork
         /// </summary>
         public void clear()
         {
-            dic.Clear();
-            dic = null;
+            if (dic != null)
+            {
+                dic.Clear();
+                dic = null;
+            }
             m_isInit = false;
             EnterFrame.instance.removeEnterFrame(enterframe);
+
+            m_loadStart = null;
+            m_loadProgress = null;
+            m_loadEnd = null;
+            m_loadFail = null;
+            m_unZipStart = null;
+            m_unZipProgress = null;
+            m_unZipEnd = null;
         }
 
     }

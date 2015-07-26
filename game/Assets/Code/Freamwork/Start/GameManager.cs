@@ -32,10 +32,6 @@ namespace Freamwork
 
         private GameManager()
         {
-            if (m_instance != null)
-            {
-                throw new Exception("GameManager是单例，请使用GameManager.instance来获取其实例！");
-            }
             m_instance = this;
             init();
         }
@@ -99,7 +95,8 @@ namespace Freamwork
             Resources.UnloadUnusedAssets();
             GC.Collect();
 
-            ManifestManager.instance.init(loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
+            ManifestManager.instance.init(LoadConstant.CDN + LoadConstant.MANIFEST_FILE, 
+                loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
         }
 
         private void loadStart(LoadData data)
@@ -143,7 +140,13 @@ namespace Freamwork
 
         private void loadFail(LoadData data)
         {
-            
+            if (data.fullName == LoadConstant.MANIFEST_FILE)
+            {
+                Debug.Log(LoadConstant.MANIFEST_FILE + "网络加载失败，放弃更新！");
+
+                string url = LoadConstant.LOCAL_TITLE + LoadConstant.localFilesPath + "/" + LoadConstant.MANIFEST_FILE;
+                ManifestManager.instance.init(url, loadStart, loadProgress, loadEnd, loadFail, unZipStart, unZipProgress, unZipEnd);
+            }
         }
 
         private void unZipStart(LoadData data)
