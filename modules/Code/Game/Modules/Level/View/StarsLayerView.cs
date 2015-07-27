@@ -3,10 +3,19 @@ using Freamwork;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using Vectrosity;
 
 public class StarsLayerView : Window
 {
+    /// <summary>
+    /// 星球列表
+    /// </summary>
     private List<Star> starsList;
+
+    /// <summary>
+    /// 连线
+    /// </summary>
+    private VectorPoints vectorPoints;
 
     private Button backBtn
     {
@@ -65,6 +74,17 @@ public class StarsLayerView : Window
 
     private void updateView()
     {
+        if (vectorPoints == null)
+        {
+            vectorPoints = new VectorPoints("VectorPoints", new List<Vector2>(), 5f, transform);
+            //vectorPoints.material = getAssetsByName("PointMaterial") as Material;
+            vectorPoints.color = Color.green;
+        }
+        else
+        {
+            vectorPoints.points2.Clear();
+        }
+
         LevelDBVO dbvo = dbModel.getVOById(model.enemyLevel);
         char[] ch = new char[] { ',' };
         string[] starX = dbvo.starX.Split(ch);
@@ -92,6 +112,43 @@ public class StarsLayerView : Window
             star.setData(int.Parse(starX[i]), int.Parse(starY[i]), sp, int.Parse(war[i]), "★★☆");
             starsList.Add(star);
         }
+
+        string[] nextList;
+        Vector3 pointA;
+        Vector3 pointB;
+        ch = new char[] { ':' };
+        for (int i = 0; i < len; i++)
+        {
+            pointA = starsList[i].rectTransform.anchoredPosition;
+            nextList = next[i].Split(ch);
+            for (int j = 0, len2 = nextList.Length; j < len2; j++)
+            {
+                int index = int.Parse(nextList[j]);
+                if (index>0)
+                {
+                    pointB = starsList[index].rectTransform.anchoredPosition;
+                    vectorPoints.points2.AddRange(getPointList(pointA, pointB));
+                }
+            }
+        }
+        vectorPoints.Draw();
+    }
+
+    private List<Vector2> getPointList(Vector2 pointA, Vector2 PointB)
+    {
+        List<Vector2> list = new List<Vector2>();
+        float d = 10;   //点间距
+        float D = Vector2.Distance(pointA, PointB);
+        float count = D / d;
+        float kx = d * (PointB.x - pointA.x) / D;
+        float ky = d * (PointB.y - pointA.y) / D;
+
+        list.Add(pointA);
+        for (int i = 1; i <= count; i++)
+        {
+            list.Add(new Vector2(pointA.x + kx * i, pointA.y + ky * i));
+        }
+        return list;
     }
 
     private void clearStars()

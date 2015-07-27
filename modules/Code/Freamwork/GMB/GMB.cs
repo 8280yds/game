@@ -71,6 +71,17 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// rectTransform
+        /// </summary>
+        public RectTransform rectTransform
+        {
+            get
+            {
+                return gmb.transform as RectTransform;
+            }
+        }
+
+        /// <summary>
         /// C#的GMonoBehaviour脚本实例
         /// </summary>
         public GMonoBehaviour gmb

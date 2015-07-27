@@ -418,8 +418,9 @@ public class VectorLine {
 			m_vectorObject.GetComponent<Collider2D>().isTrigger = m_trigger;
 		}
 	}
-	
-	// Vector3 constructors
+
+    //===========================================================================================
+	// Vector3 constructors(改造后)
     public VectorLine(string lineName, Vector3[] linePoints, float width, Transform parent)
     {
         m_points3 = new List<Vector3>(linePoints);
@@ -488,6 +489,7 @@ public class VectorLine {
     }
 
     //=========================================================================================================
+    // Vector3 constructors
 	public VectorLine (string lineName, Vector3[] linePoints, Material lineMaterial, float width) {
 		m_points3 = new List<Vector3>(linePoints);
 		SetupLine (lineName, lineMaterial, width, LineType.Discrete, Joins.None, false, false, m_points3.Count);
@@ -560,6 +562,26 @@ public class VectorLine {
 	protected VectorLine (bool usePoints, string lineName, List<Vector2> linePoints, Material lineMaterial, float width) {
 		m_points2 = new List<Vector2>(linePoints);
 		SetupLine (lineName, lineMaterial, width, LineType.Continuous, Joins.None, true, true, m_points2.Count);
+	}
+
+    //==========================================================================================================
+    // Points constructors（改造后）
+	protected VectorLine (bool usePoints, string lineName, Vector3[] linePoints, float width, Transform parent) {
+		m_points3 = new List<Vector3>(linePoints);
+		SetupLine (lineName, null, width, LineType.Continuous, Joins.None, false, true, m_points3.Count, parent);
+	}
+	protected VectorLine (bool usePoints, string lineName, List<Vector3> linePoints, float width, Transform parent) {
+		m_points3 = new List<Vector3>(linePoints);
+		SetupLine (lineName, null, width, LineType.Continuous, Joins.None, false, true, m_points3.Count, parent);
+	}
+	
+	protected VectorLine (bool usePoints, string lineName, Vector2[] linePoints, float width, Transform parent) {
+		m_points2 = new List<Vector2>(linePoints);
+		SetupLine (lineName, null, width, LineType.Continuous, Joins.None, true, true, m_points2.Count, parent);
+	}
+	protected VectorLine (bool usePoints, string lineName, List<Vector2> linePoints, float width, Transform parent) {
+		m_points2 = new List<Vector2>(linePoints);
+		SetupLine (lineName, null, width, LineType.Continuous, Joins.None, true, true, m_points2.Count, parent);
 	}
 	
 	protected void SetupLine (string lineName, Material useMaterial, float width, LineType lineType, Joins joins, 
@@ -3572,12 +3594,21 @@ public class VectorLine {
 	}
 }
 
-public class VectorPoints : VectorLine {
-	public VectorPoints (string name, Vector2[] points, Material material, float width) : base (true, name, points, material, width) {}
-	public VectorPoints (string name, List<Vector2> points, Material material, float width) : base (true, name, points, material, width) {}
+public class VectorPoints : VectorLine
+{
+    //============================================================================================
+    //改造后
+    public VectorPoints(string name, Vector2[] points, float width, Transform parent) : 
+        base(true, name, points, width, parent) { }
+    public VectorPoints(string name, List<Vector2> points, float width, Transform parent) : 
+        base(true, name, points, width,parent) { }
 
-	public VectorPoints (string name, Vector3[] points, Material material, float width) : base (true, name, points, material, width) {}
-	public VectorPoints (string name, List<Vector3> points, Material material, float width) : base (true, name, points, material, width) {}
+    //======================================================================================================================
+    public VectorPoints(string name, Vector2[] points, Material material, float width) : base(true, name, points, material, width) { }
+    public VectorPoints(string name, List<Vector2> points, Material material, float width) : base(true, name, points, material, width) { }
+
+    public VectorPoints(string name, Vector3[] points, Material material, float width) : base(true, name, points, material, width) { }
+    public VectorPoints(string name, List<Vector3> points, Material material, float width) : base(true, name, points, material, width) { }
 }
 
 public struct Vector3Pair {

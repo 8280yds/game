@@ -5,7 +5,7 @@ public class CellWarModel : Model
     /// <summary>
     /// 最后一次操作后的状态
     /// </summary>
-    private ViewStatus lastActionViewStatus;
+    //private ViewStatus lastActionViewStatus;
 
     /// <summary>
     /// 最后一次更新后的状态
@@ -45,11 +45,17 @@ public class CellWarModel : Model
             return;
         }
 
-        if (actionData != null && actionData.time >= lastActionViewStatus.time)
+        //if (actionData != null && actionData.time >= lastActionViewStatus.time)
+        //{
+        //    lastActionViewStatus.doNext(actionData.time);
+        //    lastActionViewStatus.doAction(actionData);
+        //    lastUpdateViewStatus = lastActionViewStatus.clone();
+        //}
+
+        if (actionData != null)
         {
-            lastActionViewStatus.doNext(actionData.time);
-            lastActionViewStatus.doAction(actionData);
-            lastUpdateViewStatus = lastActionViewStatus.clone();
+            lastUpdateViewStatus.doNext(actionData.time);
+            lastUpdateViewStatus.doAction(actionData);
         }
 
         lastUpdateViewStatus.doNext(getCurrentTime());
@@ -80,7 +86,7 @@ public class CellWarModel : Model
 
         beginTime = TimeUtil.getTimeStamp(false);
         lastUpdateViewStatus = new ViewStatus(sceneDBVO);
-        lastActionViewStatus = new ViewStatus(sceneDBVO);
+        //lastActionViewStatus = new ViewStatus(sceneDBVO);
     }
 
     /// <summary>
@@ -91,7 +97,7 @@ public class CellWarModel : Model
         gameBegin = false;
         beginTime = 0;
         lastUpdateViewStatus = null;
-        lastActionViewStatus = null;
+        //lastActionViewStatus = null;
         actionData = null;
     }
 
