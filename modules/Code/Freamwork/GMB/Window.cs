@@ -62,16 +62,21 @@ namespace Freamwork
 
         private void unZipEnd(LoadData data)
         {
-            assetsDic = new Dictionary<string, UnityEngine.Object>();
-            GameObject assetsGO = data.assets[0] as GameObject;
-            Assets assets = assetsGO.GetComponent<Assets>();
-            foreach (UnityEngine.Object obj in assets.assetsList)
-            {
-                assetsDic.Add(obj.name, obj);
-            }
-
             if (data.fullName == getCLRType.Name.ToLower() + ".assets")
             {
+                GameObject assetsGO = data.assets[0] as GameObject;
+                Assets assets = assetsGO.GetComponent<Assets>();
+                if (assets == null)
+                {
+                    throw new Exception(getCLRType.FullName + "面板资源包中不存在Assets组件");
+                }
+
+                assetsDic = new Dictionary<string, UnityEngine.Object>();
+                foreach (UnityEngine.Object obj in assets.assetsList)
+                {
+                    assetsDic.Add(obj.name, obj);
+                }
+
                 GameObject prefab = getAssetsByName(getCLRType.Name) as GameObject;
                 GameObject go = GameObject.Instantiate<GameObject>(prefab);
                 go.name = getCLRType.FullName;

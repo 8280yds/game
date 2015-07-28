@@ -1,4 +1,5 @@
-﻿using Freamwork;
+﻿using CLRSharp;
+using Freamwork;
 
 public class CellWarModel : Model
 {
@@ -56,14 +57,54 @@ public class CellWarModel : Model
         {
             lastUpdateViewStatus.doNext(actionData.time);
             lastUpdateViewStatus.doAction(actionData);
+            actionData = null;
         }
-
         lastUpdateViewStatus.doNext(getCurrentTime());
-
-        actionData = null;
         dispatch(CellWarUpdate.UPDATE_VIEW_STATUS);
 
-        //??在此处可以判断胜利
+        //在此处判断胜利========================
+        int count = 0;
+        foreach (CellData data in lastUpdateViewStatus.cellDataList)
+        {
+            if (data.camp == Camp.GREEN)
+            {
+                count++;
+            }
+        }
+
+        int starNum = 0;
+        int time = lastUpdateViewStatus.time / 1000;
+
+        if(count == 0)  //失败
+        {
+            starNum = 0;
+        }
+        else if (count == lastUpdateViewStatus.cellDataList.Count)  //胜利
+        {
+            string[] starTimes = lastUpdateViewStatus.vo.star.Split(new char[] { ',' });
+            if (time < int.Parse(starTimes[0]))
+            {
+                starNum = 3;
+            }
+            else if (time < int.Parse(starTimes[1]))
+            {
+                starNum = 2;
+            }
+            else
+            {
+                starNum = 1;
+            }
+        }
+        else
+        {
+            return;
+        }
+
+        WarResultModel model = mvcCharge.getInstance(typeof(WarResultModel) as ICLRType) as WarResultModel;
+        model.starNum = starNum;
+        model.time = time;
+        //model.optionNum = optionNum;
+        dispatch(CellWarUpdate.GAME_OVER);
     }
 
     /// <summary>

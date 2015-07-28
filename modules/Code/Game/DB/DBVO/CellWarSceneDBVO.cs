@@ -23,6 +23,11 @@ public class CellWarSceneDBVO : DBVO
 	/// </summary>
 	public string cellY;
 
+	/// <summary>
+	/// 星级(时间S)
+	/// </summary>
+	public string star;
+
 	public override void xmlToVo(XmlNode node)
 	{
 		XmlElement xmlelement = (XmlElement)node;
@@ -31,5 +36,6 @@ public class CellWarSceneDBVO : DBVO
 		cellHP = xmlelement.GetAttribute("cellHP");
 		cellX = xmlelement.GetAttribute("cellX");
 		cellY = xmlelement.GetAttribute("cellY");
+		star = xmlelement.GetAttribute("star");
 	}
 }

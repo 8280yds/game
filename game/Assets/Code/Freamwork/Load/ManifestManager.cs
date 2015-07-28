@@ -224,9 +224,13 @@ namespace Freamwork
         /// 获取依赖列表(不包含本身)
         /// </summary>
         /// <param name="fullName"></param>
-        /// <returns></returns>
+        /// <returns>null:不存在该manifest信息; 空数组：没有依赖; 其他返回依赖列表</returns>
         public List<string> getAllDependencies(string fullName)
         {
+            if (!dic.ContainsKey(fullName))
+            {
+                return null;
+            }
             ManifestVO vo = dic[fullName];
             if (vo.deps.Length == 0)
             {

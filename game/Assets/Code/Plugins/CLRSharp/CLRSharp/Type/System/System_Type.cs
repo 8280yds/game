@@ -258,145 +258,151 @@ namespace CLRSharp
         }
         public object Invoke(ThreadContext context, object _this, object[] _params)
         {
-            if (_this is CLRSharp_Instance)
+            try
             {
-                CLRSharp_Instance inst = _this as CLRSharp_Instance;
-                if (inst.type.HasSysBase)
+                if (_this is CLRSharp_Instance)
                 {
-                    var btype = inst.type.ContainBase(method_System.DeclaringType);
-                    if (btype)
+                    CLRSharp_Instance inst = _this as CLRSharp_Instance;
+                    if (inst.type.HasSysBase)
                     {
-                        var CrossBind = context.environment.GetCrossBind(method_System.DeclaringType);
-                        if (CrossBind != null)
+                        var btype = inst.type.ContainBase(method_System.DeclaringType);
+                        if (btype)
                         {
-                            _this = CrossBind.CreateBind(inst);
+                            var CrossBind = context.environment.GetCrossBind(method_System.DeclaringType);
+                            if (CrossBind != null)
+                            {
+                                _this = CrossBind.CreateBind(inst);
+                            }
+                            else
+                            {
+                                _this = (_this as CLRSharp_Instance).system_base;
+                                //如果没有绑定器，尝试直接使用System_base;
+                            }
+                            //context.environment.logger.Log("这里有一个需要映射的类型");
                         }
-                        else
-                        {
-                            _this = (_this as CLRSharp_Instance).system_base;
-                            //如果没有绑定器，尝试直接使用System_base;
-                        }
-                        //context.environment.logger.Log("这里有一个需要映射的类型");
                     }
                 }
-            }
-            //委托是很特殊的存在
-            //if(this.DeclaringType.IsDelegate)
-            //{
+                //委托是很特殊的存在
+                //if(this.DeclaringType.IsDelegate)
+                //{
 
-            //}
-            if (method_System is System.Reflection.ConstructorInfo)
-            {
-                if (method_System.DeclaringType.IsSubclassOf(typeof(Delegate)))
-                {//创建委托
-                    object src = _params[0];
-                    RefFunc fun = _params[1] as RefFunc;
-                    ICLRType_Sharp clrtype = fun._method.DeclaringType as ICLRType_Sharp;
-                    if (clrtype != null)//onclr
-                    {
-
-                        CLRSharp_Instance inst = src as CLRSharp_Instance;
-                        if (fun._method.isStatic && clrtype != null)
-                            inst = clrtype.staticInstance;
-                        return inst.GetDelegate(context, method_System.DeclaringType, fun._method);
-                    }
-                    else//onsystem
-                    {
-                        ICLRType_System stype = fun._method.DeclaringType as ICLRType_System;
-                        return stype.CreateDelegate(method_System.DeclaringType, src, fun._method as IMethod_System);
-                    }
-                }
-                object[] _outp = null;
-                if (_params != null && _params.Length > 0)
+                //}
+                if (method_System is System.Reflection.ConstructorInfo)
                 {
-                    _outp = new object[_params.Length];
-                    var _paramsdef = method_System.GetParameters();
-                    for (int i = 0; i < _params.Length; i++)
+                    if (method_System.DeclaringType.IsSubclassOf(typeof(Delegate)))
+                    {//创建委托
+                        object src = _params[0];
+                        RefFunc fun = _params[1] as RefFunc;
+                        ICLRType_Sharp clrtype = fun._method.DeclaringType as ICLRType_Sharp;
+                        if (clrtype != null)//onclr
+                        {
+
+                            CLRSharp_Instance inst = src as CLRSharp_Instance;
+                            if (fun._method.isStatic && clrtype != null)
+                                inst = clrtype.staticInstance;
+                            return inst.GetDelegate(context, method_System.DeclaringType, fun._method);
+                        }
+                        else//onsystem
+                        {
+                            ICLRType_System stype = fun._method.DeclaringType as ICLRType_System;
+                            return stype.CreateDelegate(method_System.DeclaringType, src, fun._method as IMethod_System);
+                        }
+                    }
+                    object[] _outp = null;
+                    if (_params != null && _params.Length > 0)
                     {
-                        if (_params[i] == null)
-                            _outp[i] = null;
-                        Type tsrc = _params[i].GetType();
-                        Type ttarget = _paramsdef[i].ParameterType;
-                        if (tsrc == ttarget)
+                        _outp = new object[_params.Length];
+                        var _paramsdef = method_System.GetParameters();
+                        for (int i = 0; i < _params.Length; i++)
                         {
-                            _outp[i] = _params[i];
+                            if (_params[i] == null)
+                                _outp[i] = null;
+                            Type tsrc = _params[i].GetType();
+                            Type ttarget = _paramsdef[i].ParameterType;
+                            if (tsrc == ttarget)
+                            {
+                                _outp[i] = _params[i];
+                            }
+                            else if (tsrc.IsSubclassOf(ttarget))
+                            {
+                                _outp[i] = _params[i];
+                            }
+                            else
+                            {
+                                if (ttarget == typeof(byte))
+                                    _outp[i] = (byte)Convert.ToDecimal(_params[i]);
+                                else
+                                {
+                                    _outp[i] = _params[i];
+                                }
+                                //var ms =_params[i].GetType().GetMethods();
+                            }
                         }
-                        else if (tsrc.IsSubclassOf(ttarget))
+                    }
+                    var newobj = (method_System as System.Reflection.ConstructorInfo).Invoke(_outp);
+                    return newobj;
+                }
+                else
+                {
+                    Dictionary<int, object> hasref = new Dictionary<int, object>();
+                    object[] _outp = null;
+                    if (_params != null && _params.Length > 0)
+                    {
+                        _outp = new object[_params.Length];
+                        var _paramsdef = method_System.GetParameters();
+                        for (int i = 0; i < _params.Length; i++)
                         {
-                            _outp[i] = _params[i];
-                        }
-                        else
-                        {
-                            if (ttarget == typeof(byte))
-                                _outp[i] = (byte)Convert.ToDecimal(_params[i]);
+                            if (_params[i] is CLRSharp.StackFrame.RefObj)//特殊处理outparam
+                            {
+                                object v = (_params[i] as CLRSharp.StackFrame.RefObj).Get();
+                                if (v is VBox)
+                                {
+                                    v = (v as VBox).BoxDefine();
+                                }
+                                hasref[i] = v;
+                                _outp[i] = v;
+                            }
+                            else if (_paramsdef[i].ParameterType.IsEnum)//特殊处理枚举
+                            {
+                                //??var ms = _paramsdef[i].ParameterType.GetMethods();
+                                _outp[i] = Enum.ToObject(_paramsdef[i].ParameterType, _params[i]);
+                            }
                             else
                             {
                                 _outp[i] = _params[i];
                             }
-                            //var ms =_params[i].GetType().GetMethods();
                         }
                     }
-                }
-                var newobj = (method_System as System.Reflection.ConstructorInfo).Invoke(_outp);
-                return newobj;
-            }
-            else
-            {
-                Dictionary<int, object> hasref = new Dictionary<int, object>();
-                object[] _outp = null;
-                if (_params != null && _params.Length > 0)
-                {
-                    _outp = new object[_params.Length];
-                    var _paramsdef = method_System.GetParameters();
-                    for (int i = 0; i < _params.Length; i++)
+                    //if (method_System.DeclaringType.IsSubclassOf(typeof(Delegate)))//直接用Delegate.Invoke,会导致转到本机代码再回来
+                    ////会导致错误堆栈不方便观察,但是也没办法直接调用，只能手写一些常用类型
+                    //{
+                    //    //需要从Delegate转换成实际类型执行的帮助类
+                    //    Action<int> abc = _this as Action<int>;
+                    //    abc((int)_params[0]);
+                    //    return null;
+                    //}
+                    //else
                     {
-                        if (_params[i] is CLRSharp.StackFrame.RefObj)//特殊处理outparam
+                        var _out = method_System.Invoke(_this, _outp);
+                        foreach (var _ref in hasref)
                         {
-                            object v = (_params[i] as CLRSharp.StackFrame.RefObj).Get();
-                            if (v is VBox)
+                            if (_ref.Value is VBox)
                             {
-                                v = (v as VBox).BoxDefine();
+                                (_ref.Value as VBox).SetDirect(_outp[_ref.Key]);
                             }
-                            hasref[i] = v;
-                            _outp[i] = v;
+                            else
+                            {
+                                (_params[_ref.Key] as CLRSharp.StackFrame.RefObj).Set(_outp[_ref.Key]);
+                            }
                         }
-                        else if (_paramsdef[i].ParameterType.IsEnum)//特殊处理枚举
-                        {
-                            //??var ms = _paramsdef[i].ParameterType.GetMethods();
-                            _outp[i] = Enum.ToObject(_paramsdef[i].ParameterType, _params[i]);
-                        }
-                        else
-                        {
-                            _outp[i] = _params[i];
-                        }
+                        return _out;
                     }
-                }
-                //if (method_System.DeclaringType.IsSubclassOf(typeof(Delegate)))//直接用Delegate.Invoke,会导致转到本机代码再回来
-                ////会导致错误堆栈不方便观察,但是也没办法直接调用，只能手写一些常用类型
-                //{
-                //    //需要从Delegate转换成实际类型执行的帮助类
-                //    Action<int> abc = _this as Action<int>;
-                //    abc((int)_params[0]);
-                //    return null;
-                //}
-                //else
-                {
-                    var _out = method_System.Invoke(_this, _outp);
-                    foreach (var _ref in hasref)
-                    {
-                        if (_ref.Value is VBox)
-                        {
-                            (_ref.Value as VBox).SetDirect(_outp[_ref.Key]);
-                        }
-                        else
-                        {
-                            (_params[_ref.Key] as CLRSharp.StackFrame.RefObj).Set(_outp[_ref.Key]);
-                        }
-                    }
-                    return _out;
                 }
             }
-
+            catch (Exception err)
+            {
+                throw new Exception(err.InnerException.Message);
+            }
         }
 
         public object Invoke(ThreadContext context, object _this, object[] _params, bool bVisual, bool autoLogDump)

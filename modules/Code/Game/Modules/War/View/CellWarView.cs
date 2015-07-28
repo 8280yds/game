@@ -117,6 +117,7 @@ public class CellWarView : Window
     {
         base.addListeners();
         addListener(CellWarUpdate.UPDATE_VIEW_STATUS, updateViewStatus);
+        addListener(CellWarUpdate.GAME_OVER, gameOver);
     }
 
     protected override void Update()
@@ -196,6 +197,16 @@ public class CellWarView : Window
                 tentacleDic.Remove(key);
             }
         }
+    }
+
+    /// <summary>
+    /// 游戏结束
+    /// </summary>
+    private void gameOver()
+    {
+        close();
+        WarResultView view = mvcCharge.getInstance(typeof(WarResultView) as ICLRType) as WarResultView;
+        view.show();
     }
 
     //==============================================================================
@@ -416,6 +427,12 @@ public class CellWarView : Window
                 }
             }
         }
+    }
+
+    public override void dispose()
+    {
+        CellWarManager.instance.clear();
+        base.dispose();
     }
 
 }

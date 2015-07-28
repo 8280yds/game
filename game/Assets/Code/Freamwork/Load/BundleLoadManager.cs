@@ -241,6 +241,10 @@ namespace Freamwork
             }
 
             List<string> dependencies = ManifestManager.instance.getAllDependencies(loadInfo.fullName);
+            if (dependencies == null)
+            {
+                throw new Exception("未找到" + loadInfo.fullName + "的Manifest信息");
+            }
             dependencies.Add(loadInfo.fullName);
             BundleLoadInfo newInfo;
             for (int i = 0, len = dependencies.Count; i < len; i++ )
@@ -258,11 +262,6 @@ namespace Freamwork
         private void addLoadItem(BundleLoadInfo loadInfo)
         {
             ManifestVO vo = ManifestManager.instance.getManifestVO(loadInfo.fullName);
-            if (vo == null)
-            {
-                throw new Exception("未找到" + loadInfo.fullName + "相关的ManifestVO信息");
-            }
-
             if (File.Exists(LoadConstant.localFilesPath + "/" + loadInfo.fullName + "@" + vo.crc))
             {
                 if (loadInfo.loadType == LoadType.web)

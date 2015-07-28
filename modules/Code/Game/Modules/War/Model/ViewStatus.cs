@@ -8,7 +8,7 @@ public class ViewStatus
     /// <summary>
     /// 场景VO
     /// </summary>
-    private CellWarSceneDBVO vo;
+    public CellWarSceneDBVO vo;
 
     /// <summary>
     /// 状态所处的时间点
