@@ -105,6 +105,7 @@ public class WarResultView : Window
         }
         destText.text = "用时：" + model.time + "秒\n操作：" + model.optionNum + "次";
 
+        bgImage.color = new Color(0.1f, 0.1f, 0.1f, 1f);
         LoadManager.instance.addLoad("result_bg_" + model.starNum + ".assets", LoadPriority.two, LoadType.local,
             null, null, null, null, null, null, unZipEnd);
     }
@@ -116,15 +117,12 @@ public class WarResultView : Window
             return;
         }
 
-        foreach(Object obj in data.assets)
-        {
-            Sprite sp = obj as Sprite;
-            if(sp != null)
-            {
-                bgImage.sprite = sp;
-                break;
-            }
-        }
+        GameObject assetsGO = data.assets[0] as GameObject;
+        Assets assets = assetsGO.GetComponent<Assets>();
+        Sprite sp = assets.assetsList[0] as Sprite;
+
+        bgImage.color = new Color(0.6f, 0.6f, 0.6f, 1f);
+        bgImage.sprite = sp;
     }
 
     protected override void OnPointerClick(PointerEventData eventData)
