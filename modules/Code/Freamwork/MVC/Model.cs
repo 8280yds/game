@@ -29,7 +29,7 @@ namespace Freamwork
         {
             if (disposed)
             {
-                Debug.Log(getCLRType.FullName + "对象重复释放！");
+                Debug.Log(clrType.FullName + "对象重复释放！");
                 return;
             }
             clearAll();

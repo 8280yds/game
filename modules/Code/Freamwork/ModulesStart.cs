@@ -40,7 +40,7 @@ namespace Freamwork
                 GameStart.setProgressData(100, "加载进程：");
 
                 Application.LoadLevel("cell_war_scene");
-                LevelView view = MVCCharge.instance.getInstance(typeof(LevelView) as ICLRType) as LevelView;
+                OpenGateView view = MVCCharge.instance.getInstance(typeof(OpenGateView) as ICLRType) as OpenGateView;
                 view.show();
             }
         }
@@ -51,7 +51,6 @@ namespace Freamwork
         public static void clear()
         {
             MVCCharge.instance.clear();
-            UIManager.instance.clear();
         }
 
     }

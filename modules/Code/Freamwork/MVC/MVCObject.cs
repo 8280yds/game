@@ -27,7 +27,7 @@ namespace Freamwork
             }
         }
 
-        public ICLRType getCLRType
+        public ICLRType clrType
         {
             get
             {
@@ -44,7 +44,7 @@ namespace Freamwork
         {
             if (disposed)
             {
-                throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
+                throw new Exception(clrType.FullName + "对象已经销毁，sendCommand失败");
             }
             mvcCharge.sendCommand(clrType, param);
         }
@@ -56,11 +56,11 @@ namespace Freamwork
         {
             if (disposed)
             {
-                Debug.Log(getCLRType.FullName + "对象重复释放！");
+                Debug.Log(clrType.FullName + "对象重复释放！");
                 return;
             }
             disposed = true;
-            mvcCharge.delInstance(getCLRType);
+            mvcCharge.delInstance(clrType);
         }
     }
 }

@@ -70,7 +70,7 @@ namespace Freamwork
         {
             if (disposed)
             {
-                throw new Exception(getCLRType.FullName + "对象已经销毁，sendCommand失败");
+                throw new Exception(clrType.FullName + "对象已经销毁，sendCommand失败");
             }
             mvcCharge.sendCommand(clrType, param);
         }
@@ -127,7 +127,7 @@ namespace Freamwork
         override public void dispose()
         {
             base.dispose();
-            mvcCharge.delInstance(getCLRType);
+            mvcCharge.delInstance(clrType);
         }
 
     }

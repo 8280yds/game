@@ -18,7 +18,7 @@ namespace Freamwork
         {
             if (inited)
             {
-                throw new Exception(getCLRType.FullName + "试图重复初始化");
+                throw new Exception(clrType.FullName + "试图重复初始化");
             }
             inited = true;
             this.gameObject = gameObject;
@@ -26,7 +26,7 @@ namespace Freamwork
             gameObject.AddComponent<GMonoBehaviour>();
         }
 
-        public ICLRType getCLRType
+        public ICLRType clrType
         {
             get
             {
@@ -111,7 +111,7 @@ namespace Freamwork
             }
             if (disposed)
             {
-                Debug.Log(getCLRType.FullName + "对象重复释放！");
+                Debug.Log(clrType.FullName + "对象重复释放！");
                 return;
             }
             disposed = true;

@@ -5,7 +5,7 @@ namespace Freamwork
 {
     public interface IMVCObject
     {
-        ICLRType getCLRType { get; }
+        ICLRType clrType { get; }
         void sendCommand(ICLRType clrType, object param);
         void dispose();
     }

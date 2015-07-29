@@ -1,6 +1,5 @@
 ﻿using CLRSharp;
 using Freamwork;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -31,6 +30,19 @@ public class LevelView : Window
         }
     }
     private Button m_rightBtn;
+
+    private Button backBtn
+    {
+        get
+        {
+            if (m_backBtn == null)
+            {
+                m_backBtn = transform.FindChild("BackBtn").GetComponent<Button>();
+            }
+            return m_backBtn;
+        }
+    }
+    private Button m_backBtn;
 
     private Text descText
     {
@@ -104,6 +116,7 @@ public class LevelView : Window
 
         leftBtn.onClick.AddListener(onLeftBtnClick);
         rightBtn.onClick.AddListener(onRightBtnClick);
+        backBtn.onClick.AddListener(onBackBtnClick);
         ufoBtn.onClick.AddListener(onUFOImageClick);
 
         updateView();
@@ -153,6 +166,13 @@ public class LevelView : Window
         }
     }
 
+    private void onBackBtnClick()
+    {
+        close();
+        OpenGateView view = mvcCharge.getInstance(typeof(OpenGateView) as ICLRType) as OpenGateView;
+        view.show();
+    }
+
     private void onUFOImageClick()
     {
         StarsLayerView starsLayerView = mvcCharge.getInstance(typeof(StarsLayerView) as ICLRType) as StarsLayerView;
@@ -165,6 +185,7 @@ public class LevelView : Window
     {
         leftBtn.onClick.RemoveListener(onLeftBtnClick);
         rightBtn.onClick.RemoveListener(onRightBtnClick);
+        backBtn.onClick.RemoveListener(onBackBtnClick);
         ufoBtn.onClick.RemoveListener(onUFOImageClick);
 
         base.dispose();

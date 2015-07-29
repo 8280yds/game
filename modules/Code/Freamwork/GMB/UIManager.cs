@@ -1,5 +1,5 @@
 ﻿using CLRSharp;
-using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -74,6 +74,7 @@ namespace Freamwork
             
             //添加EventSystem
             go = new GameObject("EventSystem");
+            GameObject.DontDestroyOnLoad(go);
             eventSystem = go.AddComponent<EventSystem>();
             go.AddComponent<TouchInputModule>();
             if (Application.isEditor)
@@ -89,7 +90,11 @@ namespace Freamwork
             {
                 layerList[i] = creatPanel(layerNameList[i]);
             }
-            modal = false;
+
+            go = getUILayer(UILayer.ModelLayer).gameObject;
+            Image image = go.AddComponent<Image>();
+            image.color = new Color(0f, 0f, 0f, 0.5f);
+            go.SetActive(false);
         }
 
         /// <summary>
@@ -103,9 +108,14 @@ namespace Freamwork
             }
             canvas = null;
             //uiCamera = null;
+            if (eventSystem != null)
+            {
+                GameObject.Destroy(eventSystem.gameObject);
+            }
             eventSystem = null;
             layerNameList = null;
             layerList = null;
+            modelList.Clear();
         }
 
         //============================================================
@@ -144,8 +154,6 @@ namespace Freamwork
         private RectTransform creatPanel(string name)
         {
             GameObject panelGameObject = new GameObject(name);
-            panelGameObject.layer = LayerMask.NameToLayer("UI");
-
             RectTransform rectTransform = panelGameObject.AddComponent<RectTransform>();
             rectTransform.SetParent(canvas.transform, false);
             rectTransform.sizeDelta = new Vector2(160f, 30f);
@@ -174,13 +182,32 @@ namespace Freamwork
         {
             get
             {
-                return layerList[(int)UILayer.ModelLayer].gameObject.activeSelf;
-            }
-            set
-            {
-                layerList[(int)UILayer.ModelLayer].gameObject.SetActive(value);
+                return getUILayer(UILayer.ModelLayer).gameObject.activeSelf;
             }
         }
+
+        /// <summary>
+        /// 设置全局模态的状态
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="model"></param>
+        public void setModel(string id, bool model)
+        {
+            if (!model)
+            {
+                modelList.Remove(id);
+            }
+            else if (!modelList.Contains(id))
+            {
+                modelList.Add(id);
+            }
+            else
+            {
+                return;
+            }
+            getUILayer(UILayer.ModelLayer).gameObject.SetActive(modelList.Count > 0);
+        }
+        private List<string> modelList = new List<string>();
 
     }
 }

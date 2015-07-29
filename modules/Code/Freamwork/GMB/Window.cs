@@ -56,19 +56,24 @@ namespace Freamwork
             }
             readyToShow = true;
 
-            LoadManager.instance.addLoad(getCLRType.Name.ToLower() + ".assets", LoadPriority.one, LoadType.local,
+            string viewName = clrType.Name;
+            UIManager.instance.setModel(viewName, true);
+            LoadManager.instance.addLoad(viewName.ToLower() + ".assets", LoadPriority.one, LoadType.local,
                 null, null, null, null, null, null, unZipEnd);
         }
 
         private void unZipEnd(LoadData data)
         {
-            if (data.fullName == getCLRType.Name.ToLower() + ".assets")
+            string viewName = clrType.Name;
+            if (data.fullName == viewName.ToLower() + ".assets")
             {
+                UIManager.instance.setModel(viewName, false);
+
                 GameObject assetsGO = data.assets[0] as GameObject;
                 Assets assets = assetsGO.GetComponent<Assets>();
                 if (assets == null)
                 {
-                    throw new Exception(getCLRType.FullName + "面板资源包中不存在Assets组件");
+                    throw new Exception(clrType.FullName + "面板资源包中不存在Assets组件");
                 }
 
                 assetsDic = new Dictionary<string, UnityEngine.Object>();
@@ -77,9 +82,9 @@ namespace Freamwork
                     assetsDic.Add(obj.name, obj);
                 }
 
-                GameObject prefab = getAssetsByName(getCLRType.Name) as GameObject;
+                GameObject prefab = getAssetsByName(viewName) as GameObject;
                 GameObject go = GameObject.Instantiate<GameObject>(prefab);
-                go.name = getCLRType.FullName;
+                go.name = viewName;
                 init(go);
             }
         }
@@ -88,7 +93,7 @@ namespace Freamwork
         {
             if (inited)
             {
-                throw new Exception(getCLRType.FullName + "试图重复初始化");
+                throw new Exception(clrType.FullName + "试图重复初始化");
             }
             inited = true;
             
