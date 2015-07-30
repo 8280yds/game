@@ -63,6 +63,9 @@ namespace Freamwork
 
             go.AddComponent<GraphicRaycaster>();
 
+            UICanvasGMB uiCanvasGMB = new UICanvasGMB();
+            uiCanvasGMB.init(go);
+
             //添加UI摄像机
             //go = new GameObject("_UICamera");
             //go.transform.SetParent(canvas.transform, false);

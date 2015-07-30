@@ -12,6 +12,8 @@ public class CellWarView : Window
     private VectorLine mouseLine;
     private List<long> mouseLinePointTime;
 
+    private Title title;
+
     public bool isMouseDown
     {
         get;
@@ -72,6 +74,9 @@ public class CellWarView : Window
     protected override void onShow()
     {
         base.onShow();
+
+        title = new Title();
+        title.init(transform.FindChild("Title").gameObject);
 
         CellWarManager.instance.setPrefab(getAssetsByName("cell") as GameObject, getAssetsByName("node") as GameObject);
         cellList = new List<Cell>();
@@ -173,6 +178,8 @@ public class CellWarView : Window
     private void updateViewStatus()
     {
         ViewStatus viewStatus = model.lastUpdateViewStatus;
+        title.updateView(viewStatus);
+
         Cell cell;
         foreach (CellData cellData in viewStatus.cellDataList)
         {
