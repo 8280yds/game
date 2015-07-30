@@ -189,6 +189,23 @@ namespace Freamwork
         }
 
         /// <summary>
+        /// 正在加载中和等待中的数量总和
+        /// </summary>
+        /// <returns></returns>
+        public int loadingAndWaitNum
+        {
+            get
+            {
+                int count = loadingList.count;
+                for (int i = 0; i < waitLists.Length; i++)
+                {
+                    count += waitLists[i].count;
+                }
+                return count;
+            }
+        }
+
+        /// <summary>
         /// 根据优先级在等待队列中删除并返回第一条信息
         /// </summary>
         /// <returns></returns>

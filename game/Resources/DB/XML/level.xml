@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <level>
-	<item id="1" ufoImage="ufo_1" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="1:3,2,3,0"/>
-	<item id="2" ufoImage="ufo_2" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="2,2,9,9" war="1,2,2,1" next="1:3,2,3,0"/>
-	<item id="3" ufoImage="ufo_3" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="3,2,7,8" war="1,2,2,1" next="1,2:3,3,0"/>
-	<item id="4" ufoImage="ufo_4" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="5,2,4,9" war="1,2,2,1" next="1,2:3,3,0"/>
-	<item id="5" ufoImage="ufo_5" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="6,2,7,2" war="1,2,2,1" next="1,2:3,3,0"/>
-	<item id="6" ufoImage="ufo_6" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="4,2,3,9" war="1,2,2,1" next="1:3,2,3,0"/>
-	<item id="7" ufoImage="ufo_7" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="1:3,2,3,0"/>
-	<item id="8" ufoImage="ufo_8" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="1,2:3,3,0"/>
-	<item id="9" ufoImage="ufo_9" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="1:3,2,3,0"/>
+	<item id="1" ufoImage="ufo_1" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="-1,0,1,2"/>
+	<item id="2" ufoImage="ufo_2" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="2,2,9,9" war="1,2,2,1" next="-1,0,0,2"/>
+	<item id="3" ufoImage="ufo_3" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="3,2,7,8" war="1,2,2,1" next="-1,0,1,2"/>
+	<item id="4" ufoImage="ufo_4" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="5,2,4,9" war="1,2,2,1" next="-1,0,0,1"/>
+	<item id="5" ufoImage="ufo_5" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="6,2,7,2" war="1,2,2,1" next="-1,0,0,2"/>
+	<item id="6" ufoImage="ufo_6" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="4,2,3,9" war="1,2,2,1" next="-1,0,0,1"/>
+	<item id="7" ufoImage="ufo_7" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="-1,0,0,2"/>
+	<item id="8" ufoImage="ufo_8" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="-1,0,1,2"/>
+	<item id="9" ufoImage="ufo_9" starX="-169,-62,82,169" starY="-46,38,-63,51" starImage="1,2,7,9" war="1,2,2,1" next="-1,0,0,1"/>
 </level>

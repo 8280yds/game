@@ -39,6 +39,9 @@ namespace Freamwork
             {
                 GameStart.setProgressData(100, "加载进程：");
 
+                LevelModel levelModel = MVCCharge.instance.getInstance(typeof(LevelModel) as ICLRType) as LevelModel;
+                levelModel.initLevelData();
+
                 Application.LoadLevel("cell_war_scene");
                 OpenGateView view = MVCCharge.instance.getInstance(typeof(OpenGateView) as ICLRType) as OpenGateView;
                 view.show();

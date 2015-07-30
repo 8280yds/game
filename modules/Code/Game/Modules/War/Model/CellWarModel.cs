@@ -100,6 +100,9 @@ public class CellWarModel : Model
             return;
         }
 
+        LevelModel levelModel = mvcCharge.getInstance(typeof(LevelModel) as ICLRType) as LevelModel;
+        levelModel.setLevelStar(levelModel.enemyLevel, levelModel.starIndex, starNum);
+
         WarResultModel model = mvcCharge.getInstance(typeof(WarResultModel) as ICLRType) as WarResultModel;
         model.starNum = starNum;
         model.time = time;

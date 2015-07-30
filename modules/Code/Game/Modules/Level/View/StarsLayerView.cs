@@ -86,12 +86,11 @@ public class StarsLayerView : Window
         }
 
         LevelDBVO dbvo = dbModel.getVOById(model.enemyLevel);
-        char[] ch = new char[] { ',' };
-        string[] starX = dbvo.starX.Split(ch);
-        string[] starY = dbvo.starY.Split(ch);
-        string[] starImage = dbvo.starImage.Split(ch);
-        string[] war = dbvo.war.Split(ch);
-        string[] next = dbvo.next.Split(ch);
+        string[] starX = dbvo.starX.Split(',');
+        string[] starY = dbvo.starY.Split(',');
+        string[] starImage = dbvo.starImage.Split(',');
+        string[] war = dbvo.war.Split(',');
+        string[] next = dbvo.next.Split(',');
 
         clearStars();
         int len = starX.Length;
@@ -100,6 +99,7 @@ public class StarsLayerView : Window
         Star star;
         GameObject go;
         Sprite sp;
+        int starNum;
 
         for (int i = 0; i < len; i++)
         {
@@ -109,22 +109,22 @@ public class StarsLayerView : Window
             star = new Star();
             star.init(go);
             sp = getAssetsByName("starImage_" + starImage[i]) as Sprite;
-            star.setData(int.Parse(starX[i]), int.Parse(starY[i]), sp, int.Parse(war[i]), "★★☆");
+            starNum = model.getLevelStar(dbvo.id, i);
+            star.setData(i ,int.Parse(starX[i]), int.Parse(starY[i]), sp, int.Parse(war[i]), starNum);
             starsList.Add(star);
         }
 
         string[] nextList;
         Vector3 pointA;
         Vector3 pointB;
-        ch = new char[] { ':' };
         for (int i = 0; i < len; i++)
         {
             pointA = starsList[i].rectTransform.anchoredPosition;
-            nextList = next[i].Split(ch);
+            nextList = next[i].Split(':');
             for (int j = 0, len2 = nextList.Length; j < len2; j++)
             {
                 int index = int.Parse(nextList[j]);
-                if (index>0)
+                if (index >= 0)
                 {
                     pointB = starsList[index].rectTransform.anchoredPosition;
                     vectorPoints.points2.AddRange(getPointList(pointA, pointB));

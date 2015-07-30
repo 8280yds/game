@@ -119,22 +119,23 @@ namespace Freamwork
         {
             if (data.fullName != LoadConstant.MANIFEST_FILE)
             {
-                int totleCount = ManifestManager.instance.getAllFullName.Count;
-                int currentCount = BundleLoadManager.instance.getLoadingFullNames().Count;
-                int progress = 10 + 80 * currentCount / totleCount;
-                GameStart.setProgressData(progress, "加载进程：");
+                if (BundleLoadManager.instance.loadingAndWaitNum == 0)
+                {
+                    GameStart.setProgressData(90, "加载进程：");
+                    LoadManager.instance.addLoad(GameConstant.MODULES + GameConstant.SUFFIX, LoadPriority.zero,
+                        LoadType.local, null, null, null, null, unZipStart, unZipProgress, unZipEnd);
+                }
+                else
+                {
+                    int totleCount = ManifestManager.instance.getAllFullName.Count;
+                    int loadingAndWaitNum = BundleLoadManager.instance.loadingAndWaitNum;
+                    int progress = 10 + 80 * (totleCount - loadingAndWaitNum) / totleCount;
+                    GameStart.setProgressData(progress, "加载进程：");
+                }
             }
             else
             {
                 GameStart.setProgressData(10, "加载进程：");
-            }
-
-            if (BundleLoadManager.instance.getLoadingFullNames().Count == 0 && 
-                data.fullName != LoadConstant.MANIFEST_FILE)
-            {
-                GameStart.setProgressData(90, "加载进程：");
-                LoadManager.instance.addLoad(GameConstant.MODULES + GameConstant.SUFFIX, LoadPriority.zero, LoadType.local,
-                    null, null, null, null, unZipStart, unZipProgress, unZipEnd);
             }
         }
 

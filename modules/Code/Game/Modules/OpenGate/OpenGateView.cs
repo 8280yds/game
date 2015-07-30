@@ -41,6 +41,9 @@ public class OpenGateView : Window
     private void onBeginBtnClock()
     {
         close();
+
+        LevelModel model = mvcCharge.getInstance(typeof(LevelModel) as ICLRType) as LevelModel;
+        model.enemyLevel = model.getCurrentMaxLevel();
         LevelView view = mvcCharge.getInstance(typeof(LevelView) as ICLRType) as LevelView;
         view.show();
     }

@@ -29,7 +29,7 @@ public class LevelDBVO : DBVO
 	public string war;
 
 	/// <summary>
-	/// 下个星球索引
+	/// 上个星球索引
 	/// </summary>
 	public string next;
 

@@ -44,6 +44,19 @@ public class LevelView : Window
     }
     private Button m_backBtn;
 
+    private Text titleText
+    {
+        get
+        {
+            if (m_titleText == null)
+            {
+                m_titleText = transform.FindChild("TitleText").GetComponent<Text>();
+            }
+            return m_titleText;
+        }
+    }
+    private Text m_titleText;
+
     private Text descText
     {
         get
@@ -134,7 +147,16 @@ public class LevelView : Window
         LevelDBVO vo = dbModel.getVOById(model.enemyLevel);
         if (vo != null)
         {
-            descText.text = "文明等级：" + vo.id;
+            if(model.enemyLevel <= model.getCurrentMaxLevel())
+            {
+                titleText.color = Color.green;
+            }
+            else
+            {
+                titleText.color = Color.red;
+            }
+            titleText.text = vo.id + "级敌对文明";
+            descText.text = "★ " + model.getLevelStarNum(model.enemyLevel) + "/" + (3 * model.getLevelMaxNum(model.enemyLevel));
             ufoImage.sprite = getAssetsByName(vo.ufoImage) as Sprite;
             ufoImage.SetNativeSize();
 

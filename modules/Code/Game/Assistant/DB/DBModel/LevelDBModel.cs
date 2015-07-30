@@ -1,5 +1,6 @@
 ﻿using CLRSharp;
 using Freamwork;
+using System.Collections.Generic;
 
 public class LevelDBModel : DBModel
 {
@@ -11,5 +12,17 @@ public class LevelDBModel : DBModel
     public LevelDBVO getVOById(int id)
     {
         return getVoById(id) as LevelDBVO;
+    }
+
+    public List<LevelDBVO> getAllData()
+    {
+        analysis();
+
+        List<LevelDBVO> list = new List<LevelDBVO>();
+        for (int i = 0; i < count; i++)
+        {
+            list.Add(getVOById(ids[i]));
+        }
+        return list;
     }
 }

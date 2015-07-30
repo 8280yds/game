@@ -63,7 +63,7 @@ namespace Freamwork
         }
 
         /// <summary>
-        /// 提取一条xml，提取后源数据不存在这条数据
+        /// 提取一条xml，提取后源数据将删除这条数据
         /// </summary>
         /// <param name="name"></param>
         /// <returns></returns>
