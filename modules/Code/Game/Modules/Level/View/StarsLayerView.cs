@@ -30,6 +30,45 @@ public class StarsLayerView : Window
     }
     private Button m_backBtn;
 
+    private Text titleText
+    {
+        get
+        {
+            if (m_titleText == null)
+            {
+                m_titleText = transform.FindChild("TitleText").GetComponent<Text>();
+            }
+            return m_titleText;
+        }
+    }
+    private Text m_titleText;
+
+    private Text noteText
+    {
+        get
+        {
+            if (m_noteText == null)
+            {
+                m_noteText = transform.FindChild("NoteText").GetComponent<Text>();
+            }
+            return m_noteText;
+        }
+    }
+    private Text m_noteText;
+
+    private Text starsNumText
+    {
+        get
+        {
+            if (m_starsNumText == null)
+            {
+                m_starsNumText = transform.FindChild("StarsNumText").GetComponent<Text>();
+            }
+            return m_starsNumText;
+        }
+    }
+    private Text m_starsNumText;
+
     private LevelModel model
     {
         get
@@ -91,6 +130,29 @@ public class StarsLayerView : Window
         string[] starImage = dbvo.starImage.Split(',');
         string[] war = dbvo.war.Split(',');
         string[] next = dbvo.next.Split(',');
+
+        titleText.text = dbvo.id + "级敌对文明";
+        starsNumText.text = "★ " + model.getLevelStarNum(model.enemyLevel) + "/" + (3 * model.getLevelMaxNum(model.enemyLevel));
+        int currentMaxLevel = model.getCurrentMaxLevel();
+
+        if (currentMaxLevel > model.enemyLevel)
+        {
+            titleText.color = Color.green;
+            noteText.color = Color.green;
+            noteText.text = "已通关该文明的全部关卡";
+        }
+        else if (currentMaxLevel == model.enemyLevel)
+        {
+            titleText.color = Color.green;
+            noteText.color = Color.green;
+            noteText.text = "尚未通关该文明的全部关卡";
+        }
+        else
+        {
+            titleText.color = Color.red;
+            noteText.color = Color.red;
+            noteText.text = "通关前面文明的全部关卡后方可进攻";
+        }
 
         clearStars();
         int len = starX.Length;
