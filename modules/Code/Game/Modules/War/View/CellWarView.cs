@@ -158,14 +158,14 @@ public class CellWarView : Window
         if (mouseLinePointTime != null && mouseLinePointTime.Count > 0)
         {
             long time = TimeUtil.getTimeStamp(false);
-            while (time - mouseLinePointTime[0] > 100)
+            while (time - mouseLinePointTime[0] > 80)
             {
                 mouseLinePointTime.RemoveAt(0);
                 mouseLine.points2.RemoveAt(0);
 
                 if (mouseLinePointTime.Count == 0)
                 {
-                    return;
+                    break;
                 }
             }
             mouseLine.Draw();
