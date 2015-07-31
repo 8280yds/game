@@ -25,6 +25,15 @@ public class ViewStatus
     /// </summary>
     public Dictionary<string, TentacleData> tentacleDataDic = new Dictionary<string,TentacleData>();
 
+    /// <summary>
+    /// 有效操作次数
+    /// </summary>
+    public int actionCount
+    {
+        get;
+        private set;
+    }
+
     public ViewStatus()
     {
 
@@ -60,6 +69,7 @@ public class ViewStatus
         ViewStatus data = new ViewStatus();
         data.vo = vo;
         data.time = time;
+        data.actionCount = actionCount;
         for (int i = 0, len = cellDataList.Count; i < len; i++ )
         {
             data.cellDataList.Add(cellDataList[i].clone());
@@ -147,6 +157,10 @@ public class ViewStatus
             if (!tentacleData.isAttackA && actionData.cellAIndex < actionData.cellBIndex && 
                 tentacleData.cutStatus != CutStatus.CUT_B)
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 tentacleData.timeA = actionData.time;  //设定时间
                 tentacleData.isAttackA = true;
 
@@ -158,6 +172,10 @@ public class ViewStatus
             else if (!tentacleData.isAttackB && actionData.cellAIndex > actionData.cellBIndex && 
                 tentacleData.cutStatus != CutStatus.CUT_A)
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 tentacleData.timeB = actionData.time;  //设定时间
                 tentacleData.isAttackB = true;
 
@@ -179,6 +197,10 @@ public class ViewStatus
 
             if(tentacleData.isAttackA && tentacleData.isAttackB)        //双方都在进攻
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 if(actionData.cellAIndex < actionData.cellBIndex)
                 {
                     tentacleData.isAttackA = false;
@@ -193,6 +215,10 @@ public class ViewStatus
             if(actionData.cellAIndex < actionData.cellBIndex && tentacleData.isAttackA &&
                 tentacleData.nodeListA.Count < tentacleData.count)    //A单方进攻，触手尚未触及
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 tentacleData.isAttackA = false;
                 return;
             }
@@ -200,6 +226,10 @@ public class ViewStatus
             if(actionData.cellAIndex > actionData.cellBIndex && tentacleData.isAttackB &&
                 tentacleData.nodeListB.Count < tentacleData.count)    //B单方进攻，触手尚未触及
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 tentacleData.isAttackB = false;
                 return;
             }
@@ -208,6 +238,10 @@ public class ViewStatus
                 tentacleData.nodeListA.Count == tentacleData.count &&
                 tentacleData.count > actionData.index)              //A单方输出时切断
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 int len = tentacleData.count - actionData.index;
                 if (len <= 0)
                 {
@@ -227,6 +261,10 @@ public class ViewStatus
                 tentacleData.nodeListB.Count == tentacleData.count &&
                 tentacleData.count > actionData.index)              //B单方输出时切断
             {
+                if (cellDataList[actionData.cellAIndex].camp == Camp.GREEN)
+                {
+                    actionCount++;
+                }
                 int len = tentacleData.count - actionData.index;
                 if (len <= 0)
                 {

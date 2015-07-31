@@ -114,7 +114,7 @@ public class Title : GMB
     public void updateView(ViewStatus viewStatus)
     {
         levelText.text = levelModel.enemyLevel + "级文明";
-        actionText.text = "操作：20次";
+        actionText.text = "操作：" + viewStatus.actionCount + "次";
 
         int time = (int)(viewStatus.time / 1000);
         timeText.text = "时间：" + time + "秒";

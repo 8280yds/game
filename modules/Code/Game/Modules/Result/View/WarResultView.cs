@@ -103,7 +103,7 @@ public class WarResultView : Window
                 starText.text = "★ ★ ★";
                 break;
         }
-        destText.text = "用时：" + model.time + "秒\n操作：" + model.optionNum + "次";
+        destText.text = "用时：" + model.time + "秒\n操作：" + model.actionCount + "次";
 
         bgImage.color = new Color(0.1f, 0.1f, 0.1f, 1f);
         LoadManager.instance.addLoad("result_bg_" + model.starNum + ".assets", LoadPriority.two, LoadType.local,

@@ -10,7 +10,7 @@ public class WarResultModel : Model
     /// <summary>
     /// 操作次数
     /// </summary>
-    public int optionNum;
+    public int actionCount;
 
     /// <summary>
     /// 用时（秒）

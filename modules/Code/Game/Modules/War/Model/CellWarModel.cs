@@ -106,7 +106,7 @@ public class CellWarModel : Model
         WarResultModel model = mvcCharge.getInstance(typeof(WarResultModel) as ICLRType) as WarResultModel;
         model.starNum = starNum;
         model.time = time;
-        //model.optionNum = optionNum;
+        model.actionCount = lastUpdateViewStatus.actionCount;
         dispatch(CellWarUpdate.GAME_OVER);
     }
 
