@@ -93,7 +93,8 @@ public class Cell : GMB
         set
         {
             m_camp = value;
-            starTxt.color = hpTxt.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
+            //starTxt.color = hpTxt.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
+            image.color = CellConstant.CAMP_COLOR_ARR[(int)m_camp];
         }
     }
     private Camp m_camp;
