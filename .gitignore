@@ -5,6 +5,10 @@ Library/
 obj/
 Temp/
 UnityVS/
+bin/
+Properties/
+dll/
+Resources/Bundles/
 
 #================
 #去除项目文件类型
@@ -14,9 +18,10 @@ UnityVS/
 *.suo
 *.csproj
 *.pidb
-*.meta
+*.manifest
 
 #================
 #去除其他文件类型
 #================
 Thumbs.db
+Bundles

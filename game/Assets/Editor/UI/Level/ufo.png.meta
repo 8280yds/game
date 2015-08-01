@@ -1,0 +1,157 @@
+fileFormatVersion: 2
+guid: 760759486d6a47846ab1a49645c2641d
+timeCreated: 1437113861
+licenseType: Pro
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: ufo_1
+    21300002: ufo_2
+    21300004: ufo_3
+    21300006: ufo_4
+    21300008: ufo_4
+    21300010: ufo_4
+    21300012: ufo_6
+    21300014: ufo_6
+    21300016: ufo_7
+    21300018: ufo_8
+    21300020: ufo_9
+    21300022: ufo_5
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: .25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 8
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: .5, y: .5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: ufo_1
+      rect:
+        serializedVersion: 2
+        x: 9
+        y: 468
+        width: 250
+        height: 142
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_2
+      rect:
+        serializedVersion: 2
+        x: 262
+        y: 457
+        width: 265
+        height: 160
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_3
+      rect:
+        serializedVersion: 2
+        x: 544
+        y: 457
+        width: 256
+        height: 160
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_4
+      rect:
+        serializedVersion: 2
+        x: 23
+        y: 213
+        width: 221
+        height: 164
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_5
+      rect:
+        serializedVersion: 2
+        x: 283
+        y: 217
+        width: 222
+        height: 167
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_6
+      rect:
+        serializedVersion: 2
+        x: 553
+        y: 212
+        width: 240
+        height: 167
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 25
+        width: 268
+        height: 138
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_8
+      rect:
+        serializedVersion: 2
+        x: 268
+        y: 25
+        width: 252
+        height: 149
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+    - name: ufo_9
+      rect:
+        serializedVersion: 2
+        x: 551
+        y: 15
+        width: 242
+        height: 154
+      alignment: 0
+      pivot: {x: .5, y: .5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+  spritePackingTag: ufo
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

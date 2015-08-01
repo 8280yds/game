@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cellLevel>
+	<item id="1" level="1" minHp="0" maxHp="20" tentacle="1" addTime="1500" attackTime="1800"/>
+	<item id="2" level="2" minHp="20" maxHp="50" tentacle="2" addTime="1200" attackTime="1440"/>
+	<item id="3" level="3" minHp="50" maxHp="80" tentacle="3" addTime="900" attackTime="1080"/>
+	<item id="4" level="4" minHp="80" maxHp="120" tentacle="4" addTime="600" attackTime="720"/>
+</cellLevel>
