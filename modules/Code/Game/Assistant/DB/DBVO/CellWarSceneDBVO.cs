@@ -28,6 +28,11 @@ public class CellWarSceneDBVO : DBVO
 	/// </summary>
 	public string star;
 
+	/// <summary>
+	/// AI计算时间间隔(ms)
+	/// </summary>
+	public int deleTime;
+
 	public override void xmlToVo(XmlNode node)
 	{
 		XmlElement xmlelement = (XmlElement)node;
@@ -37,5 +42,6 @@ public class CellWarSceneDBVO : DBVO
 		cellX = xmlelement.GetAttribute("cellX");
 		cellY = xmlelement.GetAttribute("cellY");
 		star = xmlelement.GetAttribute("star");
+		deleTime = int.Parse(xmlelement.GetAttribute("deleTime"));
 	}
 }

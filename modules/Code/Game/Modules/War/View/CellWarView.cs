@@ -13,6 +13,7 @@ public class CellWarView : Window
     private List<long> mouseLinePointTime;
 
     private Title title;
+    private AI ai;
 
     public bool isMouseDown
     {
@@ -116,6 +117,13 @@ public class CellWarView : Window
         mouseLine = new VectorLine("MouseLine", new List<Vector2>(), 5f, LineType.Continuous, transform);
         mouseLine.color = Color.red;
         mouseLinePointTime = new List<long>();
+
+        //初始化ai
+        if (ai == null)
+        {
+            ai = new AI();
+        }
+        ai.start(viewStatus);
     }
 
     protected override void addListeners()
@@ -438,6 +446,11 @@ public class CellWarView : Window
 
     public override void dispose()
     {
+        if (ai != null)
+        {
+            ai.stop();
+            ai = null;
+        }
         CellWarManager.instance.clear();
         base.dispose();
     }

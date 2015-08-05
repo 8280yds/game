@@ -654,7 +654,7 @@ public class ViewStatus
                     outTentacleData = data;
                     nextTime = data.timeA + CellConstant.MOVE_PK;
                 }
-                else if (countA == Mathf.Floor(data.count / 2) && data.isAttackB &&
+                else if (countA == Mathf.FloorToInt(data.count / 2) && data.isAttackB &&
                     countA + countB == data.count &&
                     nextTime > data.timeA + CellConstant.MOVE_PK)
                 {
@@ -670,7 +670,7 @@ public class ViewStatus
                     nextTime = data.timeA + CellConstant.MOVE_ATTACK;
                 }
                 else if (countA + countB == data.count &&
-                    countA < Mathf.Floor(data.count / 2) &&
+                    countA < Mathf.FloorToInt(data.count / 2) &&
                     nextTime > data.timeA + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_AB_A;   //整体右移
@@ -697,7 +697,7 @@ public class ViewStatus
                     outTentacleData = data;
                     nextTime = data.timeB + CellConstant.MOVE_PK;
                 }
-                else if (countB == Mathf.Ceil(data.count / 2) && data.isAttackA &&
+                else if (countA == Mathf.FloorToInt(data.count / 2) && data.isAttackA &&
                     countA + countB == data.count &&
                     nextTime > data.timeB + CellConstant.MOVE_PK)
                 {
