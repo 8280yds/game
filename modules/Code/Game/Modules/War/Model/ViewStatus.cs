@@ -713,7 +713,7 @@ public class ViewStatus
                     nextTime = data.timeB + CellConstant.MOVE_ATTACK;
                 }
                 else if (countA + countB == data.count &&
-                    countB < Mathf.Ceil(data.count / 2) &&
+                    countA > Mathf.FloorToInt(data.count / 2) &&
                     nextTime > data.timeB + CellConstant.MOVE_ATTACK)
                 {
                     outTenStatus = TenStatus.MOVE_AB_B;   //整体左移
