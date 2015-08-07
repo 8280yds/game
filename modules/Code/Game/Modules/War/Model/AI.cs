@@ -71,8 +71,9 @@ public class AI
 
             //总期望值统计
             int[] sums = new int[cellCount];
-            int maxIndex = 0;
-            int minIndex = 0;
+            int maxIndex = -1;
+            int minIndex = -1;
+            bool isCut = false;
 
             for (int i = 0; i < cellCount; i++)
             {
@@ -82,7 +83,24 @@ public class AI
                     continue;
                 }
                 cellData2 = viewStatus.cellDataList[i];
-                
+
+                //触手长度大于对方核数
+                int d = (int)Vector2.Distance(cellData.position, cellData2.position);
+                int t = (d - 2 * CellConstant.CELL_R) / CellConstant.NODE_D;
+                if (cellData.camp != cellData2.camp && t > cellData2.hp && viewStatus.hasTentacleData(currentIndex, i))
+                {
+                    TentacleData tentacleData = viewStatus.getTentacleData(currentIndex, i);
+                    if ((currentIndex < i && tentacleData.isAttackA && !tentacleData.isAttackB &&
+                        tentacleData.nodeListA.Count == tentacleData.count) ||
+                        (currentIndex > i && !tentacleData.isAttackA && tentacleData.isAttackB &&
+                        tentacleData.nodeListB.Count == tentacleData.count))
+                    {
+                        doAction(viewStatus.time, currentIndex, i, 1, 0);
+                        isCut = true;
+                        break;
+                    }
+                }
+
                 //我方等级期望
                 sums[i] = sums[i] + levelNums[cellData.vo.level - 1];
                 //我方已伸触手期望
@@ -98,8 +116,6 @@ public class AI
                     sums[i] = sums[i] + (attacked ? 20 : 0);
                 }
                 //核差期望
-                int d = (int)Vector2.Distance(cellData.position, cellData2.position);
-                int t = (d - 2 * CellConstant.CELL_R) / CellConstant.NODE_D;
                 sums[i] = sums[i] + cellData.hp - cellData2.hp - t;
                 //距离期望
                 sums[i] = sums[i] + t - 20;
@@ -108,19 +124,24 @@ public class AI
                 //敌方被援攻期望
                 sums[i] = sums[i] - 10 * helpAndAttackCounts[i];
 
-                bool contains = cellData.tentacleList.Contains(i);
-                if(sums[i] > sums[maxIndex] && !contains)
+                bool contains = viewStatus.hasTentacleData(currentIndex, i);
+                if (((maxIndex >= 0 && sums[i] > sums[maxIndex]) || maxIndex < 0) && !contains)
                 {
                     maxIndex = i;
                 }
-                else if (sums[i] < sums[minIndex] && contains)
+                else if (((minIndex >= 0 && sums[i] < sums[minIndex]) || minIndex < 0) && contains)
                 {
                     minIndex = i;
                 }
             }
 
+            if (isCut)
+            {
+                continue;
+            }
+
             //切断撤退
-            if (sums[minIndex] < -15)
+            if (minIndex >= 0 && sums[minIndex] < -15)
             {
                 TentacleData tentacleData = viewStatus.getTentacleData(currentIndex, minIndex);
                 int cutIndex;
@@ -132,27 +153,26 @@ public class AI
                 {
                     cutIndex = tentacleData.nodeListB.Count;
                 }
-
-                ActionData actionData = new ActionData();
-                actionData.time = viewStatus.time;
-                actionData.cellAIndex = (byte)currentIndex;
-                actionData.cellBIndex = (byte)minIndex;
-                actionData.type = 1;
-                actionData.index = (byte)cutIndex;
-                viewStatus.doAction(actionData);
+                doAction(viewStatus.time, currentIndex, minIndex, 1, cutIndex);
             }
 
             //主动进攻
-            if (sums[maxIndex] > 15)
+            if (maxIndex >= 0 && sums[maxIndex] > 15)
             {
-                ActionData actionData = new ActionData();
-                actionData.time = viewStatus.time;
-                actionData.cellAIndex = (byte)currentIndex;
-                actionData.cellBIndex = (byte)maxIndex;
-                actionData.type = 0;
-                viewStatus.doAction(actionData);
+                doAction(viewStatus.time, currentIndex, maxIndex, 0, 0);
             }
         }
+    }
+
+    private void doAction(int time, int indexA, int indexB, int type, int cutIndex)
+    {
+        ActionData actionData = new ActionData();
+        actionData.time = viewStatus.time;
+        actionData.cellAIndex = (byte)indexA;
+        actionData.cellBIndex = (byte)indexB;
+        actionData.type = (byte)type;
+        actionData.index = (byte)cutIndex;
+        viewStatus.doAction(actionData);
     }
 
     public void stop()

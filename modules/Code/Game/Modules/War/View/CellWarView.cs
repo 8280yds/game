@@ -136,6 +136,22 @@ public class CellWarView : Window
     protected override void Update()
     {
         base.Update();
+
+        if(Input.GetMouseButtonDown(0))
+        {
+            isMouseDown = true;
+            if (mouseLine != null)
+            {
+                mouseLine.points2.Clear();
+                mouseLinePointTime.Clear();
+            }
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            isMouseDown = false;
+        }
+
         model.getCurrentViewStatus();
 
         if (isMouseDown && Cell.SelectedCell == null)
@@ -368,24 +384,6 @@ public class CellWarView : Window
         actionData.type = 1;    //0:连接 1:切断
         actionData.index = (byte)index;
         model.actionData = actionData;
-    }
-
-    protected override void OnPointerDown(PointerEventData eventData)
-    {
-        base.OnPointerDown(eventData);
-
-        isMouseDown = true;
-        if (mouseLine != null)
-        {
-            mouseLine.points2.Clear();
-            mouseLinePointTime.Clear();
-        }
-    }
-
-    protected override void OnPointerUp(PointerEventData eventData)
-    {
-        base.OnPointerUp(eventData);
-        isMouseDown = false;
     }
 
     /// <summary>
