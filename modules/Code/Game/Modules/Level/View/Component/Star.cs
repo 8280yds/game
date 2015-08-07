@@ -8,6 +8,7 @@ public class Star : GMB
 {
     private int warId;
     private int index;
+    private bool canAttack;
 
     private Text txt
     {
@@ -21,6 +22,19 @@ public class Star : GMB
         }
     }
     private Text m_txt;
+
+    private Text indexText
+    {
+        get
+        {
+            if (m_indexText == null)
+            {
+                m_indexText = transform.FindChild("IndexText").GetComponent<Text>();
+            }
+            return m_indexText;
+        }
+    }
+    private Text m_indexText;
 
     private Image image
     {
@@ -60,12 +74,8 @@ public class Star : GMB
         txt.text = str;
         this.warId = warId;
         this.index = index;
-    }
 
-    protected override void OnPointerClick(PointerEventData eventData)
-    {
-        base.OnPointerClick(eventData);
-
+        //判断是否可以进攻
         MVCCharge mvcCharge = MVCCharge.instance;
         LevelModel model = mvcCharge.getInstance(typeof(LevelModel) as ICLRType) as LevelModel;
 
@@ -75,7 +85,7 @@ public class Star : GMB
             LevelDBVO dbvo = dbModel.getVOById(model.enemyLevel);
             string[] nexts = dbvo.next.Split(',');
             string[] list = nexts[index].Split(':');
-            bool canAttack = false;
+            canAttack = false;
             int maxLevel = model.getCurrentMaxLevel();
 
             for (int i = 0, len = list.Length; i < len; i++)
@@ -87,13 +97,26 @@ public class Star : GMB
                     break;
                 }
             }
-
-            if (!canAttack)
-            {
-                PopUpTextManager.instance.addText("<color=red>请先通关前面的关卡</color>");
-                return;
-            }
         }
+        else
+        {
+            canAttack = true;
+        }
+        indexText.color = canAttack ? Color.green : Color.red;
+        indexText.text = "" + (index + 1);
+    }
+
+    protected override void OnPointerClick(PointerEventData eventData)
+    {
+        base.OnPointerClick(eventData);
+
+        if (!canAttack)
+        {
+            PopUpTextManager.instance.addText("<color=red>请先通关前面的关卡</color>");
+            return;
+        }
+        MVCCharge mvcCharge = MVCCharge.instance;
+        LevelModel model = mvcCharge.getInstance(typeof(LevelModel) as ICLRType) as LevelModel;
         model.starIndex = index;
         CellWarView view = mvcCharge.getInstance(typeof(CellWarView) as ICLRType) as CellWarView;
         view.show(warId);
