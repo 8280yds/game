@@ -34,10 +34,6 @@ namespace Freamwork
 
         private BundleLoadManager()
         {
-            if (m_instance != null)
-            {
-                throw new Exception("BundleLoadManager是单例，请使用BundleLoadManager.instance来获取其实例！");
-            }
             m_instance = this;
             init();
         }
@@ -219,6 +215,25 @@ namespace Freamwork
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// 资源及其依赖的所有资源是否加载完毕
+        /// </summary>
+        /// <param name="fullName">资源全名</param>
+        /// <returns></returns>
+        public bool isLoadFinish(string fullName)
+        {
+            List<string> dependencies = ManifestManager.instance.getAllDependencies(fullName);
+            dependencies.Add(fullName);
+            foreach (string name in dependencies)
+            {
+                if (!cacheDic.ContainsKey(name))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
 
         /// <summary>

@@ -31,10 +31,6 @@ namespace Freamwork
 
         private LoadManager()
         {
-            if (m_instance != null)
-            {
-                throw new Exception("LoadManager是单例，请使用LoadManager.instance来获取其实例！");
-            }
             m_instance = this;
             init();
         }
@@ -182,9 +178,12 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void loadEnd(LoadData loadData)
         {
-            if (loadDic.ContainsKey(loadData.fullName))
+            foreach (LoadInfo info in loadDic.Values)
             {
-                unZipStart(loadData);
+                if (BundleLoadManager.instance.isLoadFinish(loadData.fullName))
+                {
+                    unZipStart(info);
+                }
             }
         }
 
