@@ -178,11 +178,18 @@ namespace Freamwork
         /// <param name="loadData"></param>
         private void loadEnd(LoadData loadData)
         {
-            foreach (LoadInfo info in loadDic.Values)
+            if (loadDic.ContainsKey(loadData.fullName))
             {
-                if (BundleLoadManager.instance.isLoadFinish(loadData.fullName))
+                LoadInfo info = loadDic[loadData.fullName];
+                info.assetBundle = loadData.assetBundle;
+            }
+
+            List<LoadInfo> infos = new List<LoadInfo>(loadDic.Values);
+            for (int i = 0, len = infos.Count; i < len; i++)
+            {
+                if (BundleLoadManager.instance.isLoadFinish(infos[i].fullName))
                 {
-                    unZipStart(info);
+                    unZipStart(infos[i]);
                 }
             }
         }
